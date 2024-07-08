@@ -1,0 +1,23 @@
+Package: PMLseg
+Title: Segmentation using Penalized Maximum Likelihood of time series
+        with a post-processing of the detected change-points and a
+        validation using metadata
+Version: 0.0.0.9002
+Authors@R: c(person("Annarosa", "Quarello", role = c("aut")),
+    person("Emilie", "Lebarbier", email = "emilie.lebarbier@parisnanterre.fr", role = c("aut", "cre")),
+    person("Ninh", "Nguyen", email = "knguyen@ipgp.fr", role = c("aut")),
+    person("Olivier", "Bock", email = "bock@ipgp.fr", role = c("aut")))
+Description: Segmentation time series. The model is a segmentation in the mean model including a periodic function and a monthly variances. 
+Depends: R (>= 3.5.0)
+License: GPL-3
+Encoding: UTF-8
+Imports: robustbase, capushe, gfpop, dplyr, ggplot2
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+NeedsCompilation: no
+Packaged: 2024-07-04 08:42:21 UTC; lebarbier
+Author: Annarosa Quarello [aut],
+  Emilie Lebarbier [aut, cre],
+  Ninh Nguyen [aut],
+  Olivier Bock [aut]
+Maintainer: Emilie Lebarbier <emilie.lebarbier@parisnanterre.fr>
