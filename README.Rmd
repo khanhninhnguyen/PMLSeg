@@ -1,0 +1,142 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+```
+
+
+# PMLSeg
+
+This package used to detects change-points in daily climatic time series modeled by piecewise mean, periodic bias, and monthly variance. Additionally, it includes functions to validate and visualize the segmentation results.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Examples](#examples)
+
+## Installation
+
+You can install the development version of `PMLSeg` from GitHub with:
+
+```{r, eval=FALSE}
+
+# Install devtools if you haven't already
+install.packages("devtools")
+
+# Install the package from GitHub
+devtools::install_github("khanhninhnguyen/PMLSeg")
+```
+
+
+
+## Examples
+
+1. Creating a Time Series with Arbitrary Jumps
+
+```{r}
+library(PMLseg)
+
+set.seed(1)
+length_series = 1000
+df = data.frame(date = seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(length_series-1), by = "day"),  
+                signal = rnorm(n = length_series, mean = 0, sd = 1))
+
+plot(df$date, df$signal, type = "l")
+```
+
+```{r}
+# Adding 2 arbitrary jumps 
+jump_ind = sample(1:length_series, 2, replace = FALSE) 
+for (i in jump_ind) {
+  df$signal[1: i] <- df$signal[1: i] + 1
+}
+plot(df$date, df$signal, type = "l")
+
+```
+
+2. Segmenting the Time Series
+
+Adjust the `FunctPart` parameter based on whether the series includes seasonal mean components. This code run with default option for : `Kmax` = 30 (maximum number of segments), `selectionK` = "BM_BJ" (recommended penalized criterion), etc. 
+
+```{r}
+seg = Segmentation(OneSeries = df, 
+                   FunctPart = FALSE)
+str(seg)
+```
+Main results: The beginning, end, mean value, standard deviation, and number of points of segments are provided in the `Tmu` dataframe: 
+
+```{r}
+seg$Tmu
+```
+
+3. Visualizing Segmentation Results
+
+```{r}
+PlotSeg(OneSeries = df, 
+        SegRes = seg, 
+        FunctPart = FALSE)
+```
+
+4. Validating Detected Change-Points with Metadata
+
+Change-points are validated if the segmentation finds them within  `MinDist` points from the metadata. Default `MinDist` is 62.
+
+```{r}
+# Create a metadata for example 
+meta = data.frame(date = df$date[jump_ind],  
+                type = c("example1", "example2"))
+meta
+```
+```{r}
+# Validate the segmentation result wrt metadata 
+Validation(OneSeries = df, 
+           Tmu = seg$Tmu,
+           MinDist = 30 ,
+           Metadata = meta)
+
+```
+
+5. Detecting Clusters of Change-Points
+
+Check for clusters of close change-points, which may due to outliers. In this example, the last segment is shorter than the given threshold.
+
+```{r}
+# Validate the segmentation result wrt metadata 
+screening = Cluster_screening(Tmu = seg$Tmu,
+                              MaxDist = 80)
+
+```
+
+Update variables after removal of short segments:
+
+```{r}
+seg_upd = UpdatedParametersForFixedCP(OneSeries = df, 
+                                      ResScreening = screening, 
+                                      FunctPart = FALSE)
+str(seg_upd)
+```
+
+Visualize the final results:
+
+```{r}
+PlotSeg(OneSeries = df, 
+        SegRes = seg_upd, 
+        FunctPart = FALSE)
+```
+
+
+
+
+
+
+
+

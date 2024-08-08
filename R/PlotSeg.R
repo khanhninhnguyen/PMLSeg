@@ -108,7 +108,9 @@ PlotSeg <- function(OneSeries,
 
   p <- ggplot2::ggplot(OneSeries, aes(x = date, y = value, colour = variable, shape = variable)) +
     theme_bw() +
-    geom_line(data = subset(long_data, variable %in% c("signal", "Mean", "MonthVar")),
+    geom_line(data = subset(long_data, variable %in% c("signal")),
+              aes(color = variable), size = 0.5, na.rm = TRUE) +
+    geom_line(data = subset(long_data, variable %in% c("Mean", "MonthVar")),
               aes(color = variable), size = 0.5, na.rm = TRUE) +
     geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
 
