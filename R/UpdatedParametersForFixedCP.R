@@ -81,6 +81,8 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
   UpdatePara$FitF  <-  funct
   UpdatePara$CoeffF <-  coeff
 
+  UpdatePara$Tmu <- UpdatePara$Tmu[UpdatePara$Tmu$np != 0, ]
+
   return(UpdatePara)
 
 }

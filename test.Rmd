@@ -16,11 +16,11 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-## Intro 
+## Introduction
 
-This document present result of several test of the PMLSeg package consisting:
+This document presents results from several tests of the PMLSeg package, including:
 
-- Test of the `Segmentation` function in case  with/ without offsets for the following examples : 
+- Test of the `Segmentation` function with and without offsets, featuring the following examples:
 
   + Ex1 : zero mean + IID noise
   
@@ -28,15 +28,15 @@ This document present result of several test of the PMLSeg package consisting:
   
   + Ex3 : periodic mean + monthly variance 
   
-- Test of other functions such as: 
+- Tests of other functions such as:
 
   + `PlotSeg` to visualize segmentation results 
   
-  + `Cluster_screening` to detect the group of close change-points (ussualy due to the outliers) and check if it is needed to keep or remove the cluster. 
+  + `Cluster_screening` to detect groups of close change-points (usually due to outliers) and determine whether to keep or remove the cluster. The cluster in this document is determined by a group of close change-points within 80 days.
   
-  + `Validation` to validate the detected changepoints with the help of metadata.
+  + `Validation`  to validate the detected change-points with the help of metadata.
 
-## Generate example data to test 
+## Generate Example Data 
 
 Ex1 time series 
 
@@ -53,9 +53,10 @@ plot(df1$date, df1$signal, type = "l")
 head(df1, 3)
 ```
 
-## Generate example data to test 
+## Generate Example Data 
 
-Ex2 time series : add the functional with 4 Fourier series with coefficient = 1
+Ex2 time series : Add the functional with 4 Fourier series components, each with a coefficient of 0.5
+
 \footnotesize
 ```{r ex2, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 library(dplyr)
@@ -70,9 +71,9 @@ head(df2, 3)
 plot(df2$date, df2$f, type = "l")
 ```
 
-## Generate example data to test 
+## Generate Example Data 
 
-Ex3 time series : add the functional with 4 Fourier series with coefficient = 1
+Ex3 time series : Apply the same functional as Ex2, adjusted for monthly variance
 \footnotesize
 ```{r ex3, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 std = c(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.6, 1.5, 1.4, 1.3)
@@ -86,9 +87,10 @@ head(df3, 3)
 plot(df3$date, df3$signal, type = "l")
 ```
 
-## Generate example data to test 
+## Generate Example Data  
 
-Harmmonize format of 3 dataframes to test: 
+Harmonize Formats of 3 Dataframes for Testing
+
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 df2 <- df2 %>% select(date, signal)
@@ -98,9 +100,9 @@ names(df1)
 names(df2)
 names(df3)
 ```
-## Premilinary setting
+## Preliminary Settings
 
-Generate different offset series to add into the original series (which is without change-point) :
+Generate different offset series to add to the original series :
 \footnotesize
 
 ```{r jump, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
@@ -117,13 +119,13 @@ generate_jump_series <- function(jump_indices, jump_amp, length_series) {
   
   return(jump_series)
 }
-# No cluster (group of close changepoint within 80 days
+# No cluster
 jump_ind1 <- c(200, 600)
 jump_amp1 <- c(0, 1, 1)
-# One cluster formed by the second and third changepoints, which need to be keep 
+# One cluster formed by the second and third change-points, which need to be replace by the middle point 
 jump_ind2 <- c(200, 600, 640)
-jump_amp2 <- c(0, 1, -2, 1)
-# One cluster formed by the second and third changepoints, which need to be remove 
+jump_amp2 <- c(0, 1, -2, 3)
+# One cluster formed by the second and third change-points, which need to be removed 
 jump_amp3 <- c(0, 1, -2, 2)
 ```
 
@@ -140,9 +142,9 @@ lines(jump_series2, col = "red")
 lines(jump_series3, col = "blue")
 ```
 
-## Test the `Segmentation` function
+## Testing the `Segmentation` Function
 
-When series is homogeneous 
+When the series is homogeneous
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 library(PMLseg)
@@ -152,11 +154,11 @@ str(seg1a)
 seg1a$Tmu
 ```
 \normalsize 
-No change-point is detected show in `Tmu` dataframe, which listed all segments of the series. The mean is close to 0. Additionally, the result is a list includes not only `Tmu` dataframe but also the fitted functional part `FitF` (which is not fitted by setting FunctPart = FALSE), coefficient of functional element `CoeefF`, monthly variance `MonthVar` and the Sum Square of Residual `SSR`. 
+No change-points are detected, as shown in the `Tmu` dataframe, which lists all segments of the series. The mean is close to 0. Additionally, the results include not only the `Tmu`  dataframe but also other outputs such as the fitted functional part `FitF` (which is not fitted when `FunctPart` is set to FALSE), coefficients of functional elements `CoeefF`, monthly variance `MonthVar`, and the Sum of Squares of Residuals `SSR`. 
 
-## Test the `Segmentation` function
+## Test the `Segmentation` Function
 
-When series is homogeneous for example 2 and 3
+When series is homogeneous for Example 2 and 3
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Ex2 
@@ -166,11 +168,11 @@ seg2a$Tmu
 seg3a = Segmentation(OneSeries = df3, FunctPart = TRUE)
 seg3a$Tmu
 ```
-No changepoint is detected neither in these two example. 
+No change-points are detected in these two examples either.
 
-## Test the `Segmentation` function
+## Test the `Segmentation` Function
 
-When we add the jump series in the series 
+Adding Jump Series to the original Series
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Ex1 
@@ -189,9 +191,10 @@ seg3b = Segmentation(OneSeries = df3b, FunctPart = TRUE)
 seg3b$Tmu
 ```
 
-## Test the `Segmentation` function
+## Test the `Segmentation` Function
 
-When we add other jump series in the most complicated series (Ex3) 
+Adding other jump series in the most complicated series (Ex3)
+
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 
@@ -203,44 +206,44 @@ df3d <- df3 %>% mutate(signal = signal + jump_series3)
 seg3d = Segmentation(OneSeries = df3d, FunctPart = TRUE)
 seg3d$Tmu
 ```
-## Test the `PlotSeg` function
+## Test the `PlotSeg` Function
 
 Visualize the segmentation result of example 1
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
-PlotSeg(OneSeries = df1, SegRes = seg1b, FunctPart = FALSE)
+PlotSeg(OneSeries = df1b, SegRes = seg1b, FunctPart = FALSE)
 ```
-## Test the `PlotSeg` function
+## Test the `PlotSeg` Function
 
 Visualize the segmentation result of example 2
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
-PlotSeg(OneSeries = df2, SegRes = seg2b, FunctPart = FALSE)
+PlotSeg(OneSeries = df2b, SegRes = seg2b, FunctPart = FALSE)
 ```
 
-## Test the `PlotSeg` function
+## Test the `PlotSeg` Function
 
-Visualize the segmentation result of example 3
+Visualize the segmentation result of example 3 with another jump series
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3c, SegRes = seg3c, FunctPart = FALSE)
 ```
-## Test the `PlotSeg` function
+## Test the `PlotSeg` Function
 
-Visualize the segmentation result of example 3
+Visualize the segmentation result of example 3 with another jump series
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, SegRes = seg3d, FunctPart = FALSE)
 ```
 
-## Test the `PlotSeg` function
+## Test the `PlotSeg` Function
 
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, SegRes = seg3d, FunctPart = FALSE)
 ```
 
-## Test the `Cluster_screening` function
+## Test the `Cluster_screening` Function
 
 Segmentation sometime detects very short segment like in example 3c, 3d. When it is too close and after cluster, the change in mean is not significant, we will remove such kind of cluster. If it is significant, we will replace a cluster by the middle point and remove the data inside the cluster. 
 
@@ -263,10 +266,10 @@ When the screening say it is needed to replace the changepoint, we need to updat
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Validate the segmentation result wrt metadata 
-seg_upd = UpdatedParametersForFixedCP(OneSeries = df, 
-                                      ResScreening = screening, 
-                                      FunctPart = FALSE)
-seg_upd
+seg_upd = UpdatedParametersForFixedCP(OneSeries = df3c, 
+                                      ResScreening = screening1)
+str(seg_upd)
+seg_upd$Tmu
 ```
 
 ## Test the `UpdatedParametersForFixedCP` function
@@ -276,9 +279,39 @@ Visualize the time series after the update segmentation
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 
-        SegRes = seg_upd, 
-        FunctPart = FALSE)
+        SegRes = seg_upd,
+        RemoveData = screening1$RemoveData)
+```
+Compare to the result before the cluster screening
+
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+PlotSeg(OneSeries = df3d, 
+        SegRes = seg3d)
 ```
 
+## Test the `Validation` function
 
+Validate the detected change-points with respect to the metadata 
 
+\footnotesize
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+# Create a metadata for example 
+meta = data.frame(date = df1$date[jump_ind2],  
+                type = c("type1", "type2", "type3"))
+meta
+
+# Validate the segmentation result wrt metadata 
+Validation(OneSeries = df3d, 
+           Tmu = seg_upd$Tmu,
+           MinDist = 62,
+           Metadata = meta)
+```
+
+Visualize results with metadata
+
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+PlotSeg(OneSeries = df3d, 
+        SegRes = seg_upd,
+        RemoveData = screening1$RemoveData,
+        Metadata = meta)
+```

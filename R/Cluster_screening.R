@@ -55,7 +55,6 @@ Cluster_screening <- function(Tmu, MaxDist = 80) {
         TStat = Den / Nor
         (stats::pnorm(-abs(TStat), mean = 0, sd = 1, lower.tail = TRUE)) * 2
       })
-
       # Update the segmentation result -----------------------------------------
       ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
         if (PValues[i] < 0.05) {
@@ -64,7 +63,7 @@ Cluster_screening <- function(Tmu, MaxDist = 80) {
         }
       })
       # Update of list of changepoints ------------------------------------------
-      UpdatedCP = sort(c(UpdatedCP, ReplacedCP), decreasing = FALSE)
+      UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
     }
     ChangeCP <- "Yes"
   } else {
