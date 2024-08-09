@@ -247,8 +247,37 @@ Segmentation sometime detects very short segment like in example 3c, 3d. When it
 \footnotesize
 ```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Validate the segmentation result wrt metadata 
-screening = Cluster_screening(Tmu = seg3c$Tmu,
+screening1 = Cluster_screening(Tmu = seg3c$Tmu,
                               MaxDist = 80)
+screening1
+
+screening2 = Cluster_screening(Tmu = seg3d$Tmu,
+                              MaxDist = 80)
+screening2
+```
+
+## Test the `UpdatedParametersForFixedCP` function
+
+When the screening say it is needed to replace the changepoint, we need to update the `Tmu` dataframe. 
+
+\footnotesize
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+# Validate the segmentation result wrt metadata 
+seg_upd = UpdatedParametersForFixedCP(OneSeries = df, 
+                                      ResScreening = screening, 
+                                      FunctPart = FALSE)
+seg_upd
+```
+
+## Test the `UpdatedParametersForFixedCP` function
+
+Visualize the time series after the update segmentation 
+
+\footnotesize
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+PlotSeg(OneSeries = df3d, 
+        SegRes = seg_upd, 
+        FunctPart = FALSE)
 ```
 
 
