@@ -1,0 +1,152 @@
+---
+title: "Test PMLSeg"
+author: "Ninh"
+date: "2024-08-09"
+output: beamer_presentation
+font-family: 'Helvetica'
+fontsize: 9pt
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+```
+
+## Intro 
+
+This document present result of several test of the PMLSeg package consisting:
+
+- Test of the `Segmentation` function in case  with/ without offsets for the following examples : 
+
+  + Ex1 : zero mean + IID noise
+  
+  + Ex2 : periodic mean + IID noise 
+  
+  + Ex3 : periodic mean + monthly variance 
+  
+- Test of other functions such as: 
+
+  + `PlotSeg` to visualize segmentation results 
+  
+  + `Cluster_screening` to detect the group of close change-points (ussualy due to the outliers) and check if it is needed to keep or remove the cluster. 
+  
+  + `Validation` to validate the detected changepoints with the help of metadata.
+
+## Generate example data to test 
+
+Ex1 time series 
+
+\footnotesize
+```{r ex1, size = "small", echo = TRUE, fig.width = 6, fig.height = 3}
+set.seed(1)
+length_series = 1000
+df1 = data.frame(date = seq.Date(from = as.Date("2010-01-01"),
+                                to = as.Date("2010-01-01")+(length_series-1), 
+                                by = "day"),  
+                signal = rnorm(n = length_series, mean = 0, sd = 1))
+
+plot(df1$date, df1$signal, type = "l")
+head(df1, 3)
+```
+
+## Generate example data to test 
+
+Ex2 time series : add the functional with 4 Fourier series with coefficient = 1
+\footnotesize
+```{r ex2, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+library(dplyr)
+
+T <- 365.25
+df2 <- df1 %>%
+  mutate(t = as.numeric(date - date[1])+1,
+  f = rowSums(sapply(1:4, function(i) cos(i*t*(2*pi)/T) + sin(i*t*(2*pi)/T))),
+  signal = signal + f)
+
+head(df2, 3)
+plot(df2$date, df2$f, type = "l")
+```
+
+## Generate example data to test 
+
+Ex3 time series : add the functional with 4 Fourier series with coefficient = 1
+\footnotesize
+```{r ex3, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+std = c(1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 2.5, 2, 1.5)
+
+df3 <- df1 %>% 
+  mutate(sd = std[as.numeric(format(date, "%m"))],
+         signal = signal * sd ) %>%
+  mutate(signal = signal + df2$f)
+
+head(df3, 3)
+plot(df3$date, df3$signal, type = "l")
+```
+
+## Generate example data to test 
+
+Harmmonize format of 3 dataframes to test: 
+\footnotesize
+```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+df2 <- df2 %>% select(date, signal)
+df3 <- df3 %>% select(date, signal)
+
+names(df1)
+names(df2)
+names(df3)
+```
+## Premilinary setting
+
+Randomly select two position of changepoints : 
+```{r jump, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+
+# No cluster (group of close changepoint within 80 days)
+
+jump_ind1 = c(200, 600)
+jump_ind1
+
+jump_series1 = rep(0, length_series)
+
+for (i in jump_ind1) {
+  jump_series1[1: i] <- jump_series1[1: i] + 1
+}
+plot(jump_series1, type = "l")
+
+# The second and third changepoint formed a cluster 
+
+jump_ind2 = c(200, 600, 630)
+jump_ind2
+
+jump_series2 = rep(0, length_series)
+
+for (i in jump_ind2) {
+  jump_series2[1: i] <- jump_series2[1: i] + 1
+}
+plot(jump_series2, type = "l")
+
+# Function to generate jump series
+generate_jump_series <- function(jump_indices, jump_amp, length_series) {
+  jump_series <- rep(0, length_series)
+  jump_indices <- c(1, jump_indices, length_series + 1)
+  
+  changes <- rep(0, length_series)
+  changes[jump_indices[-length(jump_indices)]] <- jump_amp
+  
+  jump_series <- cumsum(changes)
+  
+  return(jump_series)
+}
+
+# Example data parameters
+length_series <- 1000
+jump_ind1 <- c(200, 600)
+jump_ind2 <- c(200, 600, 630)
+
+# Generate jump series
+jump_series1 <- generate_jump_series(jump_ind1, length_series)
+jump_series2 <- generate_jump_series(jump_ind2, length_series)
+
+```
