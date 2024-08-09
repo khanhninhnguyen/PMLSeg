@@ -92,7 +92,7 @@ plot(df3$date, df3$signal, type = "l")
 Harmonize Formats of 3 Dataframes for Testing
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r harmonize, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 df2 <- df2 %>% select(date, signal)
 df3 <- df3 %>% select(date, signal)
 
@@ -132,7 +132,7 @@ jump_amp3 <- c(0, 1, -2, 2)
 ## Premilinary setting
 \footnotesize
 
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r jumpplot, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Generate jump series
 jump_series1 <- generate_jump_series(jump_ind1, jump_amp1, length_series)
 jump_series2 <- generate_jump_series(jump_ind2, jump_amp2, length_series)
@@ -146,7 +146,7 @@ lines(jump_series3, col = "blue")
 
 When the series is homogeneous
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r testseg1a, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 library(PMLseg)
 # Ex1 
 seg1a = Segmentation(OneSeries = df1, FunctPart = FALSE)
@@ -160,7 +160,7 @@ No change-points are detected, as shown in the `Tmu` dataframe, which lists all 
 
 When series is homogeneous for Example 2 and 3
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r testseg2a, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Ex2 
 seg2a = Segmentation(OneSeries = df2, FunctPart = TRUE)
 seg2a$Tmu
@@ -174,7 +174,7 @@ No change-points are detected in these two examples either.
 
 Adding Jump Series to the original Series
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r testseg1b, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Ex1 
 df1b <- df1 %>% mutate(signal = signal + jump_series1)
 seg1b = Segmentation(OneSeries = df1b, FunctPart = FALSE)
@@ -196,7 +196,7 @@ seg3b$Tmu
 Adding other jump series in the most complicated series (Ex3)
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r testseg3c, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 
 df3c <- df3 %>% mutate(signal = signal + jump_series2)
 seg3c = Segmentation(OneSeries = df3c, FunctPart = TRUE)
@@ -210,14 +210,14 @@ seg3d$Tmu
 
 Visualize the segmentation result of example 1
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotseg1b, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df1b, SegRes = seg1b, FunctPart = FALSE)
 ```
 ## Test the `PlotSeg` Function
 
 Visualize the segmentation result of example 2
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotseg2b, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df2b, SegRes = seg2b, FunctPart = FALSE)
 ```
 
@@ -225,7 +225,7 @@ PlotSeg(OneSeries = df2b, SegRes = seg2b, FunctPart = FALSE)
 
 Visualize the segmentation result of example 3 with another jump series
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotseg3c, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3c, SegRes = seg3c, FunctPart = FALSE)
 ```
 ## Test the `PlotSeg` Function
@@ -239,7 +239,7 @@ PlotSeg(OneSeries = df3d, SegRes = seg3d, FunctPart = FALSE)
 ## Test the `PlotSeg` Function
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotseg3d, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, SegRes = seg3d, FunctPart = FALSE)
 ```
 
@@ -248,7 +248,7 @@ PlotSeg(OneSeries = df3d, SegRes = seg3d, FunctPart = FALSE)
 Segmentation sometime detects very short segment like in example 3c, 3d. When it is too close and after cluster, the change in mean is not significant, we will remove such kind of cluster. If it is significant, we will replace a cluster by the middle point and remove the data inside the cluster. 
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r cluster, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Validate the segmentation result wrt metadata 
 screening1 = Cluster_screening(Tmu = seg3c$Tmu,
                               MaxDist = 80)
@@ -264,7 +264,7 @@ screening2
 When the screening say it is needed to replace the changepoint, we need to update the `Tmu` dataframe. 
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r update, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Validate the segmentation result wrt metadata 
 seg_upd = UpdatedParametersForFixedCP(OneSeries = df3c, 
                                       ResScreening = screening1)
@@ -274,17 +274,17 @@ seg_upd$Tmu
 
 ## Test the `UpdatedParametersForFixedCP` function
 
-Visualize the time series after the update segmentation 
+Visualize the time series after the updated segmentation 
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotupdate, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 
         SegRes = seg_upd,
         RemoveData = screening1$RemoveData)
 ```
 Compare to the result before the cluster screening
 
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotcompare, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 
         SegRes = seg3d)
 ```
@@ -294,7 +294,7 @@ PlotSeg(OneSeries = df3d,
 Validate the detected change-points with respect to the metadata 
 
 \footnotesize
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r validation, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 # Create a metadata for example 
 meta = data.frame(date = df1$date[jump_ind2],  
                 type = c("type1", "type2", "type3"))
@@ -309,7 +309,7 @@ Validation(OneSeries = df3d,
 
 Visualize results with metadata
 
-```{r , echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
+```{r plotmeta, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 
         SegRes = seg_upd,
         RemoveData = screening1$RemoveData,
