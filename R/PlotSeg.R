@@ -36,7 +36,7 @@ PlotSeg <- function(OneSeries,
   x_period = "1 year"
 
   MaxPoint = max(OneSeries$signal, na.rm = TRUE) + 0.5
-  MinPoint = min(OneSeries$signal, na.rm = TRUE) - 0.5
+  MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(SegRes$MonthVar), max(SegRes$FitF, na.rm = TRUE)) - 0.5
 
   Month <- c()
   type <- c()
@@ -150,11 +150,11 @@ PlotSeg <- function(OneSeries,
       limits = as.Date(c(OneSeries$date[1], OneSeries$date[nrow(OneSeries)])),
       breaks = function(x) seq.Date(from = OneSeries$date[1], to = OneSeries$date[nrow(OneSeries)], by = x_period),
       date_labels = "%Y") +
-    scale_color_manual( values = colors) +
+    scale_color_manual(values = colors) +
     scale_shape_manual(values = shapes) +
     labs(x = labelx, y = labely, color = "", fill = "") +
     theme(
-      legend.title =  element_blank(),
+      legend.title = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
       panel.background = element_blank()

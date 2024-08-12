@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.16)  9 AUG 2024 18:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.16)  12 AUG 2024 11:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -910,6 +910,11 @@ Package microtype Info: Loading generic protrusion settings for font family
 \openout4 = `test.vrb'.
 
 (./test.vrb
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
+.
+(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
 LaTeX Font Info:    Trying to load font information for OT1+lmss on input line 
 8.
 (/usr/share/texmf/tex/latex/lm/ot1lmss.fd
@@ -958,11 +963,6 @@ LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <6> not available
 (Font)              Font shape `T1/lmss/m/sl' tried instead on input line 8.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <5> not available
 (Font)              Font shape `T1/lmss/m/sl' tried instead on input line 8.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 8
-.
-(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 13.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
@@ -994,7 +994,7 @@ Package pdftex.def Info: test_files/figure-beamer/ex2-1.pdf  used on input line
  27.
 (pdftex.def)             Requested size: 307.28987pt x 108.32744pt.
 )
-Overfull \vbox (4.91931pt too high) detected at line 238
+Overfull \vbox (4.91931pt too high) detected at line 239
  []
 
 [4
@@ -1029,11 +1029,16 @@ Package pdftex.def Info: test_files/figure-beamer/ex3-1.pdf  used on input line
 File: test_files/figure-beamer/jumpplot-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/jumpplot-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/jumpplot-1.pdf  used on input
- line 17.
+ line 18.
 (pdftex.def)             Requested size: 307.28987pt x 107.82718pt.
 ) [8
 
  <./test_files/figure-beamer/jumpplot-1.pdf>]
+\openout4 = `test.vrb'.
+
+(./test.vrb) [9
+
+]
 \openout4 = `test.vrb'.
 
 (./test.vrb
@@ -1041,12 +1046,7 @@ LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line
 12.
 (/usr/share/texmf/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)) [9
-
-]
-\openout4 = `test.vrb'.
-
-(./test.vrb) [10
+)) [10
 
 ]
 \openout4 = `test.vrb'.
@@ -1061,113 +1061,103 @@ File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ]
 \openout4 = `test.vrb'.
 
-(./test.vrb
-<test_files/figure-beamer/plotseg1b-1.pdf, id=128, 417.56pt x 204.765pt>
-File: test_files/figure-beamer/plotseg1b-1.pdf Graphic file (type pdf)
-<use test_files/figure-beamer/plotseg1b-1.pdf>
-Package pdftex.def Info: test_files/figure-beamer/plotseg1b-1.pdf  used on inpu
-t line 11.
-(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-<test_files/figure-beamer/plotseg2b-1.pdf, id=129, 417.56pt x 204.765pt>
-File: test_files/figure-beamer/plotseg2b-1.pdf Graphic file (type pdf)
-<use test_files/figure-beamer/plotseg2b-1.pdf>
-Package pdftex.def Info: test_files/figure-beamer/plotseg2b-1.pdf  used on inpu
-t line 22.
-(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-)
-Overfull \vbox (122.38812pt too high) detected at line 486
- []
+(./test.vrb) [13
 
-[13
-
- <./test_files/figure-beamer/plotseg1b-1.pdf> <./test_files/figure-beamer/plots
-eg2b-1.pdf>]
+]
 \openout4 = `test.vrb'.
 
 (./test.vrb
-<test_files/figure-beamer/plotseg3c-1.pdf, id=158, 417.56pt x 204.765pt>
+<test_files/figure-beamer/plotseg1b-1.pdf, id=135, 417.56pt x 204.765pt>
+File: test_files/figure-beamer/plotseg1b-1.pdf Graphic file (type pdf)
+<use test_files/figure-beamer/plotseg1b-1.pdf>
+Package pdftex.def Info: test_files/figure-beamer/plotseg1b-1.pdf  used on inpu
+t line 12.
+(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
+) [14
+
+ <./test_files/figure-beamer/plotseg1b-1.pdf>]
+\openout4 = `test.vrb'.
+
+(./test.vrb
+<test_files/figure-beamer/plotseg2b-1.pdf, id=152, 417.56pt x 204.765pt>
+File: test_files/figure-beamer/plotseg2b-1.pdf Graphic file (type pdf)
+<use test_files/figure-beamer/plotseg2b-1.pdf>
+Package pdftex.def Info: test_files/figure-beamer/plotseg2b-1.pdf  used on inpu
+t line 12.
+(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
+) [15
+
+ <./test_files/figure-beamer/plotseg2b-1.pdf>]
+\openout4 = `test.vrb'.
+
+(./test.vrb
+<test_files/figure-beamer/plotseg3c-1.pdf, id=170, 417.56pt x 204.765pt>
 File: test_files/figure-beamer/plotseg3c-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotseg3c-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotseg3c-1.pdf  used on inpu
 t line 12.
 (pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-<test_files/figure-beamer/unnamed-chunk-2-1.pdf, id=159, 417.56pt x 204.765pt>
+) [16
+
+ <./test_files/figure-beamer/plotseg3c-1.pdf>]
+\openout4 = `test.vrb'.
+
+(./test.vrb
+<test_files/figure-beamer/unnamed-chunk-2-1.pdf, id=187, 417.56pt x 204.765pt>
 File: test_files/figure-beamer/unnamed-chunk-2-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/unnamed-chunk-2-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/unnamed-chunk-2-1.pdf  used o
-n input line 24.
+n input line 12.
 (pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-)
-Overfull \vbox (122.38812pt too high) detected at line 512
- []
+) [17
 
-[14
-
- <./test_files/figure-beamer/plotseg3c-1.pdf> <./test_files/figure-beamer/unnam
-ed-chunk-2-1.pdf>]
+ <./test_files/figure-beamer/unnamed-chunk-2-1.pdf>]
 \openout4 = `test.vrb'.
 
-(./test.vrb
-<test_files/figure-beamer/plotseg3d-1.pdf, id=186, 417.56pt x 204.765pt>
-File: test_files/figure-beamer/plotseg3d-1.pdf Graphic file (type pdf)
-<use test_files/figure-beamer/plotseg3d-1.pdf>
-Package pdftex.def Info: test_files/figure-beamer/plotseg3d-1.pdf  used on inpu
-t line 11.
-(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-) [15
-
- <./test_files/figure-beamer/plotseg3d-1.pdf>]
-\openout4 = `test.vrb'.
-
-(./test.vrb)
-Overfull \vbox (6.44499pt too high) detected at line 567
- []
-
-[16
+(./test.vrb) [18
 
 ]
 \openout4 = `test.vrb'.
 
-(./test.vrb) [17
+(./test.vrb) [19
 
 ]
 \openout4 = `test.vrb'.
 
 (./test.vrb
-<test_files/figure-beamer/plotupdate-1.pdf, id=215, 417.56pt x 204.765pt>
+<test_files/figure-beamer/plotupdate-1.pdf, id=217, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotupdate-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotupdate-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotupdate-1.pdf  used on inp
 ut line 15.
-(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-<test_files/figure-beamer/plotcompare-1.pdf, id=216, 417.56pt x 204.765pt>
+(pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
+<test_files/figure-beamer/plotcompare-1.pdf, id=218, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotcompare-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotcompare-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotcompare-1.pdf  used on in
-put line 25.
-(pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-)
-Overfull \vbox (135.86313pt too high) detected at line 630
- []
-
-[18
+put line 26.
+(pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
+) [20
 
  <./test_files/figure-beamer/plotupdate-1.pdf> <./test_files/figure-beamer/plot
 compare-1.pdf>]
 \openout4 = `test.vrb'.
 
+(./test.vrb) [21
+
+]
+\openout4 = `test.vrb'.
+
 (./test.vrb
-<test_files/figure-beamer/plotmeta-1.pdf, id=243, 417.56pt x 204.765pt>
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <9> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 7.
+<test_files/figure-beamer/plotmeta-1.pdf, id=251, 417.56pt x 204.765pt>
 File: test_files/figure-beamer/plotmeta-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotmeta-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotmeta-1.pdf  used on input
- line 42.
+ line 15.
 (pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-)
-Overfull \vbox (126.5924pt too high) detected at line 674
- []
-
-[19
+) [22
 
  <./test_files/figure-beamer/plotmeta-1.pdf>]
 \tf@nav=\write6
@@ -1181,13 +1171,13 @@ Overfull \vbox (126.5924pt too high) detected at line 674
 
 (./test.aux) ) 
 Here is how much of TeX's memory you used:
- 24893 strings out of 478287
- 479913 string characters out of 5849289
+ 24908 strings out of 478287
+ 479808 string characters out of 5849289
  761028 words of memory out of 5000000
- 42385 multiletter control sequences out of 15000+600000
- 522530 words of font info for 103 fonts, out of 8000000 for 9000
+ 42386 multiletter control sequences out of 15000+600000
+ 522848 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 128i,11n,122p,1001b,507s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 128i,11n,122p,1001b,509s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf
 /fonts/enc/dvips/lm/lm-ec.enc}</usr/share/texmf/fonts/type1/public/lm/lmss10.pf
 b></usr/share/texmf/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf/fonts/typ
@@ -1196,10 +1186,10 @@ e1/public/lm/lmss9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr
 lic/lm/lmtt8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb></usr/share/
 texmf/fonts/type1/public/lm/lmtti10.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/symbols/msam10.pfb>
-Output written on test.pdf (19 pages, 404154 bytes).
+Output written on test.pdf (22 pages, 406100 bytes).
 PDF statistics:
- 319 PDF objects out of 1000 (max. 8388607)
- 234 compressed objects within 3 object streams
- 57 named destinations out of 1000 (max. 500000)
- 30823 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 327 PDF objects out of 1000 (max. 8388607)
+ 242 compressed objects within 3 object streams
+ 66 named destinations out of 1000 (max. 500000)
+ 30818 words of extra memory for PDF output out of 35830 (max. 10000000)
 
