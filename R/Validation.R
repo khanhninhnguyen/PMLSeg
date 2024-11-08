@@ -28,14 +28,18 @@ Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
   CP <- c()
   MetadataIndex <- c()
 
-  CP <-  Tmu$end[-nrow(Tmu)]
-  MetadataIndex <-  which(OneSeries$date %in% Metadata$date)
+  OneSeriesFull <- OneSeries %>%
+    tidyr::complete(date = seq(min(date), max(date), by = "day"))
 
+  CP <-  Tmu$end[-nrow(Tmu)]
+  CP_m <- which(OneSeriesFull$date %in% OneSeries$date[CP])
+
+  MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
 
   positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
     dplyr::mutate(
-      distance = mapply(function(x, y) sum(!is.na(OneSeries$signal[x:y])),
-                        CP,
+      distance = mapply(function(x, y) sum(!is.na(OneSeriesFull$signal[x:y])),
+                        CP_m,
                         MetadataIndex),
       distance = distance -1
     )
