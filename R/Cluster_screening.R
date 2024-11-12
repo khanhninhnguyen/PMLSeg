@@ -17,7 +17,7 @@
 #' @export
 
 
-Cluster_screening <- function(Tmu, MaxDist = 80) {
+Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
 
   RemoveData <-  c()
   UpdatedCP <-  c()
@@ -43,18 +43,32 @@ Cluster_screening <- function(Tmu, MaxDist = 80) {
 
     RemoveData <-  data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
     SegmentsTest = stats::na.omit(data.frame(begin = SegBefInd,end = SegAftInd))
+    SegmentsTestOut = data.frame(begin = Tmu$begin[ClusterBegInd],
+                                 end = Tmu$end[ClusterEndInd])
 
     UpdatedCP = Tmu$end[-unique(stats::na.omit(c(which(flag!=0), SegBefInd)))]
 
     # Test difference in mean before and after cluster if needed ----
     if(nrow(SegmentsTest) > 0) {
-      PValues <- sapply(1:nrow(SegmentsTest), function(x) {
+      TValues <- sapply(1:nrow(SegmentsTest), function(x) {
         Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
         Nor = sqrt(1 / Tmu$se[SegmentsTest$begin[x]]^2 +
                      1 / Tmu$se[SegmentsTest$end[x]]^2)
-        TStat = Den / Nor
-        (stats::pnorm(-abs(TStat), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+        Den / Nor
       })
+      PValues <- sapply(TValues, function(x) {
+        (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+      })
+      SegmentsTestOut %>%
+        mutate(mu_L = Tmu$mean[SegmentsTest$begin],
+               mu_R = Tmu$mean[SegmentsTest$end],
+               se_L = Tmu$se[SegmentsTest$begin],
+               se_R = Tmu$se[SegmentsTest$end,],
+               np_L = Tmu$np[SegmentsTest$begin],
+               np_R = Tmu$np[SegmentsTest$end],
+               tstat = TValues,
+               pval = PValues,
+               signif = ifelse(PValues > 0.05, 0, 1))
       # Update the segmentation result -----------------------------------------
       ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
         if (PValues[i] < 0.05) {
@@ -74,7 +88,12 @@ Cluster_screening <- function(Tmu, MaxDist = 80) {
 
   Out = list(UpdatedCP = UpdatedCP,
              RemoveData = RemoveData,
-             ChangeCP=ChangeCP)
+             ChangeCP = ChangeCP)
+
+
+  if(!is.null(detail)){
+
+  }
 
   return(Out)
 

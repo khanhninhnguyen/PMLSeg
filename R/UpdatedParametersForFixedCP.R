@@ -16,7 +16,7 @@
 #' @export
 
 
-UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,selectionF=FALSE){
+UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,ResSeg,FunctPart=TRUE,selectionF=FALSE){
 
   UpdatedData <- OneSeries
 
@@ -24,15 +24,14 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
     stop("Screening did not change segmentation results")
   }
 
-
   segments <- sapply(1:nrow(ResScreening$RemoveData), function(i) {
     ResScreening$RemoveData$begin[i]:ResScreening$RemoveData$end[i]
   })
-  # Remplacement des valeurs par NA
+  # Remove data in cluster
   for (seg in segments) {
     UpdatedData$signal[seg] <- NA
   }
-
+  UpdatedData <- na.omit(UpdatedData)
   n.UpdatedData <- nrow(UpdatedData)
 
   # Calculation of the monthly variances
@@ -45,10 +44,11 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
   MonthVar <- RobEstiMonthlyVariance(UpdatedData)^2
 
   # New estimation of the Tmu
-  var.est.t=MonthVar[as.numeric(UpdatedData$month)]
-  Tmu <- FormatOptSegK(c(ResScreening$UpdatedCP,n.UpdatedData),UpdatedData,var.est.t)
-  mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[SegRes$Tmu$end])
 
+  var.est.t = MonthVar[as.numeric(UpdatedData$month)]
+  Tmu <- FormatOptSegK(c(UpdatedCP,n.UpdatedData),UpdatedData,var.est.t)
+  mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
 
   # New estimation of f
   if (FunctPart==TRUE){
@@ -57,7 +57,7 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
 
     res.funct <- c()
     auxiliar_data <- UpdatedData
-    auxiliar_data$signal <- auxiliar_data$signal- mean.est.t
+    auxiliar_data$signal <- auxiliar_data$signal - mean.est.t
 
     #Option for estimating f
     if (selectionF==TRUE){
@@ -82,6 +82,14 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
   UpdatePara$CoeffF <-  coeff
 
   UpdatePara$Tmu <- UpdatePara$Tmu[UpdatePara$Tmu$np != 0, ]
+  UpdatePara$Tmu$end[nrow(UpdatePara$Tmu)] <- nrow(OneSeries)
+  # Update new changepoints
+  update_ind = which(Screening$UpdatedCP != UpdatePara$Tmu$end)
+
+  UpdatePara$Tmu$end <- Screening$UpdatedCP
+  for(i in update_ind){
+    UpdatePara$Tmu$begin[i+1] <- Screening$UpdatedCP[i] + 1
+  }
 
   return(UpdatePara)
 
