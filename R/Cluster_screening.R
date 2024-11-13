@@ -7,6 +7,7 @@
 #
 #' @param Tmu the segmentation results obtained from the Segmentation function
 #' @param MaxDist the maximal number of days between change-points used to determinate the cluster. Default is 80
+#' @param detail any object indicating to have detail of test as output. Defaul is NULL, do not include the details.
 #'
 #' @return list of two variables (RemoveData and UpdatedCP) :
 #' \itemize{
@@ -59,11 +60,11 @@ Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
       PValues <- sapply(TValues, function(x) {
         (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
       })
-      SegmentsTestOut %>%
+      SegmentsTestOut <- SegmentsTestOut %>%
         mutate(mu_L = Tmu$mean[SegmentsTest$begin],
                mu_R = Tmu$mean[SegmentsTest$end],
                se_L = Tmu$se[SegmentsTest$begin],
-               se_R = Tmu$se[SegmentsTest$end,],
+               se_R = Tmu$se[SegmentsTest$end],
                np_L = Tmu$np[SegmentsTest$begin],
                np_R = Tmu$np[SegmentsTest$end],
                tstat = TValues,
@@ -92,7 +93,9 @@ Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
 
 
   if(!is.null(detail)){
-
+    Out$detail = SegmentsTestOut
+  } else{
+    Out$detail = NA
   }
 
   return(Out)
