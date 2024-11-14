@@ -2,6 +2,7 @@
 #'
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param ResScreening the output of the Cluster_screening function
+#' @param Tmu a dataframe resulting from the segmentation function
 #' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
 #' @param selectionF a boolean indicating if a selection on the functions of the Fourier decomposition of order 4 is performed. The level of the test is by default 0.001. Default is FALSE
 #'
@@ -16,7 +17,7 @@
 #' @export
 
 
-UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,selectionF=FALSE){
+UpdatedParametersForFixedCP <- function(OneSeries, Tmu, ResScreening, FunctPart=TRUE, selectionF=FALSE){
 
   UpdatedData <- OneSeries
 
@@ -44,7 +45,7 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
   MonthVar <- RobEstiMonthlyVariance(UpdatedData)^2
 
   # New estimation of the Tmu
-  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[SegRes$Tmu$end])
+  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[Tmu$end])
 
   var.est.t = MonthVar[as.numeric(UpdatedData$month)]
   Tmu <- FormatOptSegK(c(UpdatedCP,n.UpdatedData),UpdatedData,var.est.t)
@@ -61,10 +62,10 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,se
 
     #Option for estimating f
     if (selectionF==TRUE){
-      res.funct <- PMLseg:::periodic_estimation_selb(auxiliar_data,var.est.t,lyear,threshold)
+      res.funct <- periodic_estimation_selb(auxiliar_data,var.est.t,lyear,threshold)
 
     } else{
-      res.funct <-  PMLseg:::periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+      res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
     }
 
     funct<-res.funct$predict
