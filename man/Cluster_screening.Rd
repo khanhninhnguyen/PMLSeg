@@ -4,12 +4,16 @@
 \alias{Cluster_screening}
 \title{Post-processing, called screening, of the detected change-points}
 \usage{
-Cluster_screening(Tmu, MaxDist = 80)
+Cluster_screening(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL)
 }
 \arguments{
 \item{Tmu}{the segmentation results obtained from the Segmentation function}
 
+\item{p_val}{a number from 0 to 1 indicating the threshold for p-value}
+
 \item{MaxDist}{the maximal number of days between change-points used to determinate the cluster. Default is 80}
+
+\item{detail}{any object indicating to have detail of test as output. Defaul is NULL, do not include the details.}
 }
 \value{
 list of two variables (RemoveData and UpdatedCP) :

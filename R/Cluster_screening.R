@@ -8,6 +8,7 @@
 #' @param Tmu the segmentation results obtained from the Segmentation function
 #' @param MaxDist the maximal number of days between change-points used to determinate the cluster. Default is 80
 #' @param detail any object indicating to have detail of test as output. Defaul is NULL, do not include the details.
+#' @param p_val a number from 0 to 1 indicating the threshold for p-value
 #'
 #' @return list of two variables (RemoveData and UpdatedCP) :
 #' \itemize{
@@ -18,7 +19,7 @@
 #' @export
 
 
-Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
+Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
 
   RemoveData <-  c()
   UpdatedCP <-  c()
@@ -53,8 +54,8 @@ Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
     if(nrow(SegmentsTest) > 0) {
       TValues <- sapply(1:nrow(SegmentsTest), function(x) {
         Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
-        Nor = sqrt(1 / Tmu$se[SegmentsTest$begin[x]]^2 +
-                     1 / Tmu$se[SegmentsTest$end[x]]^2)
+        Nor = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
+                   Tmu$se[SegmentsTest$end[x]]^2)
         Den / Nor
       })
       PValues <- sapply(TValues, function(x) {
@@ -69,10 +70,10 @@ Cluster_screening <- function(Tmu, MaxDist = 80, detail = NULL) {
                np_R = Tmu$np[SegmentsTest$end],
                tstat = TValues,
                pval = PValues,
-               signif = ifelse(PValues > 0.05, 0, 1))
+               signif = ifelse(PValues > p_val, 0, 1))
       # Update the segmentation result -----------------------------------------
       ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
-        if (PValues[i] < 0.05) {
+        if (PValues[i] < p_val) {
           ceiling((Tmu$end[SegmentsTest$begin[i]] +
                      Tmu$begin[SegmentsTest$end[i]]) / 2)
         }

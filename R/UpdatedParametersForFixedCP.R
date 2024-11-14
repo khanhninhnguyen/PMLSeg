@@ -16,7 +16,7 @@
 #' @export
 
 
-UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,ResSeg,FunctPart=TRUE,selectionF=FALSE){
+UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,FunctPart=TRUE,selectionF=FALSE){
 
   UpdatedData <- OneSeries
 
@@ -61,10 +61,10 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,ResSeg,FunctPart=
 
     #Option for estimating f
     if (selectionF==TRUE){
-      res.funct <- periodic_estimation_selb(auxiliar_data,var.est.t,lyear,threshold)
+      res.funct <- PMLseg:::periodic_estimation_selb(auxiliar_data,var.est.t,lyear,threshold)
 
     } else{
-      res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+      res.funct <-  PMLseg:::periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
     }
 
     funct<-res.funct$predict
@@ -83,12 +83,13 @@ UpdatedParametersForFixedCP <- function(OneSeries,ResScreening,ResSeg,FunctPart=
 
   UpdatePara$Tmu <- UpdatePara$Tmu[UpdatePara$Tmu$np != 0, ]
   UpdatePara$Tmu$end[nrow(UpdatePara$Tmu)] <- nrow(OneSeries)
-  # Update new changepoints
-  update_ind = which(Screening$UpdatedCP != UpdatePara$Tmu$end)
 
-  UpdatePara$Tmu$end <- Screening$UpdatedCP
+  # Update new changepoints
+  update_ind = which(ResScreening$UpdatedCP != UpdatePara$Tmu$end)
+
+  UpdatePara$Tmu$end <- ResScreening$UpdatedCP
   for(i in update_ind){
-    UpdatePara$Tmu$begin[i+1] <- Screening$UpdatedCP[i] + 1
+    UpdatePara$Tmu$begin[i+1] <- ResScreening$UpdatedCP[i] + 1
   }
 
   return(UpdatePara)

@@ -525,8 +525,8 @@ FormatOptSegK <- function(breakpointsK,Data,v){
   Data.var   = Data$signal/v
   mean.est.k = apply(rupt,1,FUN=function(z) sum(Data.var[z[1]:z[2]],na.rm=TRUE))
   var.est.k = apply(rupt,1,FUN=function(z) sum(1/(v[z[1]:z[2]]),na.rm=TRUE))
-  mean.est.k=mean.est.k/var.est.k
-  Tmu=data.frame(rupt,mean.est.k, 1/sqrt(var.est.k),diff(c(0,breakpointsK)))
+  mean.est.k = mean.est.k/var.est.k
+  Tmu = data.frame(rupt,mean.est.k, 1/sqrt(var.est.k),diff(c(0,breakpointsK)))
   colnames(Tmu) = c("begin","end","mean","se","np")
   return(Tmu)
 }
