@@ -24,7 +24,7 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
   RemoveData <-  c()
   UpdatedCP <-  c()
   ChangeCP <- c()
-
+  SegmentsTestOut <- NA
 
   flag <- integer(length(Tmu$np))
   flag[Tmu$np<MaxDist] <- 1
@@ -92,11 +92,8 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
              RemoveData = RemoveData,
              ChangeCP = ChangeCP)
 
-
   if(!is.null(detail)){
     Out$detail = SegmentsTestOut
-  } else{
-    Out$detail = NA
   }
 
   return(Out)

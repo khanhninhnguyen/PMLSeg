@@ -2,7 +2,6 @@
 #'
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param ResScreening the output of the Cluster_screening function
-#' @param Tmu a dataframe resulting from the segmentation function
 #' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
 #' @param selectionF a boolean indicating if a selection on the functions of the Fourier decomposition of order 4 is performed. The level of the test is by default 0.001. Default is FALSE
 #'
@@ -17,7 +16,7 @@
 #' @export
 
 
-UpdatedParametersForFixedCP <- function(OneSeries, Tmu, ResScreening, FunctPart=TRUE, selectionF=FALSE){
+UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE, selectionF=FALSE){
 
   UpdatedData <- OneSeries
 
@@ -32,8 +31,10 @@ UpdatedParametersForFixedCP <- function(OneSeries, Tmu, ResScreening, FunctPart=
   for (seg in segments) {
     UpdatedData$signal[seg] <- NA
   }
+
   UpdatedData <- na.omit(UpdatedData)
-  n.UpdatedData <- nrow(UpdatedData)
+
+  UpdatedData <- UpdatedData %>% tidyr::complete(date = seq(min(date), max(date), by = "day"))
 
   # Calculation of the monthly variances
   UpdatedData$year <- as.factor(format(UpdatedData$date,format='%Y'))
@@ -43,55 +44,140 @@ UpdatedParametersForFixedCP <- function(OneSeries, Tmu, ResScreening, FunctPart=
 
   # New estimation of the monthly variances
   MonthVar <- RobEstiMonthlyVariance(UpdatedData)^2
+  var.est.t = MonthVar[as.numeric(UpdatedData$month)]
 
   # New estimation of the Tmu
-  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[Tmu$end])
+  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[ResScreening$UpdatedCP])
 
-  var.est.t = MonthVar[as.numeric(UpdatedData$month)]
-  Tmu <- FormatOptSegK(c(UpdatedCP,n.UpdatedData),UpdatedData,var.est.t)
-  mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+  print(UpdatedCP)
+  print(ResScreening$UpdatedCP)
+  print(OneSeries$date[ResScreening$UpdatedCP])
+  print(UpdatedData$date[UpdatedCP])
 
   # New estimation of f
   if (FunctPart==TRUE){
     lyear <- 365.25
-    threshold<- 0.001
+    tol <- 0.001
+
+    maxIter = 100
+    Diff    = 2*tol
+    Iter = 0
 
     res.funct <- c()
     auxiliar_data <- UpdatedData
-    auxiliar_data$signal <- auxiliar_data$signal - mean.est.t
 
     #Option for estimating f
     if (selectionF==TRUE){
-      res.funct <- periodic_estimation_selb(auxiliar_data,var.est.t,lyear,threshold)
+
+      period <- periodic_estimation_tot_init(UpdatedData,var.est.t,lyear = 365.25)
+      auxiliar_data$signal <- UpdatedData$signal - period$predict
+      # res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+
+      Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
+      mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+
+      while ((Diff  > tol) & (Iter < maxIter)) {
+        Iter = Iter +1
+
+        auxiliar_data$signal = UpdatedData$signal - mean.est.t
+        periodi = periodic_estimation_selb(auxiliar_data,var.est.t,lyear)
+
+        auxiliar_data$signal = UpdatedData$signal - periodi$predict
+        Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
+        mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+
+        if (Iter == 2){
+          t2 = c(period$predict, mean.est.t)
+        }
+        if (Iter == 3){
+          t1 = c(period$predict, mean.est.t)
+          t0 = c(periodi$predict,mean.est.t)
+          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
+          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
+        }
+        if (Iter > 3){
+          t2 = t1
+          t1 = t0
+          t0 = c(periodi$predict, mean.est.t)
+          tp1 = tp0
+          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
+          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
+          Diff = sum((tp0-tp1)^2)
+        }
+
+        period = periodi
+        Tmu = Tmu
+      }
+      res.funct <- period
 
     } else{
-      res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+
+      period <- periodic_estimation_tot_init(UpdatedData,var.est.t,lyear = 365.25)
+      auxiliar_data$signal <- UpdatedData$signal - period$predict
+      # res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+
+      Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
+      mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+
+      maxIter = 100
+      Diff    = 2*tol
+      Iter = 0
+
+      while ((Diff  > tol) & (Iter < maxIter)) {
+        Iter = Iter +1
+
+        auxiliar_data$signal = UpdatedData$signal - mean.est.t
+        periodi = periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+
+        auxiliar_data$signal = UpdatedData$signal - periodi$predict
+        Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
+        mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+
+        if (Iter == 2){
+          t2 = c(period$predict, mean.est.t)
+        }
+        if (Iter == 3){
+          t1 = c(period$predict, mean.est.t)
+          t0 = c(periodi$predict,mean.est.t)
+          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
+          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
+        }
+        if (Iter > 3){
+          t2 = t1
+          t1 = t0
+          t0 = c(periodi$predict, mean.est.t)
+          tp1 = tp0
+          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
+          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
+          Diff = sum((tp0-tp1)^2)
+        }
+
+        period = periodi
+        Tmu = Tmu
+      }
+      res.funct <- period
     }
 
-    funct<-res.funct$predict
-    coeff<-res.funct$coeff
+    funct <-res.funct$predict
+    coeff <-res.funct$coeff
 
   } else {
+    Tmu <- FormatOptSegK(UpdatedCP,UpdatedData,var.est.t)
+
     funct<-FALSE
     coeff<-FALSE
   }
+
+  Tmu <- Tmu %>%
+    mutate(begin = which(OneSeries$date %in% UpdatedData$date[Tmu$begin]),
+           end = ResScreening$UpdatedCP,
+           np = end - begin + 1)
 
   UpdatePara <- c()
   UpdatePara$MonthVar <- MonthVar
   UpdatePara$Tmu   <-  Tmu
   UpdatePara$FitF  <-  funct
   UpdatePara$CoeffF <-  coeff
-
-  UpdatePara$Tmu <- UpdatePara$Tmu[UpdatePara$Tmu$np != 0, ]
-  UpdatePara$Tmu$end[nrow(UpdatePara$Tmu)] <- nrow(OneSeries)
-
-  # Update new changepoints
-  update_ind = which(ResScreening$UpdatedCP != UpdatePara$Tmu$end)
-
-  UpdatePara$Tmu$end <- ResScreening$UpdatedCP
-  for(i in update_ind){
-    UpdatePara$Tmu$begin[i+1] <- ResScreening$UpdatedCP[i] + 1
-  }
 
   return(UpdatePara)
 

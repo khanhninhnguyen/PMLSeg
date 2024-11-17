@@ -6,7 +6,6 @@
 \usage{
 UpdatedParametersForFixedCP(
   OneSeries,
-  Tmu,
   ResScreening,
   FunctPart = TRUE,
   selectionF = FALSE
@@ -14,8 +13,6 @@ UpdatedParametersForFixedCP(
 }
 \arguments{
 \item{OneSeries}{a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date}
-
-\item{Tmu}{a dataframe resulting from the segmentation function}
 
 \item{ResScreening}{the output of the Cluster_screening function}
 
