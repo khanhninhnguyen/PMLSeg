@@ -25,66 +25,82 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
   UpdatedCP <-  c()
   ChangeCP <- c()
   SegmentsTestOut <- NA
+  if(nrow(Tmu) > 1) {
+    flag <- integer(length(Tmu$np))
+    flag[Tmu$np<MaxDist] <- 1
 
-  flag <- integer(length(Tmu$np))
-  flag[Tmu$np<MaxDist] <- 1
+    ClusterBegInd = which(diff(flag) == 1)+1
+    NormalSegInd = which(flag == 0)
 
-  ClusterBegInd = which(diff(flag) == 1)+1
-  NormalSegInd = which(flag == 0)
-
-  if (length(ClusterBegInd) > 0){
-    SegBefInd = sapply(ClusterBegInd, function(x) {
-      if (any(NormalSegInd < x)) max(NormalSegInd[NormalSegInd < x]) else NA
-    })
-    SegAftInd = sapply(ClusterBegInd, function(x) {
-      if (any(NormalSegInd > x)) min(NormalSegInd[NormalSegInd > x]) else NA
-    })
-
-    ClusterEndInd <-  SegAftInd - 1
-    ClusterEndInd[is.na(ClusterEndInd)] <- length(flag)
-
-    RemoveData <-  data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
-    SegmentsTest = stats::na.omit(data.frame(begin = SegBefInd,end = SegAftInd))
-    SegmentsTestOut = data.frame(begin = Tmu$begin[ClusterBegInd],
-                                 end = Tmu$end[ClusterEndInd])
-
-    UpdatedCP = Tmu$end[-unique(stats::na.omit(c(which(flag!=0), SegBefInd)))]
-
-    # Test difference in mean before and after cluster if needed ----
-    if(nrow(SegmentsTest) > 0) {
-      TValues <- sapply(1:nrow(SegmentsTest), function(x) {
-        Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
-        Nor = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
-                   Tmu$se[SegmentsTest$end[x]]^2)
-        Den / Nor
+    if (length(ClusterBegInd) > 0){
+      SegBefInd = sapply(ClusterBegInd, function(x) {
+        if (any(NormalSegInd < x)) max(NormalSegInd[NormalSegInd < x]) else NA
       })
-      PValues <- sapply(TValues, function(x) {
-        (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+      SegAftInd = sapply(ClusterBegInd, function(x) {
+        if (any(NormalSegInd > x)) min(NormalSegInd[NormalSegInd > x]) else NA
       })
-      SegmentsTestOut <- SegmentsTestOut %>%
-        mutate(mu_L = Tmu$mean[SegmentsTest$begin],
-               mu_R = Tmu$mean[SegmentsTest$end],
-               se_L = Tmu$se[SegmentsTest$begin],
-               se_R = Tmu$se[SegmentsTest$end],
-               np_L = Tmu$np[SegmentsTest$begin],
-               np_R = Tmu$np[SegmentsTest$end],
-               tstat = TValues,
-               pval = PValues,
-               signif = ifelse(PValues > p_val, 0, 1))
-      # Update the segmentation result -----------------------------------------
-      ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
-        if (PValues[i] < p_val) {
-          ceiling((Tmu$end[SegmentsTest$begin[i]] +
-                     Tmu$begin[SegmentsTest$end[i]]) / 2)
+
+      ClusterEndInd <-  SegAftInd - 1
+      ClusterEndInd[is.na(ClusterEndInd)] <- length(flag)
+
+      RemoveData <-  data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
+      SegmentsTest = stats::na.omit(data.frame(begin = SegBefInd,end = SegAftInd))
+      SegmentsTestOut = data.frame(begin = Tmu$begin[ClusterBegInd],
+                                   end = Tmu$end[ClusterEndInd])
+      ind_removed = which(is.na(SegBefInd) | is.na(SegAftInd))
+      if(length(ind_removed) > 0) {
+        SegmentsTestOut = SegmentsTestOut[-ind_removed,]
+      }
+      UpdatedCP = Tmu$end[-unique(stats::na.omit(c(which(flag!=0), SegBefInd)))]
+      # Test difference in mean before and after cluster if needed ----
+      if(nrow(SegmentsTest) > 0) {
+        TValues <- sapply(1:nrow(SegmentsTest), function(x) {
+          Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
+          Nor = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
+                     Tmu$se[SegmentsTest$end[x]]^2)
+          Den / Nor
+        })
+        PValues <- sapply(TValues, function(x) {
+          (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+        })
+        SegmentsTestOut <- SegmentsTestOut %>%
+          mutate(mu_L = Tmu$mean[SegmentsTest$begin],
+                 mu_R = Tmu$mean[SegmentsTest$end],
+                 se_L = Tmu$se[SegmentsTest$begin],
+                 se_R = Tmu$se[SegmentsTest$end],
+                 np_L = Tmu$np[SegmentsTest$begin],
+                 np_R = Tmu$np[SegmentsTest$end],
+                 tstat = TValues,
+                 pval = PValues,
+                 signif = ifelse(PValues > p_val, 0, 1))
+        # Update the segmentation result -----------------------------------------
+        ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
+          if (PValues[i] < p_val) {
+            ceiling((Tmu$end[SegmentsTest$begin[i]] +
+                       Tmu$begin[SegmentsTest$end[i]]) / 2)
+          }
+        })
+        # Update of list of changepoints ------------------------------------------
+        UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
+
+        # remove the last point ----------------------------------------------
+        if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
+          UpdatedCP = UpdatedCP[-length(UpdatedCP)]
         }
-      })
-      # Update of list of changepoints ------------------------------------------
-      UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
+      }
+
+      if(nrow(SegmentsTestOut) == 0){
+        SegmentsTestOut <- NA
+      }
+      ChangeCP <- "Yes"
+    } else {
+      UpdatedCP = Tmu$end[-nrow(Tmu)]
+      RemoveData = data.frame(begin = NA,end = NA)
+      ChangeCP <- "No"
     }
-    ChangeCP <- "Yes"
+
   } else {
     RemoveData = data.frame(begin = NA,end = NA)
-    UpdatedCP = Tmu$end[-nrow(Tmu)]
     ChangeCP <- "No"
   }
 

@@ -47,130 +47,57 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   var.est.t = MonthVar[as.numeric(UpdatedData$month)]
 
   # New estimation of the Tmu
-  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[ResScreening$UpdatedCP])
+  if(length(ResScreening$UpdatedCP)>1){
+    begin = c(1, ResScreening$UpdatedCP + 1)
+    end =  c(ResScreening$UpdatedCP, nrow(OneSeries))
+  } else{
+    begin = 1
+    end = nrow(OneSeries)
+  }
 
-  print(UpdatedCP)
-  print(ResScreening$UpdatedCP)
-  print(OneSeries$date[ResScreening$UpdatedCP])
-  print(UpdatedData$date[UpdatedCP])
+  # update according to the result of screening
+  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[ResScreening$UpdatedCP])
+  UpdatedCP <- c(UpdatedCP, nrow(UpdatedData))
 
   # New estimation of f
   if (FunctPart==TRUE){
     lyear <- 365.25
-    tol <- 0.001
-
-    maxIter = 100
-    Diff    = 2*tol
-    Iter = 0
 
     res.funct <- c()
     auxiliar_data <- UpdatedData
 
-    #Option for estimating f
-    if (selectionF==TRUE){
+    res.funct = periodic_estimation_all(Data = UpdatedData,
+                                          CP = UpdatedCP,
+                                          var.est.t = var.est.t,
+                                          lyear = 365.25)
 
-      period <- periodic_estimation_tot_init(UpdatedData,var.est.t,lyear = 365.25)
-      auxiliar_data$signal <- UpdatedData$signal - period$predict
-      # res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
+    funct <- res.funct$predict
+    coeff <- res.funct$coeff
 
-      Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
-      mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+    Tmu <- data.frame(begin = begin,
+                      end = end,
+                      mean = coeff[-c(1:8)])
 
-      while ((Diff  > tol) & (Iter < maxIter)) {
-        Iter = Iter +1
+    var_est_t_inv = 1/(var.est.t[as.numeric(UpdatedData$month)])
+    var_est_t_inv = var_est_t_inv[which(UpdatedData$date %in% OneSeries$date)]
+    se.est.k = sapply(1:nrow(Tmu), function(x) {
+      sqrt(1/(sum(var_est_t_inv[Tmu$begin[x]:Tmu$end[x]])))
+    })
 
-        auxiliar_data$signal = UpdatedData$signal - mean.est.t
-        periodi = periodic_estimation_selb(auxiliar_data,var.est.t,lyear)
-
-        auxiliar_data$signal = UpdatedData$signal - periodi$predict
-        Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
-        mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
-
-        if (Iter == 2){
-          t2 = c(period$predict, mean.est.t)
-        }
-        if (Iter == 3){
-          t1 = c(period$predict, mean.est.t)
-          t0 = c(periodi$predict,mean.est.t)
-          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
-          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
-        }
-        if (Iter > 3){
-          t2 = t1
-          t1 = t0
-          t0 = c(periodi$predict, mean.est.t)
-          tp1 = tp0
-          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
-          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
-          Diff = sum((tp0-tp1)^2)
-        }
-
-        period = periodi
-        Tmu = Tmu
-      }
-      res.funct <- period
-
-    } else{
-
-      period <- periodic_estimation_tot_init(UpdatedData,var.est.t,lyear = 365.25)
-      auxiliar_data$signal <- UpdatedData$signal - period$predict
-      # res.funct <- periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
-
-      Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
-      mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
-
-      maxIter = 100
-      Diff    = 2*tol
-      Iter = 0
-
-      while ((Diff  > tol) & (Iter < maxIter)) {
-        Iter = Iter +1
-
-        auxiliar_data$signal = UpdatedData$signal - mean.est.t
-        periodi = periodic_estimation_tot(auxiliar_data,var.est.t,lyear)
-
-        auxiliar_data$signal = UpdatedData$signal - periodi$predict
-        Tmu <- FormatOptSegK(UpdatedCP,auxiliar_data,var.est.t)
-        mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
-
-        if (Iter == 2){
-          t2 = c(period$predict, mean.est.t)
-        }
-        if (Iter == 3){
-          t1 = c(period$predict, mean.est.t)
-          t0 = c(periodi$predict,mean.est.t)
-          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
-          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
-        }
-        if (Iter > 3){
-          t2 = t1
-          t1 = t0
-          t0 = c(periodi$predict, mean.est.t)
-          tp1 = tp0
-          tp0 = (t2-t1)/sum((t1==t2)+((t2-t1)^2)) + (t0-t1)/sum((t1==t0)+((t0-t1)^2))
-          tp0 = t1 + tp0 / sum((tp0==0) + tp0^2)
-          Diff = sum((tp0-tp1)^2)
-        }
-
-        period = periodi
-        Tmu = Tmu
-      }
-      res.funct <- period
-    }
-
-    funct <-res.funct$predict
-    coeff <-res.funct$coeff
+    Tmu <- Tmu %>%
+      mutate(se = se.est.k,
+             np = diff(c(0,Tmu$end)))
 
   } else {
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedData,var.est.t)
 
-    funct<-FALSE
-    coeff<-FALSE
+    funct <- FALSE
+    coeff <- FALSE
   }
 
   Tmu <- Tmu %>%
-    mutate(begin = which(OneSeries$date %in% UpdatedData$date[Tmu$begin]),
-           end = ResScreening$UpdatedCP,
+    mutate(begin = begin,
+           end = end,
            np = end - begin + 1)
 
   UpdatePara <- c()
@@ -183,3 +110,39 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
 
 }
 
+periodic_estimation_all = function(Data,CP,var.est.t,lyear){
+  DataF=Data
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  for (i in 1:4){
+    cosX=cos(i*DataF$t*(2*pi)/lyear)
+    sinX=sin(i*DataF$t*(2*pi)/lyear)
+    DataF=cbind(DataF,cosX,sinX)
+    colnames(DataF)[(dim(DataF)[2]-1):(dim(DataF)[2])]=c(paste0('cos',i),paste0('sin',i))
+  }
+
+  # Add the new columns represent the mean to the dataframe
+  new_columns <- lapply(1:length(CP), function(i) {
+    new_col <- rep(0, nrow(DataF))
+    if (i == 1) {
+      start_index <- 1
+      end_index <- CP[i]
+    } else {
+      start_index <- CP[i - 1] + 1
+      end_index <- CP[i]
+    }
+    new_col[start_index:end_index] <- 1
+    return(new_col)
+  })
+
+  names(new_columns) <- paste0("mean_", 1:length(CP))
+  DataF <- DataF %>%
+    select(signal,cos1, sin1, cos2, sin2, cos3, sin3, cos4, sin4)
+  DataF <- cbind(DataF, new_columns)
+
+  reg=stats::lm(signal~-1+.,weights=1/var.est.t,data=DataF)
+  coeff=base::summary(reg)$coefficients[,1]
+  result=list()
+  result$predict=stats::predict(reg,DataF)
+  result$coeff=coeff
+  return(result)
+}
