@@ -51,8 +51,8 @@ df = data.frame(date = seq.Date(from = as.Date("2010-01-01"),
                                 to = as.Date("2010-01-01")+(length_series-1), 
                                 by = "day"),  
                 signal = rnorm(n = length_series, mean = 0, sd = 1))
-plot(df1$date, df1$signal, type = "l")
-head(df1, 3)
+plot(df$date, df$signal, type = "l")
+head(df, 3)
 ```
 
 ```{r}
@@ -122,31 +122,17 @@ Validation(OneSeries = df,
 
 5. Detecting Clusters of Change-Points
 
-Check for clusters of close change-points, which may due to outliers. In this example, the last segment is shorter than the given threshold.
+Check for clusters of close change-points, which may due to outliers. In this example, there are no clusters of change-points, so Cluster_Screening returns the same change-points as in the segmentation.
 
 ```{r}
 # Validate the segmentation result wrt metadata 
 screening = Cluster_screening(Tmu = seg$Tmu,
                               MaxDist = 80)
-
+screening
 ```
 
-Update variables after removal of short segments:
+If a cluster is detected, ClusterScreening indicates "Yes" to change the vector of change-points. In such a situation, it is necessary to run the UpdatedParametersForFixedCP function to re-estimate the mean with the updated change-points. For more details, please refer to the test.pdf.
 
-```{r}
-seg_upd = UpdatedParametersForFixedCP(OneSeries = df, 
-                                      ResScreening = screening, 
-                                      FunctPart = FALSE)
-str(seg_upd)
-```
-
-Visualize the final results:
-
-```{r}
-PlotSeg(OneSeries = df, 
-        SegRes = seg_upd, 
-        FunctPart = FALSE)
-```
 
 
 

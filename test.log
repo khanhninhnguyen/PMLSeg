@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.16)  21 NOV 2024 11:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.3.16)  21 NOV 2024 14:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1119,66 +1119,69 @@ n input line 12.
 ]
 \openout4 = `test.vrb'.
 
-(./test.vrb)
-Overfull \vbox (98.1169pt too high) detected at line 634
- []
+(./test.vrb) [19
 
-[19
+]
+\openout4 = `test.vrb'.
+
+(./test.vrb) [20
 
 ]
 \openout4 = `test.vrb'.
 
 (./test.vrb
-<test_files/figure-beamer/plotupdate1-1.pdf, id=217, 417.56pt x 96.36pt>
+<test_files/figure-beamer/plotupdate1-1.pdf, id=223, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotupdate1-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotupdate1-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotupdate1-1.pdf  used on in
 put line 15.
 (pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
-<test_files/figure-beamer/plotcompare1-1.pdf, id=218, 417.56pt x 96.36pt>
+<test_files/figure-beamer/plotcompare1-1.pdf, id=224, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotcompare1-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotcompare1-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotcompare1-1.pdf  used on i
-nput line 27.
+nput line 25.
 (pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
-<test_files/figure-beamer/plotupdate2-1.pdf, id=219, 417.56pt x 96.36pt>
+) [21
+
+ <./test_files/figure-beamer/plotupdate1-1.pdf> <./test_files/figure-beamer/plo
+tcompare1-1.pdf>]
+\openout4 = `test.vrb'.
+
+(./test.vrb
+<test_files/figure-beamer/plotupdate2-1.pdf, id=251, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotupdate2-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotupdate2-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotupdate2-1.pdf  used on in
-put line 42.
+put line 15.
 (pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
-<test_files/figure-beamer/plotcompare2-1.pdf, id=220, 417.56pt x 96.36pt>
+<test_files/figure-beamer/plotcompare2-1.pdf, id=252, 417.56pt x 96.36pt>
 File: test_files/figure-beamer/plotcompare2-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotcompare2-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotcompare2-1.pdf  used on i
-nput line 52.
+nput line 25.
 (pdftex.def)             Requested size: 307.28987pt x 70.9171pt.
-)
-Overfull \vbox (226.7309pt too high) detected at line 689
- []
+) [22
 
-[20
-
- <./test_files/figure-beamer/plotupdate1-1.pdf> <./test_files/figure-beamer/plo
-tcompare1-1.pdf> <./test_files/figure-beamer/plotupdate2-1.pdf> <./test_files/f
-igure-beamer/plotcompare2-1.pdf>]
+ <./test_files/figure-beamer/plotupdate2-1.pdf> <./test_files/figure-beamer/plo
+tcompare2-1.pdf>]
 \openout4 = `test.vrb'.
 
-(./test.vrb) [21
+(./test.vrb) [23
 
 ]
 \openout4 = `test.vrb'.
 
 (./test.vrb
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <9> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 7.
-<test_files/figure-beamer/plotmeta-1.pdf, id=273, 417.56pt x 204.765pt>
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 5.
+<test_files/figure-beamer/plotmeta-1.pdf, id=285, 417.56pt x 204.765pt>
 File: test_files/figure-beamer/plotmeta-1.pdf Graphic file (type pdf)
 <use test_files/figure-beamer/plotmeta-1.pdf>
 Package pdftex.def Info: test_files/figure-beamer/plotmeta-1.pdf  used on input
- line 15.
+ line 13.
 (pdftex.def)             Requested size: 307.28987pt x 150.69885pt.
-) [22
+) [24
 
  <./test_files/figure-beamer/plotmeta-1.pdf>]
 \tf@nav=\write6
@@ -1192,10 +1195,10 @@ Package pdftex.def Info: test_files/figure-beamer/plotmeta-1.pdf  used on input
 
 (./test.aux) ) 
 Here is how much of TeX's memory you used:
- 24926 strings out of 478287
- 480659 string characters out of 5849289
- 766028 words of memory out of 5000000
- 42402 multiletter control sequences out of 15000+600000
+ 24940 strings out of 478287
+ 480860 string characters out of 5849289
+ 761028 words of memory out of 5000000
+ 42406 multiletter control sequences out of 15000+600000
  522848 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,11n,122p,1001b,509s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1207,10 +1210,10 @@ e1/public/lm/lmss9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr
 lic/lm/lmtt8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb></usr/share/
 texmf/fonts/type1/public/lm/lmtti10.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/symbols/msam10.pfb>
-Output written on test.pdf (22 pages, 448724 bytes).
+Output written on test.pdf (24 pages, 451019 bytes).
 PDF statistics:
- 349 PDF objects out of 1000 (max. 8388607)
- 258 compressed objects within 3 object streams
- 66 named destinations out of 1000 (max. 500000)
+ 362 PDF objects out of 1000 (max. 8388607)
+ 269 compressed objects within 3 object streams
+ 72 named destinations out of 1000 (max. 500000)
  30828 words of extra memory for PDF output out of 35830 (max. 10000000)
 

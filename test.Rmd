@@ -275,7 +275,11 @@ seg_upd3c = UpdatedParametersForFixedCP(OneSeries = df3c,
                                       ResScreening = screening1)
 str(seg_upd3c)
 seg_upd3c$Tmu
+```
+## Test the `UpdatedParametersForFixedCP` function
 
+\footnotesize
+```{r update1, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 seg_upd3d = UpdatedParametersForFixedCP(OneSeries = df3d, 
                                       ResScreening = screening2)
 str(seg_upd3d)
@@ -292,14 +296,12 @@ PlotSeg(OneSeries = df3d,
         SegRes = seg_upd3d,
         RemoveData = screening2$RemoveData)
 ```
-
 Compare to the result before the cluster screening
-
 ```{r plotcompare1, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
-PlotSeg(OneSeries = df3c, 
-        SegRes = seg_upd3c,
-        RemoveData = screening1$RemoveData)
+PlotSeg(OneSeries = df3d, 
+        SegRes = seg3d)
 ```
+
 ## Test the `UpdatedParametersForFixedCP` function
 
 Visualize the time series after the updated segmentation 
@@ -311,7 +313,6 @@ PlotSeg(OneSeries = df3c,
         RemoveData = screening1$RemoveData)
 ```
 Compare to the result before the cluster screening
-
 ```{r plotcompare2, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
 PlotSeg(OneSeries = df3c, 
         SegRes = seg3c)
@@ -330,9 +331,7 @@ valid = Validation(OneSeries = df3d,
 valid
 ```
 
-## Test the `Validation` function
-
-Visualize results with metadata
+## Visualize results with metadata
 
 ```{r plotmeta, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 

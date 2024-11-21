@@ -35,20 +35,42 @@ library(PMLseg)
 
 set.seed(1)
 length_series = 1000
-df = data.frame(date = seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(length_series-1), by = "day"),  
+df = data.frame(date = seq.Date(from = as.Date("2010-01-01"),
+                                to = as.Date("2010-01-01")+(length_series-1), 
+                                by = "day"),  
                 signal = rnorm(n = length_series, mean = 0, sd = 1))
-
 plot(df$date, df$signal, type = "l")
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="100%" />
 
 ``` r
-# Adding 2 arbitrary jumps 
-jump_ind = sample(1:length_series, 2, replace = FALSE) 
-for (i in jump_ind) {
-  df$signal[1: i] <- df$signal[1: i] + 1
+head(df, 3)
+#>         date     signal
+#> 1 2010-01-01 -0.6264538
+#> 2 2010-01-02  0.1836433
+#> 3 2010-01-03 -0.8356286
+```
+
+``` r
+# Adding 2 jumps 
+# Function to generate jump series
+generate_jump_series <- function(jump_indices, jump_amp, length_series) {
+  jump_series <- rep(0, length_series)
+  jump_indices <- c(1, jump_indices, length_series + 1)
+  
+  changes <- rep(0, length_series)
+  changes[jump_indices[-length(jump_indices)]] <- jump_amp
+  
+  jump_series <- cumsum(changes)
+  
+  return(jump_series)
 }
+# No cluster
+jump_ind <- c(200, 600)
+jump_amp <- c(0, 1, 1)
+jump_series <- generate_jump_series(jump_ind, jump_amp, length_series)
+df$signal <- df$signal + jump_series
 plot(df$date, df$signal, type = "l")
 ```
 
@@ -67,15 +89,15 @@ seg = Segmentation(OneSeries = df,
 str(seg)
 #> List of 5
 #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
-#>   ..$ begin: int [1:3] 1 814 924
-#>   ..$ end  : int [1:3] 813 923 1000
-#>   ..$ mean : num [1:3] 1.9911 1.0773 -0.0453
-#>   ..$ se   : num [1:3] 26.75 9.7 8.57
-#>   ..$ np   : num [1:3] 813 110 77
+#>   ..$ begin: int [1:3] 1 200 599
+#>   ..$ end  : int [1:3] 199 598 1000
+#>   ..$ mean : num [1:3] 0.0423 0.9973 1.969
+#>   ..$ se   : num [1:3] 0.075 0.0536 0.0527
+#>   ..$ np   : num [1:3] 199 399 402
 #>  $ FitF    : logi FALSE
 #>  $ CoeffF  : logi FALSE
-#>  $ MonthVar: num [1:12] 1.089 0.887 1.322 1.092 1.21 ...
-#>  $ SSR     : num 929
+#>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
+#>  $ SSR     : num 933
 ```
 
 Main results: The beginning, end, mean value, standard deviation, and
@@ -83,10 +105,10 @@ number of points of segments are provided in the `Tmu` dataframe:
 
 ``` r
 seg$Tmu
-#>   begin  end        mean        se  np
-#> 1     1  813  1.99109942 26.751349 813
-#> 2   814  923  1.07725214  9.697921 110
-#> 3   924 1000 -0.04528994  8.569465  77
+#>   begin  end       mean         se  np
+#> 1     1  199 0.04231954 0.07503647 199
+#> 2   200  598 0.99732352 0.05361806 399
+#> 3   599 1000 1.96897996 0.05271989 402
 ```
 
 3.  Visualizing Segmentation Results
@@ -110,8 +132,8 @@ meta = data.frame(date = df$date[jump_ind],
                 type = c("example1", "example2"))
 meta
 #>         date     type
-#> 1 2012-03-25 example1
-#> 2 2012-07-11 example2
+#> 1 2010-07-19 example1
+#> 2 2011-08-23 example2
 ```
 
 ``` r
@@ -123,46 +145,33 @@ Validation(OneSeries = df,
 #> # A tibble: 2 × 5
 #>   CP         closestMetadata Distance type     valid
 #>   <date>     <date>             <dbl> <chr>    <dbl>
-#> 1 2012-03-23 2012-03-25             2 example1     1
-#> 2 2012-07-11 2012-07-11             0 example2     1
+#> 1 2010-07-18 2010-07-19             1 example1     1
+#> 2 2011-08-21 2011-08-23             2 example2     1
 ```
 
 5.  Detecting Clusters of Change-Points
 
 Check for clusters of close change-points, which may due to outliers. In
-this example, the last segment is shorter than the given threshold.
+this example, there are no clusters of change-points, so
+Cluster_Screening returns the same change-points as in the segmentation.
 
 ``` r
 # Validate the segmentation result wrt metadata 
 screening = Cluster_screening(Tmu = seg$Tmu,
                               MaxDist = 80)
+screening
+#> $UpdatedCP
+#> [1] 199 598
+#> 
+#> $RemoveData
+#>   begin end
+#> 1    NA  NA
+#> 
+#> $ChangeCP
+#> [1] "No"
 ```
 
-Update variables after removal of short segments:
-
-``` r
-seg_upd = UpdatedParametersForFixedCP(OneSeries = df, 
-                                      ResScreening = screening, 
-                                      FunctPart = FALSE)
-str(seg_upd)
-#> List of 4
-#>  $ MonthVar: num [1:12] 1.089 0.887 1.322 1.092 1.21 ...
-#>  $ Tmu     :'data.frame':    2 obs. of  5 variables:
-#>   ..$ begin: num [1:2] 1 814
-#>   ..$ end  : num [1:2] 813 1000
-#>   ..$ mean : num [1:2] 1.991 0.621
-#>   ..$ se   : num [1:2] 26.5 12.7
-#>   ..$ np   : num [1:2] 813 187
-#>  $ FitF    : logi FALSE
-#>  $ CoeffF  : logi FALSE
-```
-
-Visualize the final results:
-
-``` r
-PlotSeg(OneSeries = df, 
-        SegRes = seg_upd, 
-        FunctPart = FALSE)
-```
-
-<img src="README_files/figure-gfm/unnamed-chunk-12-1.png" width="100%" />
+If a cluster is detected, ClusterScreening indicates “Yes” to change the
+vector of change-points. In such a situation, it is necessary to run the
+UpdatedParametersForFixedCP function to re-estimate the mean with the
+updated change-points. For more details, please refer to the test.pdf.
