@@ -10,12 +10,19 @@
 #' @param detail any object indicating to have detail of test as output. Defaul is NULL, do not include the details.
 #' @param p_val a number from 0 to 1 indicating the threshold for p-value
 #'
-#' @return list of two variables (RemoveData and UpdatedCP) :
+#' @return A list of four variables (RemoveData, UpdatedCP, ChangeCP, and detail):
 #' \itemize{
-#' \item \code{UpdatedCP} that is the change-points remaining after screening
-#' \item \code{RemoveData} that is a data frame including the beginning and the end positions (time index) of the segments to be deleted after filtering
+#' \item \code{UpdatedCP}: The change-points remaining after screening.
+#' \item \code{RemoveData}: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
+#' \item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after cluster screening.
+#' \item \code{detail}: A data frame containing the results of the significance test of the mean difference before and after the cluster, including the following columns:
+#'   \itemize{
+#'     \item \code{mu_L}, \code{mu_R}: Means of the segments before and after the cluster.
+#'     \item \code{se_L}, \code{se_R}: Standard errors of the means of the segments before and after the cluster.
+#'     \item \code{np_L}, \code{np_R}: Number of points before and after the cluster.
+#'     \item \code{tstat}, \code{pval}, \code{signif}: t-values, p-values, and significance codes of the test.
+#'   }
 #' }
-#'
 #' @export
 
 
@@ -25,6 +32,7 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
   UpdatedCP <-  c()
   ChangeCP <- c()
   SegmentsTestOut <- NA
+
   if(nrow(Tmu) > 1) {
     flag <- integer(length(Tmu$np))
     flag[Tmu$np<MaxDist] <- 1
@@ -82,10 +90,9 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
         })
         # Update of list of changepoints ------------------------------------------
         UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
-
         # remove the last point ----------------------------------------------
         if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
-          UpdatedCP = UpdatedCP[-length(UpdatedCP)]
+          UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
         }
       }
 

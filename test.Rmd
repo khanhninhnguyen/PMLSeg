@@ -125,9 +125,9 @@ jump_amp1 <- c(0, 1, 1)
 # One cluster formed by the second and third change-points, which need to be 
 # replaced by the middle point 
 jump_ind2 <- c(200, 600, 640)
-jump_amp2 <- c(0, 1, -2, 3)
+jump_amp2 <- c(0, 1, -3, 2)
 # One cluster formed by the second and third change-points, which need to be removed 
-jump_amp3 <- c(0, 1, -2, 2)
+jump_amp3 <- c(0, 1, -3, 3)
 ```
 
 ## Premilinary setting
@@ -271,10 +271,15 @@ When the screening say it is needed to replace the changepoint, we need to reest
 
 \footnotesize
 ```{r update, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
-seg_upd = UpdatedParametersForFixedCP(OneSeries = df3c, 
+seg_upd3c = UpdatedParametersForFixedCP(OneSeries = df3c, 
                                       ResScreening = screening1)
-str(seg_upd)
-seg_upd$Tmu
+str(seg_upd3c)
+seg_upd3c$Tmu
+
+seg_upd3d = UpdatedParametersForFixedCP(OneSeries = df3d, 
+                                      ResScreening = screening2)
+str(seg_upd3d)
+seg_upd3d$Tmu
 ```
 
 ## Test the `UpdatedParametersForFixedCP` function
@@ -282,17 +287,34 @@ seg_upd$Tmu
 Visualize the time series after the updated segmentation 
 
 \footnotesize
-```{r plotupdate, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
+```{r plotupdate1, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
 PlotSeg(OneSeries = df3d, 
-        SegRes = seg_upd,
-        RemoveData = screening1$RemoveData)
+        SegRes = seg_upd3d,
+        RemoveData = screening2$RemoveData)
 ```
 
 Compare to the result before the cluster screening
 
-```{r plotcompare, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
-PlotSeg(OneSeries = df3d, 
-        SegRes = seg3d)
+```{r plotcompare1, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
+PlotSeg(OneSeries = df3c, 
+        SegRes = seg_upd3c,
+        RemoveData = screening1$RemoveData)
+```
+## Test the `UpdatedParametersForFixedCP` function
+
+Visualize the time series after the updated segmentation 
+
+\footnotesize
+```{r plotupdate2, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
+PlotSeg(OneSeries = df3c, 
+        SegRes = seg_upd3c,
+        RemoveData = screening1$RemoveData)
+```
+Compare to the result before the cluster screening
+
+```{r plotcompare2, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 1.5}
+PlotSeg(OneSeries = df3c, 
+        SegRes = seg3c)
 ```
 
 ## Test the `Validation` function
@@ -302,7 +324,7 @@ Validate the detected change-points with respect to the metadata
 \footnotesize
 ```{r validation, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 valid = Validation(OneSeries = df3d, 
-           Tmu = seg_upd$Tmu,
+           Tmu = seg_upd3d$Tmu,
            MinDist = 62,
            Metadata = meta)
 valid
@@ -314,7 +336,7 @@ Visualize results with metadata
 
 ```{r plotmeta, echo = TRUE, message=FALSE, fig.width = 6, fig.height = 3}
 PlotSeg(OneSeries = df3d, 
-        SegRes = seg_upd,
+        SegRes = seg_upd3d,
         RemoveData = screening1$RemoveData,
         Metadata = meta, 
         Validated_CP_Meta = valid)

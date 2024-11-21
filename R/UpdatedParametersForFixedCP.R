@@ -32,9 +32,7 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     UpdatedData$signal[seg] <- NA
   }
 
-  UpdatedData <- na.omit(UpdatedData)
-
-  UpdatedData <- UpdatedData %>% tidyr::complete(date = seq(min(date), max(date), by = "day"))
+  # UpdatedData <- na.omit(UpdatedData)
 
   # Calculation of the monthly variances
   UpdatedData$year <- as.factor(format(UpdatedData$date,format='%Y'))
@@ -47,7 +45,7 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   var.est.t = MonthVar[as.numeric(UpdatedData$month)]
 
   # New estimation of the Tmu
-  if(length(ResScreening$UpdatedCP)>1){
+  if(length(ResScreening$UpdatedCP)>0){
     begin = c(1, ResScreening$UpdatedCP + 1)
     end =  c(ResScreening$UpdatedCP, nrow(OneSeries))
   } else{
@@ -78,10 +76,10 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
                       end = end,
                       mean = coeff[-c(1:8)])
 
-    var_est_t_inv = 1/(var.est.t[as.numeric(UpdatedData$month)])
-    var_est_t_inv = var_est_t_inv[which(UpdatedData$date %in% OneSeries$date)]
+    var_est_t_inv = 1/(var.est.t)
+    var_est_t_inv[which(is.na(UpdatedData$signal))] <- NA
     se.est.k = sapply(1:nrow(Tmu), function(x) {
-      sqrt(1/(sum(var_est_t_inv[Tmu$begin[x]:Tmu$end[x]])))
+      sqrt(1/(sum(var_est_t_inv[Tmu$begin[x]:Tmu$end[x]], na.rm = TRUE)))
     })
 
     Tmu <- Tmu %>%

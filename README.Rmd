@@ -47,18 +47,33 @@ library(PMLseg)
 
 set.seed(1)
 length_series = 1000
-df = data.frame(date = seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(length_series-1), by = "day"),  
+df = data.frame(date = seq.Date(from = as.Date("2010-01-01"),
+                                to = as.Date("2010-01-01")+(length_series-1), 
+                                by = "day"),  
                 signal = rnorm(n = length_series, mean = 0, sd = 1))
-
-plot(df$date, df$signal, type = "l")
+plot(df1$date, df1$signal, type = "l")
+head(df1, 3)
 ```
 
 ```{r}
-# Adding 2 arbitrary jumps 
-jump_ind = sample(1:length_series, 2, replace = FALSE) 
-for (i in jump_ind) {
-  df$signal[1: i] <- df$signal[1: i] + 1
+# Adding 2 jumps 
+# Function to generate jump series
+generate_jump_series <- function(jump_indices, jump_amp, length_series) {
+  jump_series <- rep(0, length_series)
+  jump_indices <- c(1, jump_indices, length_series + 1)
+  
+  changes <- rep(0, length_series)
+  changes[jump_indices[-length(jump_indices)]] <- jump_amp
+  
+  jump_series <- cumsum(changes)
+  
+  return(jump_series)
 }
+# No cluster
+jump_ind <- c(200, 600)
+jump_amp <- c(0, 1, 1)
+jump_series <- generate_jump_series(jump_ind, jump_amp, length_series)
+df$signal <- df$signal + jump_series
 plot(df$date, df$signal, type = "l")
 
 ```

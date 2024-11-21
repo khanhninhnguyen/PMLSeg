@@ -16,10 +16,18 @@ Cluster_screening(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL)
 \item{detail}{any object indicating to have detail of test as output. Defaul is NULL, do not include the details.}
 }
 \value{
-list of two variables (RemoveData and UpdatedCP) :
+A list of four variables (RemoveData, UpdatedCP, ChangeCP, and detail):
 \itemize{
-\item \code{UpdatedCP} that is the change-points remaining after screening
-\item \code{RemoveData} that is a data frame including the beginning and the end positions (time index) of the segments to be deleted after filtering
+\item \code{UpdatedCP}: The change-points remaining after screening.
+\item \code{RemoveData}: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
+\item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after cluster screening.
+\item \code{detail}: A data frame containing the results of the significance test of the mean difference before and after the cluster, including the following columns:
+\itemize{
+\item \code{mu_L}, \code{mu_R}: Means of the segments before and after the cluster.
+\item \code{se_L}, \code{se_R}: Standard errors of the means of the segments before and after the cluster.
+\item \code{np_L}, \code{np_R}: Number of points before and after the cluster.
+\item \code{tstat}, \code{pval}, \code{signif}: t-values, p-values, and significance codes of the test.
+}
 }
 }
 \description{
