@@ -11,7 +11,7 @@ Description: Segmentation time series. The model is a segmentation in the mean m
 Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
-Imports: robustbase, capushe, gfpop, dplyr, ggplot2
+Imports: robustbase, capushe, gfpop, dplyr, ggplot2, tidyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 NeedsCompilation: no
