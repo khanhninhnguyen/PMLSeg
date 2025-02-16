@@ -51,7 +51,15 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
       ClusterEndInd <-  SegAftInd - 1
       ClusterEndInd[is.na(ClusterEndInd)] <- length(flag)
 
-      RemoveData <-  data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
+      RemoveData <- data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
+      # add the first cluster ----------------------------------------------
+      if(flag[1] == 1){
+        FirstClusterEnd <- which(flag == 0)[1]-1
+        FirstCluster <- data.frame(begin = Tmu$begin[1:FirstClusterEnd],end = Tmu$end[1:FirstClusterEnd])
+        RemoveData <- FirstCluster %>%
+          rbind(RemoveData)
+      }
+
       SegmentsTest = stats::na.omit(data.frame(begin = SegBefInd,end = SegAftInd))
       SegmentsTestOut = data.frame(begin = Tmu$begin[ClusterBegInd],
                                    end = Tmu$end[ClusterEndInd])
@@ -65,7 +73,7 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
         TValues <- sapply(1:nrow(SegmentsTest), function(x) {
           Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
           Nor = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
-                     Tmu$se[SegmentsTest$end[x]]^2)
+                       Tmu$se[SegmentsTest$end[x]]^2)
           Den / Nor
         })
         PValues <- sapply(TValues, function(x) {

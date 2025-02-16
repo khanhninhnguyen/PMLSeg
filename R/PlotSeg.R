@@ -6,7 +6,7 @@
 #'   \itemize{
 #'     \item \code{Tmu}: the segmentation results
 #'     \item \code{FitF}: the estimated functional part. If the function is not taking into account in the model, \code{FitF} is FALSE
-#'     \item \code{MonthVar}: the estimated variances of each month
+#'     \item \code{MonthStd}: the estimated standard deviations of each month
 #'   }
 #' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
 #' @param RemoveData  a data frame including the beginning and the end positions (time index) of the segments to be deleted after filtering
@@ -44,18 +44,19 @@ PlotSeg <- function(OneSeries,
   variable <- c()
   shapes <- c()
 
-  colors <- c("signal" = "gray", "Mean" = "red", "FitF" = "purple", "MonthVar" = "cyan")
+  colors <- c("signal" = "gray", "Mean" = "red", "FitF" = "purple", "MonthStd" = "cyan")
 
   OneSeries <- OneSeries %>%
-    mutate(Mean = rep(SegRes$Tmu$mean, times = SegRes$Tmu$np),
+    mutate(Mean = rep(SegRes$Tmu$mean, times = (SegRes$Tmu$end - SegRes$Tmu$begin + 1)),
            Month = as.numeric(format(date, "%m")),
-           MonthVar = SegRes$MonthVar[as.numeric(Month)] - abs(MinPoint)) %>%
+           MonthStd = sqrt(SegRes$MonthVar[as.numeric(Month)]) - abs(MinPoint)) %>%
     select(-Month)
 
   if (FunctPart==TRUE){
     OneSeries <- OneSeries %>%
       mutate( FitF = SegRes$FitF - abs(MinPoint))
   }
+
 
   # validated CP
   if (!is.null(Validated_CP_Meta)) {
@@ -72,6 +73,13 @@ PlotSeg <- function(OneSeries,
     }))
 
     OneSeries[RemoveInd, c("signal", "Mean")] <- NA
+  }
+
+  IndNA <- which(is.na(OneSeries$signal))
+  if(length(IndNA) > 0){
+    OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
+    OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
+    OneSeries$FitF[which(is.na(OneSeries$signal))] <- NA
   }
 
   # Add metadata
@@ -94,6 +102,7 @@ PlotSeg <- function(OneSeries,
     shapes <- c(shapes, "Meta" = 1)
   }
   # make data for plot
+
   variable_names <- names(OneSeries)[-1]  # Exclude the first column which is 'date'
 
   long_data <- stats::reshape(OneSeries,
@@ -110,9 +119,10 @@ PlotSeg <- function(OneSeries,
     theme_bw() +
     geom_line(data = subset(long_data, variable %in% c("signal")),
               aes(color = variable), size = 0.5, na.rm = TRUE) +
-    geom_line(data = subset(long_data, variable %in% c("Mean", "MonthVar")),
+    geom_line(data = subset(long_data, variable %in% c("Mean", "MonthStd")),
               aes(color = variable), size = 0.5, na.rm = TRUE) +
-    geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
+    geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE) +
+    geom_hline(yintercept = MinPoint, size = 0.3, lty = 1, color = "mediumpurple",na.rm = TRUE)
 
 
   if (FunctPart==TRUE){
