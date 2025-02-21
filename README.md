@@ -3,8 +3,7 @@
 
 # PMLSeg
 
-PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. It was initially developed for the detection of change-points in climate data but its versatility makes is a more general-purpose tool.
-The package includes the segmentation function as well as auxiliary functions for the screening, validation and visualization of the segmentation results.
+PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. It was initially developed for the detection of change-points in daily climate data with annual periodic bias and variance changing on monthly intervals. It is quite versatile and can be of more general-purpose usage. The package includes the segmentation function as well as auxiliary functions for the screening, validation and visualization of the segmentation results.
 
 ## Table of Contents
 
