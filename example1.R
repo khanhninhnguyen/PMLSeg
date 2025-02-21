@@ -1,1 +1,132 @@
+# example1: simple time series with 2 change-points (CPs) 
+#           noise periodica bias, and IID noise
+#
+# Note: by convention the position of the change-point is the last point of the segment
+
+rm(list=ls(all=TRUE))
+library(PMLseg)
+
+# time series simulation function
+simulate_time_series <- function(jump_ind, segmt_mean, noise_stdev, length_series) {
+  time_series <- rep(0, length_series)
+  jump_indices <- c(1, jump_ind+1, length_series + 1)
+  offsets <- c(0, diff(segmt_mean))
+  
+  changes <- rep(0, length_series)
+  changes[jump_indices[-length(jump_indices)]] <- offsets
+  changes[1] <- segmt_mean[1]
+  
+  time_series <- cumsum(changes)
+  noise <- rnorm(n = length_series, mean = 0, sd = noise_stdev)
+  time_series <- time_series + noise
+  
+  return(time_series)
+}
+
+# specify time series simulation parameters and analysis parameters
+n = 1000                    # length of time series
+jump_ind <- c(200, 600)     # position of change points (index in time series)
+segmt_mean <- c(-1, 1, 2)   # mean value of segments
+noise_stdev = 1             # noise std dev
+
+# create a time series df
+set.seed(1)                 # initialise random generator
+mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
+mysignal <- simulate_time_series(jump_ind, segmt_mean, noise_stdev, n)
+df = data.frame(date = mydate, signal = mysignal)
+plot(df$date, df$signal, type = "l")
+
+# run segmentation
+seg = Segmentation(OneSeries = df, FunctPart = FALSE)
+seg
+# $Tmu
+  # begin  end       mean         se  np
+# 1     1  200 -0.9590041 0.07503988 200
+# 2   201  600  0.9986774 0.05381478 400
+# 3   601 1000  1.9700134 0.05301899 400
+# $FitF
+# [1] FALSE
+# $CoeffF
+# [1] FALSE
+# $MonthVar
+ # [1] 1.0887581 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2189503
+ # [8] 1.2485059 0.8340097 1.8745634 1.2375832 1.1062817
+# $SSR
+# [1] 926.264
+
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE)
+
+# Compare estimated CP position to truth
+est_cp_ind <- seg$Tmu$end[1:(length(seg$Tmu$end)-1)]
+est_cp_ind - jump_ind
+# [1] 0 0                       # perfect detection
+
+# Create fake metadata df
+meta_ind <- c(100, 600)         # position of metadata (index in time series)
+meta_date <- df$date[meta_ind]  # date of metadata
+meta_type <- c("R", "RAD")      # type of event, e.g. R = receiver change, A = antenna change, D = radome change
+metadata = data.frame(date = meta_date, type = meta_type)
+metadata
+        # date type
+# 1 2010-04-10    R
+# 2 2011-08-23  RAD
+
+# Validate estimated CP position wrt metadata
+valid_max_dist = 62         # validation parameter
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = metadata)
+valid
+# A tibble: 2 × 5
+  # CP         closestMetadata Distance type  valid
+  # <date>     <date>             <dbl> <chr> <dbl>
+# 1 2010-07-19 2010-04-10           100 R         0
+# 2 2011-08-23 2011-08-23             0 RAD       1
+
+# Note: valid$Distance gives the distance between estimated CP and metadata
+
+# Tip: for the validation of simulated data, define a metadata df with the true positions of CPs to evaluate the accuracy of the estimated CPs
+
+# Create a metadata df with the true CP positions
+truth = data.frame(date = df$date[jump_ind], type = rep("True", (length(jump_ind))))
+
+# Evaluate the estimated CP position wrt truth
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
+valid
+# A tibble: 2 × 5
+  # CP         closestMetadata Distance type  valid
+  # <date>     <date>             <dbl> <chr> <dbl>
+# 1 2010-07-19 2010-07-19             0 True      1
+# 2 2011-08-23 2011-08-23             0 True      1
+
+# Explore further plot options:
+# plot with metadata
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata) 
+# plot with truth
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth) 
+# plot with validation results
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth, Validated_CP_Meta = valid)
+
+#
+# Check the impact of sample size on estimated parameters
+#
+# run again with:
+# n = 4000
+# seg
+# $Tmu
+  # begin  end       mean         se   np
+# 1     1  200 -0.9594519 0.07320467  200
+# 2   201  600  1.0035507 0.05183425  400
+# 3   601 4000  1.9996984 0.01770575 3400
+# $FitF
+# [1] FALSE
+# $CoeffF
+# [1] FALSE
+# $MonthVar
+ # [1] 1.0028753 1.0197086 1.1533860 1.0246834 1.1557490 1.0810175 1.0853490
+ # [8] 1.2065935 0.9384455 1.0965172 1.0328801 1.0531350
+# $SSR
+# [1] 4012.517
+#
+# Note: position of change-points is the same as with n=1000; 
+#       the $mean value and the $se of the last segment (longer than with n=1000) are improved;
+#       the $MonthVar values are closer to the true value (1)
 
