@@ -17,8 +17,9 @@ The development version of `PMLSeg` can be installed from GitHub with:
 
 ``` r
 
-# Install devtools if you haven't already
+# Install devtools and tidyr if you haven't already
 install.packages("devtools")
+install.packages("tidyr")
 
 # Install gfpop from
 https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
