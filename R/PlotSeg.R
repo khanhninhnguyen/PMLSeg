@@ -122,7 +122,7 @@ PlotSeg <- function(OneSeries,
     geom_line(data = subset(long_data, variable %in% c("Mean", "MonthStd")),
               aes(color = variable), size = 0.5, na.rm = TRUE) +
     geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE) +
-    geom_hline(yintercept = MinPoint, size = 0.3, lty = 1, color = "mediumpurple",na.rm = TRUE)
+    geom_hline(yintercept = MinPoint, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
 
 
   if (FunctPart==TRUE){
