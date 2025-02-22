@@ -1,3 +1,14 @@
+output: github_document
+<!-- example1.md is generated from example1.Rmd. Please edit that file -->
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+```
+
 # example1: simple time series with 2 change-points (CPs) 
 #           noise periodica bias, and IID noise
 #
