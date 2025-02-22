@@ -75,7 +75,7 @@ generate_jump_series <- function(jump_indices, jump_amp, length_series) {
   return(jump_series)
 }
 # No cluster
-jump_ind <- c(200, 600)
+jump_ind <- c(300, 600)
 jump_amp <- c(0, 1, 1)
 jump_series <- generate_jump_series(jump_ind, jump_amp, length_series)
 df$signal <- df$signal + jump_series
