@@ -36,7 +36,7 @@ PlotSeg <- function(OneSeries,
   x_period = "1 year"
 
   MaxPoint = max(OneSeries$signal, na.rm = TRUE) + 0.5
-  MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(SegRes$MonthVar), max(SegRes$FitF, na.rm = TRUE)) - 0.5
+  MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE)) - 0.5
 
   Month <- c()
   type <- c()
