@@ -467,7 +467,7 @@ Seg_funct_selbK <-function(Data,var.est.month,K,graphK,lmin,lyear,threshold,tol)
   segmK$LogLg = segmentation$LogLg
   segmK$f     = period$predict
   segmK$coeff = period$coeff
-  segmK$
+  #segmK$
   return(segmK)
 
 }
