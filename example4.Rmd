@@ -55,4 +55,3 @@ seg$MonthVar - noise_stdev ** 2
 sd(seg$MonthVar - noise_stdev ^ 2)^2
 
 # Note: increasing the length of the time series (more years) would improve the accuracy of the noise variance estimation
-# as well as the segmentation results
