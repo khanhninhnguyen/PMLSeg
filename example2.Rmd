@@ -1,18 +1,18 @@
 # example2: time series with gaps (NA values)
 #
-# Note: the df$date must be continous, gaps in the data must be introduced as NA's in df$signal
+# Note: the df$date must be continuous, gaps in the data must be introduced as NA's in df$signal
 
 rm(list=ls(all=TRUE))
 
 library(PMLseg)
 
-simulate_time_series <- function(jump_ind, segmt_mean, noise_stdev, length_series) {
+simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
   time_series <- rep(0, length_series)
-  jump_indices <- c(1, jump_ind+1, length_series + 1)
+  cp_indices <- c(1, cp_ind+1, length_series + 1)
   offsets <- c(0, diff(segmt_mean))
   
   changes <- rep(0, length_series)
-  changes[jump_indices[-length(jump_indices)]] <- offsets
+  changes[cp_indices[-length(cp_indices)]] <- offsets
   changes[1] <- segmt_mean[1]
   
   time_series <- cumsum(changes)
@@ -22,70 +22,40 @@ simulate_time_series <- function(jump_ind, segmt_mean, noise_stdev, length_serie
   return(time_series)
 }
 
-n = 1000
-jump_ind <- c(200, 600)
-segmt_mean <- c(-1, 1, 2)
-noise_stdev = 1
-valid_max_dist = 62         # validation parameter
-cluster_max_dist = 80       # screening parameter
-set.seed(1)
+# specify time series simulation parameters and analysis parameters
+n = 1000                     # length of time series
+cp_ind <- c(200, 600)        # position of change points (index in time series)
+segmt_mean <- c(-1, 1, 2)    # mean value of segments
+noise_stdev = 10             # noise std dev
 
+# create a time series df
+set.seed(1)                 # initialise random generator
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
-mysignal <- simulate_time_series(jump_ind, segmt_mean, noise_stdev, n)
+mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # add NA's in the signal
-NA_ind = seq(from = 10, to = 100, by = 1) # gap in the 1st segment
+NA_ind = seq(from = 100, to = 150, by = 1)  # gap in the 1st segment
 mysignal[NA_ind] <- NA
-NA_ind = seq(from = 580, to = 630, by = 1) # gap superposed with 2nd change-point
+NA_ind = seq(from = 580, to = 630, by = 1) # gap in the 2nd segment, superposed with 2nd change-point
 mysignal[NA_ind] <- NA
 
+# plot signal
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l")
 
+# run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
 seg
-# $Tmu
-  # begin  end      mean         se  np
-# 1     1  200 -1.017022 0.10468969 109
-# 2   201  636  1.005575 0.05476708 385
-# 3   637 1000  1.970641 0.05674252 364
-# $FitF
-# [1] FALSE
-# $CoeffF
-# [1] FALSE
-# $MonthVar
- # [1] 1.1772676 1.0229296 1.4490512 1.1939713 1.2098637 1.1702334 1.2189503
- # [8] 1.5899343 0.6306707 1.8745634 1.2375832 1.1062817
-# $SSR
-# [1] 775.1579
 
-
+# plot segmentation results
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE)
 
-Error in `mutate()`:
-ℹ In argument: `Mean = rep(SegRes$Tmu$mean, times = SegRes$Tmu$np)`.
-Caused by error:
-! `Mean` must be size 1000 or 1, not 909.
-Run `rlang::last_trace()` to see where the error occurred.
-
 # Create metadata for the true CP positions
-truth = data.frame(date = df$date[jump_ind], type = rep("True", (length(jump_ind))))
+truth = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 
 # validate estimated CP position wrt metadata
 valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
 valid
-# A tibble: 2 × 5
-  # CP         closestMetadata Distance type  valid
-  # <date>     <date>             <dbl> <chr> <dbl>
-# 1 2010-07-19 2010-07-19             0 True      1
-# 2 2011-09-28 2011-08-23             5 True      1
 
-screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
-screening
-# $UpdatedCP
-# [1] 200 636
-# $RemoveData
-  # begin end
-# 1    NA  NA
-# $ChangeCP
-# [1] "No"
+# plot time series with segmentation results, validation
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth, Validated_CP_Meta = valid)
