@@ -22,14 +22,15 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 # specify time series simulation parameters
-n = 1000                    # length of time series
-cp_ind <- c(200, 600)       # position of change points (index in time series)
-segmt_mean <- c(-1, 1, 2)   # mean value of segments
+date_begin <- as.Date("2010-01-01") # date of first data point
+n = 1000                            # length of time series
+cp_ind <- c(200, 600)               # position of change points (index in time series)
+segmt_mean <- c(-1, 1, 2)           # mean value of segments
 noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
 
 # create a time series df
 set.seed(1)
-mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
+mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l")
