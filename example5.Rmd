@@ -26,8 +26,8 @@ date_begin <- as.Date("2010-03-01") # date of first data point
 n = 1000                            # length of time series
 cp_ind <- c(200, 600)               # position of change points (index in time series)
 segmt_mean <- c(-1, 1, 2)           # mean value of segments
-noise_stdev <- rep(0.1, 12)           # noise variance (Jan to Dec)
-coeff <- c(1, 0, 0, 0)              # Fourier series coefficients (cos1, sin1, cos2, sin2...)
+noise_stdev <- rep(0.1, 12)         # noise variance (Jan to Dec)
+coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
 
 # create a time series df with jumps and noise
 set.seed(1)
@@ -35,13 +35,11 @@ mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # create a periodic function (Fourier series)
-date_periodic <- date_begin
-# date_periodic <- as.Date("2010-01-01") # reference date of periodic function
 T = 365.25                             # reference period (unit days)
-t = as.numeric(mydate)
-t0 = as.numeric(date_periodic)
-p = length(coeff) / 2
-f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0)*(2*pi)/T)))
+t = as.numeric(mydate)                 # time variable for periodic function
+t0 = as.numeric(mydate[1])             # reference date of periodic function is first date of time series
+p = length(coeff) / 2                  # order of Fourier Series
+f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
 plot(mydate, f, type = "l")
 
 # full signal
@@ -55,3 +53,16 @@ seg$Tmu
 seg$CoeffF
 seg$MonthVar
 seg$SSR
+
+sum(seg$CoeffF^2)
+
+# run segmentation with selection of statistically significant Fourier coefficients
+seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
+seg$Tmu
+seg$CoeffF
+seg$MonthVar
+seg$SSR
+
+sum(seg$CoeffF^2)
+
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
