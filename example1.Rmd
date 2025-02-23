@@ -65,7 +65,7 @@ valid
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata) 
 
 # plot with metadata and validation results
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
 # Tip: for the validation of simulated data, define a metadata df with the true positions of CPs to evaluate the accuracy of the estimated CPs
 
