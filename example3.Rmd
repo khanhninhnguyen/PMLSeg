@@ -67,7 +67,7 @@ valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MinDist = valid_max_di
 valid
 
 # Plot the time series with RemoveData option
-PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData, Metadata = truth, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
 # Note: the data in the clusters are not shown by the Plot function with the RemoveData option, but they are still in the time series
 # it may safe to remove them also from the signal data frame:
@@ -77,4 +77,4 @@ df_screened <- df
 for (i in 1:(length(screening$RemoveData))) {
     df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
 }
-PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = truth, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
