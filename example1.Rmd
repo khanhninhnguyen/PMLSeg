@@ -79,7 +79,7 @@ valid
 # plot with metadata=truth
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth) 
 
-# Explore the sensitivity of segmentation results to signal and noise parameters
+# Further explore the sensitivity of segmentation results to signal and noise parameters
 # a) Impact of sample size on estimated parameters
 #    run again with n = 4000 and observe that:
 #    - the position of change-points is the same as with n=1000
