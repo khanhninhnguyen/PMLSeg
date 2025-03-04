@@ -77,10 +77,16 @@ PlotSeg <- function(OneSeries,
 
   IndNA <- which(is.na(OneSeries$signal))
   if(length(IndNA) > 0){
-    OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
-    OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
-    OneSeries$FitF[which(is.na(OneSeries$signal))] <- NA
-  }
+    if (FunctPart==TRUE){
+      OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
+      OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
+      OneSeries$FitF[which(is.na(OneSeries$signal))] <- NA
+      } else {
+        OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
+        OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
+        }
+    }
+
 
   # Add metadata
   if (!is.null(Metadata)) {
