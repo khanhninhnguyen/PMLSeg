@@ -115,7 +115,7 @@ PlotSeg <- function(OneSeries,
   long_data$variable = as.factor(variable_names[long_data$variable])
   long_data$variable = as.factor(long_data$variable)
 
-  p <- ggplot2::ggplot(OneSeries, aes(x = date, y = value, colour = variable, shape = variable)) +
+  p <- ggplot2::ggplot(long_data, aes(x = date, y = value, colour = variable, shape = variable)) +
     theme_bw() +
     geom_line(data = subset(long_data, variable %in% c("signal")),
               aes(color = variable), size = 0.5, na.rm = TRUE) +
@@ -154,21 +154,38 @@ PlotSeg <- function(OneSeries,
     }
   }
 
+  if (!is.null(Metadata)){
+    p <- p +
+      scale_x_date(
+        limits = as.Date(c(OneSeries$date[1], OneSeries$date[nrow(OneSeries)])),
+        breaks = function(x) seq.Date(from = OneSeries$date[1], to = OneSeries$date[nrow(OneSeries)], by = x_period),
+        date_labels = "%Y") +
+      scale_color_manual(values = colors) +
+      scale_shape_manual(values = shapes) +
+      labs(x = labelx, y = labely, color = "", fill = "") +
+      theme(
+        legend.title = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank()
+      ) 
+  } else {
+    p <- p +
+      scale_x_date(
+        limits = as.Date(c(OneSeries$date[1], OneSeries$date[nrow(OneSeries)])),
+        breaks = function(x) seq.Date(from = OneSeries$date[1], to = OneSeries$date[nrow(OneSeries)], by = x_period),
+        date_labels = "%Y") +
+      scale_color_manual(values = colors) +
+      labs(x = labelx, y = labely, color = "", fill = "") +
+      theme(
+        legend.title = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank()
+      )
+  }
 
-  p <- p +
-    scale_x_date(
-      limits = as.Date(c(OneSeries$date[1], OneSeries$date[nrow(OneSeries)])),
-      breaks = function(x) seq.Date(from = OneSeries$date[1], to = OneSeries$date[nrow(OneSeries)], by = x_period),
-      date_labels = "%Y") +
-    scale_color_manual(values = colors) +
-    scale_shape_manual(values = shapes) +
-    labs(x = labelx, y = labely, color = "", fill = "") +
-    theme(
-      legend.title = element_blank(),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.background = element_blank()
-    )
+  
 
   p
   return(p)
