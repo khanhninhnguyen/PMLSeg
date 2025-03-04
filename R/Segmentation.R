@@ -37,7 +37,7 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
   cond1 <- TRUE
   cond2 <- TRUE
   cond3 <- TRUE
-
+  cond4 <- TRUE
   #Parameters
   lyear <- 365.25
   S     <- 0.75
@@ -69,7 +69,12 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
     warning("The minimal length of the segments lmin", lmin," needs to be lower than " ,round(n.X/Kmax),"\n")
   }
 
-  if ((cond1==TRUE) & (cond2==TRUE) & (cond3==TRUE)){
+  if(Kmax==1){
+    cond4 <- FALSE
+    warning("Kmax=1 means no segmentation")
+  }
+
+  if ((cond1==TRUE) & (cond2==TRUE) & (cond3==TRUE) & (cond4==TRUE)){
     OneSeries.X$year <- as.factor(format(OneSeries.X$date,format='%Y'))
     OneSeries.X$month <- as.factor(format(OneSeries.X$date,format='%m'))
     OneSeries.X$month <-  droplevels(OneSeries.X$month)
