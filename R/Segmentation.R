@@ -537,7 +537,7 @@ FormatOptSegK <- function(breakpointsK,Data,v){
 ######## Functions for functional
 periodic_estimation_tot=function(Data,var.est.t,lyear){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
     sinX=sin(i*DataF$t*(2*pi)/lyear)
@@ -555,7 +555,7 @@ periodic_estimation_tot=function(Data,var.est.t,lyear){
 
 periodic_estimation_tot_init=function(Data,var.est.t,lyear){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
     sinX=sin(i*DataF$t*(2*pi)/lyear)
@@ -573,7 +573,7 @@ periodic_estimation_tot_init=function(Data,var.est.t,lyear){
 
 periodic_estimation_selb=function(Data,var.est.t,lyear,threshold=0.001){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   num.col=dim(DataF)[2]
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
@@ -619,7 +619,7 @@ periodic_estimation_selb=function(Data,var.est.t,lyear,threshold=0.001){
 
 periodic_estimation_selb_init=function(Data,var.est.t,lyear,threshold=0.001){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   num.col=dim(DataF)[2]
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
