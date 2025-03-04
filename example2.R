@@ -41,7 +41,7 @@ mysignal[NA_ind] <- NA
 
 # plot signal
 df = data.frame(date = mydate, signal = mysignal)
-plot(df$date, df$signal, type = "l")
+plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 
 # run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
