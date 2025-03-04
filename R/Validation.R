@@ -17,16 +17,28 @@
 #' @import dplyr
 #'
 #' @export
-
 Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
+  cond1=TRUE
+  cond2=TRUE
 
   if (!inherits( Metadata$date, "Date")) {
-    stop("date must be in Date formate")
+    cond1=FALSE
+    cat("date must be in Date formate")
   }
+
+  if (nrow(Tmu)==1){
+    cond2=FALSE
+    cat("no change-point to validate")
+  }
+
+  if ((cond1==TRUE) & (cond2==TRUE)){
+
   distance <- c()
   Distance <- c()
   CP <- c()
   MetadataIndex <- c()
+
+
 
   OneSeriesFull <- OneSeries %>%
     tidyr::complete(date = seq(min(date), max(date), by = "day"))
@@ -61,4 +73,6 @@ Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
 
 
   return(Out)
+  }
 }
+
