@@ -43,7 +43,7 @@ df = data.frame(date = mydate, signal = mysignal)
 true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
 
 # plot signal
-plot(df$date, df$signal, type = "l")
+plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 
 # run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
