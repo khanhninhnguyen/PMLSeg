@@ -34,7 +34,7 @@ set.seed(1)                 # initialise random generator
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 df = data.frame(date = mydate, signal = mysignal)
-plot(df$date, df$signal, type = "l")
+plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 
 # run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
