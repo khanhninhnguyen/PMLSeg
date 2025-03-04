@@ -43,6 +43,8 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   # New estimation of the monthly variances
   MonthVar <- RobEstiMonthlyVariance(UpdatedData)^2
   var.est.t = MonthVar[as.numeric(UpdatedData$month)]
+  var.est.t[which(is.na(UpdatedData$signal))] <- NA
+
 
   # New estimation of the Tmu
   if(length(ResScreening$UpdatedCP)>0){
@@ -62,8 +64,6 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     lyear <- 365.25
 
     res.funct <- c()
-    auxiliar_data <- UpdatedData
-
     res.funct = periodic_estimation_all(Data = UpdatedData,
                                           CP = UpdatedCP,
                                           var.est.t = var.est.t,
@@ -72,20 +72,9 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     funct <- res.funct$predict
     coeff <- res.funct$coeff
 
-    Tmu <- data.frame(begin = begin,
-                      end = end,
-                      mean = coeff[-c(1:8)])
-
-    var_est_t_inv = 1/(var.est.t)
-    var_est_t_inv[which(is.na(UpdatedData$signal))] <- NA
-    se.est.k = sapply(1:nrow(Tmu), function(x) {
-      sqrt(1/(sum(var_est_t_inv[Tmu$begin[x]:Tmu$end[x]], na.rm = TRUE)))
-    })
-
-    Tmu <- Tmu %>%
-      mutate(se = se.est.k,
-             np = diff(c(0,Tmu$end)))
-
+    auxilary_Data <- UpdatedData
+    auxilary_Data$signal <- auxilary_Data$signal-funct
+    Tmu <- FormatOptSegK(UpdatedCP,auxilary_Data,var.est.t)
   } else {
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedData,var.est.t)
 
@@ -93,10 +82,6 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     coeff <- FALSE
   }
 
-  Tmu <- Tmu %>%
-    mutate(begin = begin,
-           end = end,
-           np = end - begin + 1)
 
   UpdatePara <- c()
   UpdatePara$MonthVar <- MonthVar
@@ -107,6 +92,7 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   return(UpdatePara)
 
 }
+
 
 periodic_estimation_all = function(Data,CP,var.est.t,lyear){
   DataF=Data
