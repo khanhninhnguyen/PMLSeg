@@ -1,4 +1,4 @@
-#' Segmentation of time series by penalized maximum likelyhood
+#' Segmentation of time series by Penalized Maximum Likelihood
 #'
 #' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance chaing over fixed intervals (monthly)
 #'
