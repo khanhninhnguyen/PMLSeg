@@ -33,20 +33,15 @@
 #' \item The segmentation parameters (change-point positions and segments' means) and the functional parameters (Fourier coefficients) are estimated iteratively, for a fixed number of segments \code{K = 1..Kmax}.
 #' The estimation method is based on maximum likelihood with known variance (from step 1). 
 #' The segmentation and functional parameters are estimated separately, which allows to use the Dynamical Programming algorithm for the search of the optimal change-point positions and segment means.
-#' \item The optimal number of segments is obtain by model selection using one of the following criteria:
-#' \itemize{
-#' \item \code{mBIC} the modified Bayesian Inference Criterion \insertCite{Schwarz1978}{@Schwarz1978}
-#' \item \code{Lav} the criterion proposed by Lavielle \insertCite{Lavielle2005}{@Lavielle2005}
-#' \item \code{BM_BJ} and \code{BM_slope} the criteria proposed by \insertCite{Lavielle2005}{@Lavielle2005}
-the penalty constant is calibrated using the Biggest Jump and the slope.
-
-The data is a data frame with 2 columns: $signal is the signal to be segmented and $date is the date. The date will be in Date format.
-#' \item The function part is estimated using a Fourier decomposition of order 4 with \code{selectionF=FALSE}. \code{selectionF=TRUE} consists in selecting the significant functions of the Fourier decomposition of order 4
-#' \item If \code{selectionK="none"}, the procedure is performed with \code{Kmax} segments.
-#' \item Missing data in the signal are accepted.
-#' \item By convention, the position of a change-point is referred to the last point in a segment (\code{Tmu$end}).
+#' \item The optimal number of segments is obtained by model selection using one of the following penalty criteria:
+#'   \itemize{
+#'   \item \code{mBIC} the modified Bayesian Inference Criterion \insertCite{Schwarz1978}{@Schwarz1978}
+#'   \item \code{Lav} the criterion proposed by insertCite{Lavielle2005}{@Lavielle2005}
+#'   \item \code{BM_BJ} and \code{BM_slope} the criteria proposed by \insertCite{BM2001}{@BM2001}, where the penalty constant is calibrated using the Biggest Jump and the slope, respectively.
+#'   }
 #' }
-#' @references \insertCite{Quarello2022}{@Quarello2022}, \insertCite{Schwarz1978}{@Schwarz1978}, \insertCite{Lavielle2005}{@Lavielle2005}
+#' By convention, the position of a change-point refers to the last point in a segment (\code{Tmu$end}).
+#' @references \insertCite{Quarello2022}{@Quarello2022}, \insertCite{Bock2019}{@Bock2019}, \insertCite{Schwarz1978}{@Schwarz1978}, \insertCite{Lavielle2005}{@Lavielle2005}, \insertCite{BM2001}{@BM2001}.
 #' @export
 
 
