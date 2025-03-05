@@ -1,23 +1,23 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
 #' Fit a segmentation model comprising one mean per segment, a global functional (Fourier series of order 4), and IID noise with variance changing over fixed intervals. 
-#' The time series should be given with a daily resolution. The variances are estimated on monthly intervals.
+#' The time series should be given with a daily resolution, the functional has a fundamental period of 1 year, and the variances are estimated on monthly intervals.
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
-#'    Note: the $date variable should be continous. If the original data has gaps, NAs shoudl be added at the corresponding dates.
+#'    Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.
 #' @param lmin is the minimum length of the segments. Default value is 1.
-#' @param Kmax is the maximal number of segments (Kmax < n). Default value is 30. Note: with \code{BM_slope}, \code{Kmax} must be larger or equal to 10.
-#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax), options are: \code{"none"}, \code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}). 
-#' with \code{"none"} the model is fixed to \code{K = Kmax}. Default is \code{"BM_BJ"}.
-#' @param FunctPart speficies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE. 
-#'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation in an iterative way; with \code{FunctPart=FALSE}, only one segmentation is performed.
+#' @param Kmax is the maximal number of segments (Kmax < n). Default value is 30. Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.
+#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}). 
+#' If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. Default is \code{"BM_BJ"}.
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE. 
+#'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way; with \code{FunctPart=FALSE}, only one segmentation is performed.
 #'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
 #' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.
 #'
 #' @return 
 #' \itemize{
 #' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series. 
-#'    The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the index (numeric) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA values in the segment.
+#'    The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
 #' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 #' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
 #'    Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
@@ -26,7 +26,7 @@
 #' }
 #'
 #' @details
-#' The theoretical basis of the method was published in \insertCite{Quarello2022}{@Quarello2022}. 
+#' The theoretical basis of the method was published in [@Quarello2022]. 
 #' The inference procedure consists in three steps:
 #' \enumerate{
 #' \item The monthly variances are estimated using a robust method (\insertCite{Bock2019}{@Bock2019}).
