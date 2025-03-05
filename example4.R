@@ -45,7 +45,7 @@ truth = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 
 # validation of estimated CP position wrt truth
 valid_max_dist = 62         # validation parameter
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = truth)
 valid
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth, Validated_CP_Meta = valid)
 
