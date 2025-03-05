@@ -55,7 +55,7 @@ truth = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 
 # validate estimated CP position wrt metadata
 valid_max_dist = 62               # max distance between CP and metadata for the validation
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = truth)
 valid
 
 # plot time series with segmentation results, validation
