@@ -56,7 +56,7 @@ metadata
 
 # Validate estimated CP position wrt metadata
 valid_max_dist = 62             # validation parameter
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = metadata)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
 valid
 
 # Note: valid$Distance gives the distance between estimated CP and metadata
@@ -73,7 +73,7 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Va
 truth = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 
 # Evaluate the estimated CP position wrt truth
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = truth)
 valid
 
 # plot with metadata=truth
