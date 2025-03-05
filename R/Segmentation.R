@@ -3,6 +3,7 @@
 #' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance changing over fixed intervals (monthly)
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1.
+#'    Note: the $date variable should be continous. If the original data has gaps, add NAs at the corresponding dates.
 #' @param lmin is the minimum length of the segments. Default value is 1.
 #' @param Kmax is the maximal number of segments (Kmax < n). Default value is 30. Note: with BM_slope, Kmax must be larger or equal to 10.
 #' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax), options are: \code{"none"}, \code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}). 
