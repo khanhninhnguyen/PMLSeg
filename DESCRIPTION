@@ -1,13 +1,11 @@
 Package: PMLseg
-Title: Segmentation using Penalized Maximum Likelihood of time series
-        with a post-processing of the detected change-points and a
-        validation using metadata
+Title: Segmentation of time series by Penalized Maximum Likelihood 
 Version: 0.0.0.9002
 Authors@R: c(person("Annarosa", "Quarello", role = c("aut")),
     person("Emilie", "Lebarbier", email = "emilie.lebarbier@parisnanterre.fr", role = c("aut", "cre")),
-    person("Ninh", "Nguyen", email = "knguyen@ipgp.fr", role = c("aut")),
+    person("Ninh", "Nguyen", email = "ninh.nguyen.cva@gmail.com", role = c("aut")),
     person("Olivier", "Bock", email = "bock@ipgp.fr", role = c("aut")))
-Description: Segmentation time series. The model is a segmentation in the mean model including a periodic function and a monthly variances. 
+Description: PMLseg is a R package for the detection of change-points (segmentation) of univariate time series by Penalized Maximum Likelihood. The method detects changes in the mean superposed with a periodic signal (here modelled as a 4th order Fourier series) and IID noise with variance changing over fixed intervals. It was initially developed for the detection of change-points in daily climate data susperposed with an annually periodic bias and variance changing over monthly intervals \insertCite{Quarello2022}{@Quarello2022}. The package was first published under the name \code{GNSSseg} and applied to the segmentation of daily GNSS minus reanalysis Integrated Water Vapor (IWV) differences. Compared to \code{GNSSseg}, PMLseg has several bugs fixed and includes auxiliary functions for the screening, validation and visualization of the segmentation results.
 Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
@@ -20,4 +18,4 @@ Author: Annarosa Quarello [aut],
   Emilie Lebarbier [aut, cre],
   Ninh Nguyen [aut],
   Olivier Bock [aut]
-Maintainer: Emilie Lebarbier <emilie.lebarbier@parisnanterre.fr>
+Maintainer: Emilie Lebarbier <emilie.lebarbier@parisnanterre.fr>, Olivier Bock <bock@ipgp.fr>
