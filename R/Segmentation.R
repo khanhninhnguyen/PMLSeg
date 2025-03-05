@@ -26,21 +26,27 @@
 #' }
 #'
 #' @details
-#' The theoretical basis of the method was publised in \insertCite{Quarello2022}{@Quarello2022}. 
-#' The inference procedure consists in three steps. First, the monthly variances are estimated using a robust method (\insertCite{Bock2019}{@Bock2019}).
-the number of segments is fixed to \code{Kmax} and the parameters are estimated using the maximum likelihood procedure using the
-following procedure: 
-and then the segmentation and the functional parts are iteratively estimated. 
-Then the number of segments is chosen using model selection criteria. 
-The possible criteria are \code{mBIC} the modified BIC criterion, \code{Lav} the criterion proposed by Lavielle, \code{BM_BJ} and \code{BM_slope} the criteria which the penalty constant is calibrated using the Biggest Jump and the slope.
+#' The theoretical basis of the method was published in \insertCite{Quarello2022}{@Quarello2022}. 
+#' The inference procedure consists in three steps:
+#' \enumerate{
+#' \item The monthly variances are estimated using a robust method (\insertCite{Bock2019}{@Bock2019}).
+#' \item The segmentation parameters (change-point positions and segments' means) and the functional parameters (Fourier coefficients) are estimated iteratively, for a fixed number of segments \code{K = 1..Kmax}.
+#' The estimation method is based on maximum likelihood with known variance (from step 1). 
+#' The segmentation and functional parameters are estimated separately, which allows to use the Dynamical Programming algorithm for the search of the optimal change-point positions and segment means.
+#' \item The optimal number of segments is obtain by model selection using one of the following criteria:
 #' \itemize{
-#' \item The data is a data frame with 2 columns: $signal is the signal to be segmented and $date is the date. The date will be in Date format.
+#' \item \code{mBIC} the modified Bayesian Inference Criterion \insertCite{Schwarz1978}{@Schwarz1978}
+#' \item \code{Lav} the criterion proposed by Lavielle \insertCite{Lavielle2005}{@Lavielle2005}
+#' \item \code{BM_BJ} and \code{BM_slope} the criteria proposed by \insertCite{Lavielle2005}{@Lavielle2005}
+the penalty constant is calibrated using the Biggest Jump and the slope.
+
+The data is a data frame with 2 columns: $signal is the signal to be segmented and $date is the date. The date will be in Date format.
 #' \item The function part is estimated using a Fourier decomposition of order 4 with \code{selectionF=FALSE}. \code{selectionF=TRUE} consists in selecting the significant functions of the Fourier decomposition of order 4
 #' \item If \code{selectionK="none"}, the procedure is performed with \code{Kmax} segments.
 #' \item Missing data in the signal are accepted.
 #' \item By convention, the position of a change-point is referred to the last point in a segment (\code{Tmu$end}).
 #' }
-#' @references [@Quarello2022]
+#' @references \insertCite{Quarello2022}{@Quarello2022}, \insertCite{Schwarz1978}{@Schwarz1978}, \insertCite{Lavielle2005}{@Lavielle2005}
 #' @export
 
 
