@@ -1,7 +1,7 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
 #' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance changing over fixed intervals (monthly).
-#' The method was previously published under the name \code{GNSSseg} [@Quarello2022].
+#' The method was previously published under the name \code{GNSSseg} \insertCite{Quarello2022}{@Quarello2022}.
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1.
 #'    Note: the $date variable should be continous. If the original data has gaps, add NAs at the corresponding dates.
@@ -26,8 +26,13 @@
 #' }
 #'
 #' @details
-#' The function performs the segmentation of one GNSS series. The considered model is such that: (1) the average is composed of a piece wise function (changes in the mean) with a functional part and (2) the variance is heterogeneous on fixed intervals. By default the latter intervals are the months.
-#' The inference procedure consists in two steps. First, the number of segments is fixed to \code{Kmax} and the parameters are estimated using the maximum likelihood procedure using the following procedure: first the variances are robustly estimated and then the segmentation and the functional parts are iteratively estimated. Then the number of segments is chosen using model selection criteria. The possible criteria are \code{mBIC} the modified BIC criterion, \code{Lav} the criterion proposed by Lavielle, \code{BM_BJ} and \code{BM_slope} the criteria which the penalty constant is calibrated using the Biggest Jump and the slope.
+#' The theoretical basis of the method was publised in \insertCite{Quarello2022}{@Quarello2022}. 
+#' The inference procedure consists in three steps. First, the monthly variances are estimated using a robust method (\insertCite{Bock2019}{@Bock2019}).
+the number of segments is fixed to \code{Kmax} and the parameters are estimated using the maximum likelihood procedure using the
+following procedure: 
+and then the segmentation and the functional parts are iteratively estimated. 
+Then the number of segments is chosen using model selection criteria. 
+The possible criteria are \code{mBIC} the modified BIC criterion, \code{Lav} the criterion proposed by Lavielle, \code{BM_BJ} and \code{BM_slope} the criteria which the penalty constant is calibrated using the Biggest Jump and the slope.
 #' \itemize{
 #' \item The data is a data frame with 2 columns: $signal is the signal to be segmented and $date is the date. The date will be in Date format.
 #' \item The function part is estimated using a Fourier decomposition of order 4 with \code{selectionF=FALSE}. \code{selectionF=TRUE} consists in selecting the significant functions of the Fourier decomposition of order 4
