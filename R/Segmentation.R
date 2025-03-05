@@ -1,6 +1,7 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
-#' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance changing over fixed intervals (monthly)
+#' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance changing over fixed intervals (monthly).
+#' The method was previsously published under the name \code{GNSSseg} [@Quarello2022].
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1.
 #'    Note: the $date variable should be continous. If the original data has gaps, add NAs at the corresponding dates.
@@ -34,7 +35,7 @@
 #' \item Missing data in the signal are accepted.
 #' \item By convention, the position of a change-point is referred to the last point in a segment (\code{Tmu$end}).
 #' }
-#'
+#' @references [@Quarello2022]
 #' @export
 
 
