@@ -83,7 +83,7 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth)
 # a) Impact of sample size on estimated parameters
 #    run again with n = 4000 and observe that:
 #    - the position of change-points is the same as with n=1000
-#    - the seg$Tmu$mean value the last segment (longer than with n=1000) is more accurate and seg$Tmu$se is smaller
+#    - the seg$Tmu$mean value of the last segment (longer than with n=1000) is more accurate and seg$Tmu$se is smaller
 #    - the seg$MonthVar values are closer to the true value (1)
 #    run again with n = 500
 # b) Impact of noise_std
