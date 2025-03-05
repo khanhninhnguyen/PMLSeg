@@ -1,6 +1,6 @@
-#'Segmentation of time series
+#' Segmentation of time series by penalized maximum likelyhood
 #'
-#' fit a segmentation in the mean model by taken into account a functional part and a monthly variance
+#' Fit a segmentation in the mean model by taking into account a functional part (Fourier series of order 4) and a variance chaing over fixed intervals (monthly)
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1.
 #' @param lmin is the minimum length of the segments. Default value is 1.
