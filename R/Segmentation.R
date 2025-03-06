@@ -26,25 +26,30 @@
 #' }
 #'
 #' @details
-#' The theoretical basis of the method was published in [@Quarello2022]. 
+#' The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022). 
 #' The inference procedure consists in three steps:
 #' \enumerate{
-#' \item The monthly variances are estimated using a robust method (\insertCite{Bock2019}{@Bock2019}).
+#' \item The monthly variances are estimated using a robust method following Bock et al. (2020).
 #' \item The segmentation parameters (change-point positions and segments' means) and the functional parameters (Fourier coefficients) are estimated iteratively, for a fixed number of segments \code{K = 1..Kmax}.
 #' The estimation method is based on maximum likelihood with known variance (from step 1). 
 #' The segmentation and functional parameters are estimated separately, which allows to use the Dynamical Programming algorithm for the search of the optimal change-point positions and segment means.
 #' \item The optimal number of segments is obtained by model selection using one of the following penalty criteria:
 #'   \itemize{
-#'   \item \code{mBIC} the modified Bayesian Inference Criterion \insertCite{Schwarz1978}{@Schwarz1978}
-#'   \item \code{Lav} the criterion proposed by insertCite{Lavielle2005}{@Lavielle2005}
-#'   \item \code{BM_BJ} and \code{BM_slope} the criteria proposed by \insertCite{BM2001}{@BM2001}, where the penalty constant is calibrated using the Biggest Jump and the slope, respectively.
+#'   \item \code{mBIC}, the modified Bayesian Inference Criterion proposed by Zhang and Siegmund (2007),
+#'   \item \code{Lav}, the criterion proposed Lavielle (2005),
+#'   \item \code{BM_BJ} and \code{BM_slope}, the criteria proposed by Birgé and Massart (2001), where the penalty constant is calibrated using the Biggest Jump and the slope, respectively.
 #'   }
 #' }
 #'
 #' Note: by convention, the position of a change-point refers to the last point in a segment (\code{Tmu$end}).
 #'
-#' @references \insertCite{Quarello2022}{@Quarello2022}, \insertCite{Bock2019}{@Bock2019}, \insertCite{Schwarz1978}{@Schwarz1978}, \insertCite{Lavielle2005}{@Lavielle2005}, \insertCite{BM2001}{@BM2001}.
-#'
+#' @references
+#' Birgé, L.; Massart, P. (2001) Gaussian model selection. J. Eur. Math. Soc. 2001, 3, 203–268, DOI 10.1007/S100970100031.
+#' Bock, O.; Collilieux, X.; Guillamon, F.; Lebarbier, E.; Pascal, C. (2020) A breakpoint detection in the mean model with heterogeneous variance on fixed time intervals. Statistics and Computing 2020, 30, 195–207. https://doi.org/10.1007/s11222-019-09853-5.
+#' Lavielle, M. (2005) Using penalized contrasts for the change-point problem. Signal Processing 2005, 85, 1501–1510.
+#' Quarello, A. (2020) A. Development of New Homogenisation Methods for GNSS Atmospheric Data. Application to the Analysis of Climate Trends and Variability. Ph.D. Thesis, Sorbonne Universite, Paris, France, 2020
+#' Quarello, A., Bock, O. & Lebarbier, E. (2022) GNSSseg, a statistical method for the segmentation of daily GNSS IWV time series. Remote Sensing, 14(14), 3379. Available from: https://doi.org/10.3390/rs14143379
+#' Zhang, N.R.; Siegmund, D.O. (2007) A Modified Bayes Information Criterion with Applications to the Analysis of Comparative Genomic Hybridization Data. Biometrics 2007, 63, 22–32.
 #' @export
 
 
