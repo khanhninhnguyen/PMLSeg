@@ -40,8 +40,11 @@
 #'   \item \code{BM_BJ} and \code{BM_slope} the criteria proposed by \insertCite{BM2001}{@BM2001}, where the penalty constant is calibrated using the Biggest Jump and the slope, respectively.
 #'   }
 #' }
-#' By convention, the position of a change-point refers to the last point in a segment (\code{Tmu$end}).
+#'
+#' Note: by convention, the position of a change-point refers to the last point in a segment (\code{Tmu$end}).
+#'
 #' @references \insertCite{Quarello2022}{@Quarello2022}, \insertCite{Bock2019}{@Bock2019}, \insertCite{Schwarz1978}{@Schwarz1978}, \insertCite{Lavielle2005}{@Lavielle2005}, \insertCite{BM2001}{@BM2001}.
+#'
 #' @export
 
 
