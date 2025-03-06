@@ -45,13 +45,18 @@
 #'
 #' @references
 #' Birgé, L.; Massart, P. (2001) Gaussian model selection. J. Eur. Math. Soc. 2001, 3, 203–268, DOI 10.1007/S100970100031.
+#'
 #' Bock, O.; Collilieux, X.; Guillamon, F.; Lebarbier, E.; Pascal, C. (2020) A breakpoint detection in the mean model with heterogeneous variance on fixed time intervals. Statistics and Computing 2020, 30, 195–207. https://doi.org/10.1007/s11222-019-09853-5.
+#'
 #' Lavielle, M. (2005) Using penalized contrasts for the change-point problem. Signal Processing 2005, 85, 1501–1510.
+#'
 #' Quarello, A. (2020) A. Development of New Homogenisation Methods for GNSS Atmospheric Data. Application to the Analysis of Climate Trends and Variability. Ph.D. Thesis, Sorbonne Universite, Paris, France, 2020
+#'
 #' Quarello, A., Bock, O. & Lebarbier, E. (2022) GNSSseg, a statistical method for the segmentation of daily GNSS IWV time series. Remote Sensing, 14(14), 3379. Available from: https://doi.org/10.3390/rs14143379
+#'
 #' Zhang, N.R.; Siegmund, D.O. (2007) A Modified Bayes Information Criterion with Applications to the Analysis of Comparative Genomic Hybridization Data. Biometrics 2007, 63, 22–32.
+#'
 #' @export
-
 
 Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=TRUE,selectionF=FALSE){
   result  <-  list()
