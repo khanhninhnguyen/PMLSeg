@@ -337,35 +337,22 @@ BMcriterion<-function(J,pen)
 {
   Kmax=length(J)
   Kseq=1:Kmax
-  k=1
-  kv=c()
-  dv=c()
-  pv=c()
-  dmax=1
-  while (k<Kmax) {
-    pk=(J[(k+1):Kmax]-J[k])/(pen[k]-pen[(k+1):Kmax])
-    pm=max(pk)
-    dm=which.max(pk)
-    dv=c(dv,dm)
-    kv=c(kv,k)
-    pv=c(pv,pm)
-    if (dm>dmax){
-      dmax=dm
-      kmax=k
-      pmax=pm
-    } #end
-    k=k+dm
-  } #end
+  kv <- chull(pen, J) %>% 
+  rev() %>% 
+  { if (last(.) != Kmax) c(., Kmax) else . }
+   pv <- -diff(J[kv])/diff(pen[kv])
+  dv <- diff(kv)
+  rg <- which(pv>0)
+  pv <- pv[rg]
+  dv <- dv[rg]
 
-  pv=c(pv,0)
-  kv=c(kv,Kmax)
-  dv=diff(kv);
-  dmax=max(dv)
-  rt=which.max(dv)
-  pmax=pv[rt[length(rt)]]
-  alpha=2*pmax
-  km=kv[alpha>=pv]
-  km=km[1]
+  dmax <- max(dv)  # Trouver le maximum de dv
+  rt <- which.max(dv)  # Trouver l'indice du maximum
+
+  pmax <- pv[rt]  # Extraire la valeur correspondante dans pv
+  alpha <- 2 * pmax  # Calculer alpha
+
+  km <- kv[alpha >= pv] %>% first()
   Kh =Kseq[km]
   return(Kh)
 }
