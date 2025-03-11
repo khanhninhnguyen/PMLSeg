@@ -1,4 +1,4 @@
-# example1: simple time series with 2 change-points (CPs) 
+# example1: simple time series with 2 change-points (CPs)
 #           IID noise, and no periodic bias
 #
 # Note: by convention the position of a change-point is the last point in the segment
@@ -11,15 +11,15 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
   time_series <- rep(0, length_series)
   jump_indices <- c(1, cp_ind+1, length_series + 1)
   offsets <- c(0, diff(segmt_mean))
-  
+
   changes <- rep(0, length_series)
   changes[jump_indices[-length(jump_indices)]] <- offsets
   changes[1] <- segmt_mean[1]
-  
+
   time_series <- cumsum(changes)
   noise <- rnorm(n = length_series, mean = 0, sd = noise_stdev)
   time_series <- time_series + noise
-  
+
   return(time_series)
 }
 
@@ -27,7 +27,7 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 n = 1000                    # length of time series
 cp_ind <- c(200, 600)       # position of change points (index in time series)
 segmt_mean <- c(-1, 1, 2)   # mean value of segments
-noise_stdev = 1             # noise std dev
+noise_stdev = 10             # noise std dev
 
 # create a time series data frame
 set.seed(1)                 # initialise random generator
@@ -56,13 +56,13 @@ metadata
 
 # Validate estimated CP position wrt metadata
 valid_max_dist = 62             # validation parameter
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = metadata)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
 valid
 
 # Note: valid$Distance gives the distance between estimated CP and metadata
 
 # plot with metadata
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata) 
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata)
 
 # plot with metadata and validation results
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
@@ -73,19 +73,20 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Va
 truth = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 
 # Evaluate the estimated CP position wrt truth
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MinDist = valid_max_dist, Metadata = truth)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = truth)
 valid
 
 # plot with metadata=truth
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth) 
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = truth)
 
 # Further explore the sensitivity of segmentation results to signal and noise parameters
-# a) Impact of sample size on estimated parameters
-#    run again with n = 4000 and observe that:
+# * Impact of sample size on estimated parameters
+#    a) run again with n = 4000 and observe that:
 #    - the position of change-points is the same as with n=1000
 #    - the seg$Tmu$mean value the last segment (longer than with n=1000) is more accurate and seg$Tmu$se is smaller
 #    - the seg$MonthVar values are closer to the true value (1)
-#    run again with n = 500
-# b) Impact of noise_std
-#    run again with noise_std = 0.1
-#    run again with noise_std = 10
+#    b) run again with n = 500
+# * Impact of noise_std
+#    c) run again with noise_std = 0.1
+#    d) run again with noise_std = 10
+

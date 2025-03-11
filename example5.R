@@ -8,16 +8,16 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
   time_series <- rep(0, length_series)
   cp_indices <- c(1, cp_ind, length_series + 1)
   offsets <- c(0, diff(segmt_mean))
-  
+
   changes <- rep(0, length_series)
   changes[cp_indices[-length(cp_indices)]] <- offsets
   changes[1] <- segmt_mean[1]
   time_series <- cumsum(changes)
-  
+
   sd = noise_stdev[as.numeric(format(mydate, "%m"))]
   noise <- rnorm(n = length_series, mean = 0, sd = 1)
   time_series <- time_series + noise * sd
-  
+
   return(time_series)
 }
 
@@ -26,7 +26,7 @@ date_begin <- as.Date("2010-03-01") # date of first data point
 n = 1000                            # length of time series
 cp_ind <- c(200, 600)               # position of change points (index in time series)
 segmt_mean <- c(-1, 1, 2)           # mean value of segments
-noise_stdev <- rep(0.1, 12)         # noise variance (Jan to Dec)
+noise_stdev <- rep(0.01, 12)         # noise variance (Jan to Dec)
 coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
 
 # create a time series df with jumps and noise
@@ -48,7 +48,12 @@ df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l")
 
 # run segmentation
-seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+seg.SSR=c()
+for (k in 2:30){
+  seg = Segmentation(OneSeries = df, FunctPart = TRUE,selectionK="none",Kmax = k)
+  seg.SSR[k]=seg$SSR
+}
+
 seg$Tmu
 seg$CoeffF
 seg$MonthVar

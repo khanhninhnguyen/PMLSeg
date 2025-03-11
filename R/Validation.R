@@ -1,32 +1,56 @@
 #' Validation of change-points using metadata
 #'
-#' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
-#' @param Tmu the segmentation results
-#' @param MinDist the minimum distance from change-points to known changes to be validated
-#' @param Metadata a data frame with two columns: $date that is the known change in same format as date of \code{OneSeries} and the $type that is the type the change
-#'
+#' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1
+#' @param Tmu is a data frame containing segmentation results (see segmentation.R)
+#' @param MaxDist is the maximum distance (number of valid days) between a change-point and the nearest metadata to be valid
+#' @param Metadata is a data frame with two columns, $date and $type, they represent changes at the station which observed the OneSeries time series
 #' @return a data frame with four columns :
 #' \itemize{
-#' \item \code{CP} that is the change-points expressed in date to be validated
-#' \item \code{closestMetadata} that is the closest date of a known change
-#' \item \code{Distance} that is the distance between \code{CP} and \code{closestMetadata}
-#' \item \code{type} that is the type of the known change
-#' \item \code{valid} that takes the value 1 if the change-point is validated, 0 otherwise using a distance of \code{MinDist}
+#' \item \code{CP} are the dates of the change-points contained in \code{Tmu}
+#' \item \code{closestMetadata} are the nearest dates found in \code{Metadata}
+#' \item \code{Distance} is the distance between \code{CP} and \code{Metadata}
+#' \item \code{type} is the corresponding type of change from \code{Metadata}
+#' \item \code{valid} is the validation result: 1 if \code{Distance} is smaller than \code{MaxDist}, 0 otherwise
 #' }
 #'
 #' @import dplyr
 #'
 #' @export
+<<<<<<< HEAD
 
 Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
+=======
+Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
+>>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
+  cond1=TRUE
+  cond2=TRUE
 
   if (!inherits( Metadata$date, "Date")) {
-    stop("date must be in Date formate")
+    cond1=FALSE
+<<<<<<< HEAD
+    cat("date must be in Date formate")
+=======
+    cat("Metadata$date must be a Date object\n")
+>>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   }
+
+  if (nrow(Tmu)==1){
+    cond2=FALSE
+<<<<<<< HEAD
+    cat("no change-point to validate")
+=======
+    cat("No change-point to validate.\n")
+>>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
+  }
+
+  if ((cond1==TRUE) & (cond2==TRUE)){
+
   distance <- c()
   Distance <- c()
   CP <- c()
   MetadataIndex <- c()
+
+
 
   OneSeriesFull <- OneSeries %>%
     tidyr::complete(date = seq(min(date), max(date), by = "day"))
@@ -56,9 +80,11 @@ Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
   Out <- Out %>%
    dplyr:: mutate(
       CP = OneSeries$date[CP],
-      valid = ifelse(Distance < MinDist, 1, 0))
+      valid = ifelse(Distance < MaxDist, 1, 0))
 
 
 
   return(Out)
+  }
 }
+

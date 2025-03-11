@@ -75,11 +75,15 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     auxilary_Data <- UpdatedData
     auxilary_Data$signal <- auxilary_Data$signal-funct
     Tmu <- FormatOptSegK(UpdatedCP,auxilary_Data,var.est.t)
+    mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))+funct
+
   } else {
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedData,var.est.t)
+    mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
 
     funct <- FALSE
     coeff <- FALSE
+    mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
   }
 
 
@@ -88,7 +92,12 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   UpdatePara$Tmu   <-  Tmu
   UpdatePara$FitF  <-  funct
   UpdatePara$CoeffF <-  coeff
+  UpdatePara$SSR <- sum(((UpdatedData$signal-mean.est.t)^2)/var.est.t,na.rm=TRUE)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   return(UpdatePara)
 
 }

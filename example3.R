@@ -63,7 +63,7 @@ seg_updated
 
 # validate updated CP position wrt metadata
 valid_max_dist = 62               # max distance between CP and metadata for the validation
-valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MinDist = valid_max_dist, Metadata = true_cp_df)
+valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 valid
 
 # Plot the time series with RemoveData option

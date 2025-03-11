@@ -1,35 +1,62 @@
-#'Segmentation of time series
+#' Segmentation of time series by Penalized Maximum Likelihood
 #'
-#' fit a segmentation in the mean model by taken into account a functional part and a monthly variance
+#' Fit a segmentation model comprising one mean per segment, a global functional (Fourier series of order 4), and IID noise with variance changing over fixed intervals. 
+#' The time series should be given with a daily resolution, the functional has a fundamental period of 1 year, and the variances are estimated on monthly intervals.
 #'
-#' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
-#' @param lmin the minimum length of the segments. Default is 1
-#' @param Kmax the maximal number of segments (must be lower than n). Default is 30
-#' @param selectionK a name indicating the model selection criterion to select the number of segments K (\code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}). \code{"none"} indicates that no selection is claimed and the procedure considers \code{Kmax} segments or \code{Kmax}-1 changes. Default is \code{"BM_BJ"}
-#' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
-#' @param selectionF a boolean indicating if a selection on the functions of the Fourier decomposition of order 4 is performed. The level of the test is by default 0.001. Default is FALSE
+#' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
+#'    Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.
+#' @param lmin is the minimum length of the segments. Default value is 1.
+#' @param Kmax is the maximal number of segments (Kmax < n). Default value is 30. Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.
+#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}). 
+#' If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. Default is \code{"BM_BJ"}.
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE. 
+#'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way; with \code{FunctPart=FALSE}, only one segmentation is performed.
+#'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
+#' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.
 #'
-#' @return A file containing
+#' @return 
 #' \itemize{
-#' \item \code{Tmu} that is a data frame containing the estimation of the segmentation parameters: for each segment, we get the beginning and the end positions (time index), the estimated mean (mean), the standard deviation of the mean (se) and the number of "valid" points (np) i.e. non-NA values in the segment
-#' \item \code{FitF} that corresponds to the estimation of the functional part. If \code{FunctPart=FALSE}, \code{FitF} is FALSE
-#' \item \code{CoeffF} that corresponds to the estimation of the coefficients of the Fourier decomposition. The vector contains 8 coefficients if \code{selectionF=FALSE} or as many coefficients as the number of selected functions if \code{selectionF=TRUE}. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE
-#' \item \code{MonthVar} that corresponds to the estimated variances of each fixed interval (each month)
-#' \item \code{SSR} that corresponds to the Residuals Sum of Squares for \code{Kmax} segments
+#' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series. 
+#'    The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
+#' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
+#' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
+#'    Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
+#' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
+#' \item \code{SSR} is the Sum of Squared Residuals of the fit.
 #' }
 #'
 #' @details
-#' The function performs the segmentation of one GNSS series. The considered model is such that: (1) the average is composed of a piece wise function (changes in the mean) with a functional part and (2) the variance is heterogeneous on fixed intervals. By default the latter intervals are the months.
-#' The inference procedure consists in two steps. First, the number of segments is fixed to \code{Kmax} and the parameters are estimated using the maximum likelihood procedure using the following procedure: first the variances are robustly estimated and then the segmentation and the functional parts are iteratively estimated. Then the number of segments is chosen using model selection criteria. The possible criteria are \code{mBIC} the modified BIC criterion, \code{Lav} the criterion proposed by Lavielle, \code{BM_BJ} and \code{BM_slope} the criteriain which the penalty constant is calibrated using the Biggest Jump and the slope.
-#' \itemize{
-#' \item The data is a data frame with 2 columns: $signal is the signal to be segmented and $date is the date. The date will be in Date format.
-#' \item The function part is estimated using a Fourier decomposition of order 4 with \code{selectionF=FALSE}. \code{selectionF=TRUE} consists in selecting the significant functions of the Fourier decomposition of order 4
-#' \item If \code{selectionK="none"}, the procedure is performed with \code{Kmax} segments.
-#' \item Missing data in the signal are accepted.
+#' The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022). 
+#' The inference procedure consists in three steps:
+#' \enumerate{
+#' \item The monthly variances are estimated using a robust method following Bock et al. (2020).
+#' \item The segmentation parameters (change-point positions and segments' means) and the functional parameters (Fourier coefficients) are estimated iteratively, for a fixed number of segments \code{K = 1..Kmax}.
+#' The estimation method is based on maximum likelihood with known variance (from step 1). 
+#' The segmentation and functional parameters are estimated separately, which allows to use the Dynamical Programming algorithm for the search of the optimal change-point positions and segment means.
+#' \item The optimal number of segments is obtained by model selection using one of the following penalty criteria:
+#'   \itemize{
+#'   \item \code{mBIC}, the modified Bayesian Inference Criterion proposed by Zhang and Siegmund (2007),
+#'   \item \code{Lav}, the criterion proposed Lavielle (2005),
+#'   \item \code{BM_BJ} and \code{BM_slope}, the criteria proposed by Birgé and Massart (2001), where the penalty constant is calibrated using the Biggest Jump and the slope, respectively.
+#'   }
 #' }
 #'
+#' Note: by convention, the position of a change-point refers to the last point in a segment (\code{Tmu$end}).
+#'
+#' @references
+#' Birgé, L.; Massart, P. (2001) Gaussian model selection. J. Eur. Math. Soc. 2001, 3, 203–268, DOI 10.1007/S100970100031.
+#'
+#' Bock, O.; Collilieux, X.; Guillamon, F.; Lebarbier, E.; Pascal, C. (2020) A breakpoint detection in the mean model with heterogeneous variance on fixed time intervals. Statistics and Computing 2020, 30, 195–207. https://doi.org/10.1007/s11222-019-09853-5.
+#'
+#' Lavielle, M. (2005) Using penalized contrasts for the change-point problem. Signal Processing 2005, 85, 1501–1510.
+#'
+#' Quarello, A. (2020) A. Development of New Homogenisation Methods for GNSS Atmospheric Data. Application to the Analysis of Climate Trends and Variability. Ph.D. Thesis, Sorbonne Universite, Paris, France, 2020
+#'
+#' Quarello, A., Bock, O. & Lebarbier, E. (2022) GNSSseg, a statistical method for the segmentation of daily GNSS IWV time series. Remote Sensing, 14(14), 3379. Available from: https://doi.org/10.3390/rs14143379
+#'
+#' Zhang, N.R.; Siegmund, D.O. (2007) A Modified Bayes Information Criterion with Applications to the Analysis of Comparative Genomic Hybridization Data. Biometrics 2007, 63, 22–32.
+#'
 #' @export
-
 
 Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=TRUE,selectionF=FALSE){
   result  <-  list()
@@ -37,7 +64,7 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
   cond1 <- TRUE
   cond2 <- TRUE
   cond3 <- TRUE
-
+  cond4 <- TRUE
   #Parameters
   lyear <- 365.25
   S     <- 0.75
@@ -69,7 +96,12 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
     warning("The minimal length of the segments lmin", lmin," needs to be lower than " ,round(n.X/Kmax),"\n")
   }
 
-  if ((cond1==TRUE) & (cond2==TRUE) & (cond3==TRUE)){
+  if(Kmax==1){
+    cond4 <- FALSE
+    warning("Kmax=1 means no segmentation")
+  }
+
+  if ((cond1==TRUE) & (cond2==TRUE) & (cond3==TRUE) & (cond4==TRUE)){
     OneSeries.X$year <- as.factor(format(OneSeries.X$date,format='%Y'))
     OneSeries.X$month <- as.factor(format(OneSeries.X$date,format='%m'))
     OneSeries.X$month <-  droplevels(OneSeries.X$month)
@@ -305,35 +337,22 @@ BMcriterion<-function(J,pen)
 {
   Kmax=length(J)
   Kseq=1:Kmax
-  k=1
-  kv=c()
-  dv=c()
-  pv=c()
-  dmax=1
-  while (k<Kmax) {
-    pk=(J[(k+1):Kmax]-J[k])/(pen[k]-pen[(k+1):Kmax])
-    pm=max(pk)
-    dm=which.max(pk)
-    dv=c(dv,dm)
-    kv=c(kv,k)
-    pv=c(pv,pm)
-    if (dm>dmax){
-      dmax=dm
-      kmax=k
-      pmax=pm
-    } #end
-    k=k+dm
-  } #end
+  kv <- chull(pen, J) %>% 
+  rev() %>% 
+  { if (last(.) != Kmax) c(., Kmax) else . }
+   pv <- -diff(J[kv])/diff(pen[kv])
+  dv <- diff(kv)
+  rg <- which(pv>0)
+  pv <- pv[rg]
+  dv <- dv[rg]
 
-  pv=c(pv,0)
-  kv=c(kv,Kmax)
-  dv=diff(kv);
-  dmax=max(dv)
-  rt=which.max(dv)
-  pmax=pv[rt[length(rt)]]
-  alpha=2*pmax
-  km=kv[alpha>=pv]
-  km=km[1]
+  dmax <- max(dv)  # Trouver le maximum de dv
+  rt <- which.max(dv)  # Trouver l'indice du maximum
+
+  pmax <- pv[rt]  # Extraire la valeur correspondante dans pv
+  alpha <- 2 * pmax  # Calculer alpha
+
+  km <- kv[alpha >= pv] %>% first()
   Kh =Kseq[km]
   return(Kh)
 }
@@ -537,7 +556,7 @@ FormatOptSegK <- function(breakpointsK,Data,v){
 ######## Functions for functional
 periodic_estimation_tot=function(Data,var.est.t,lyear){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
     sinX=sin(i*DataF$t*(2*pi)/lyear)
@@ -555,7 +574,7 @@ periodic_estimation_tot=function(Data,var.est.t,lyear){
 
 periodic_estimation_tot_init=function(Data,var.est.t,lyear){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
     sinX=sin(i*DataF$t*(2*pi)/lyear)
@@ -573,7 +592,7 @@ periodic_estimation_tot_init=function(Data,var.est.t,lyear){
 
 periodic_estimation_selb=function(Data,var.est.t,lyear,threshold=0.001){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   num.col=dim(DataF)[2]
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
@@ -619,7 +638,7 @@ periodic_estimation_selb=function(Data,var.est.t,lyear,threshold=0.001){
 
 periodic_estimation_selb_init=function(Data,var.est.t,lyear,threshold=0.001){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
+  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))
   num.col=dim(DataF)[2]
   for (i in 1:4){
     cosX=cos(i*DataF$t*(2*pi)/lyear)
