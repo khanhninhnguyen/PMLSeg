@@ -16,43 +16,20 @@
 #' @import dplyr
 #'
 #' @export
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-Validation <- function(OneSeries,Tmu, MinDist = 62, Metadata) {
-=======
 Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
-=======
-Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   cond1=TRUE
   cond2=TRUE
 
   if (!inherits( Metadata$date, "Date")) {
     cond1=FALSE
-<<<<<<< HEAD
-<<<<<<< HEAD
     cat("date must be in Date formate")
-=======
     cat("Metadata$date must be a Date object\n")
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
-=======
-    cat("Metadata$date must be a Date object\n")
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   }
 
   if (nrow(Tmu)==1){
     cond2=FALSE
-<<<<<<< HEAD
-<<<<<<< HEAD
     cat("no change-point to validate")
-=======
-    cat("No change-point to validate.\n")
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
-=======
-    cat("No change-point to validate.\n")
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   }
 
   if ((cond1==TRUE) & (cond2==TRUE)){
