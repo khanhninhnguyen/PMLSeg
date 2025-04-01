@@ -36,9 +36,7 @@ The development version of `PMLSeg` can be installed from GitHub with:
 
 ## Example 1
 
-1.  Simulate a time series with 2 change-points
-
-<!-- -->
+### 1. Simulate a time series with 2 change-points
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
@@ -82,7 +80,7 @@ The development version of `PMLSeg` can be installed from GitHub with:
     #> 2 2010-01-02 -0.8163567
     #> 3 2010-01-03 -1.8356286
 
-1.  Segmentation
+### 2. Segmentation
 
 Run the segmentation with default parameters and no functional:
 
@@ -111,10 +109,7 @@ of valid (non-NA) data points `np` in the signal:
     #> 2   201  600  0.9986774 0.05381478 400
     #> 3   601 1000  1.9700134 0.05301899 400
 
-1.  Visualization of the time series with segmentation results
-    superposed
-
-<!-- -->
+### 3. Visualization of the time series with segmentation results superposed
 
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
@@ -122,7 +117,7 @@ of valid (non-NA) data points `np` in the signal:
 
 <img src="README_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
 
-1.  Validation of detected change-points with metadata
+### 4. Validation of detected change-points with metadata
 
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 

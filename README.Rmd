@@ -46,7 +46,7 @@ devtools::install_github("khanhninhnguyen/PMLSeg")
 
 ## Example 1
 
-1. Simulate a time series with 2 change-points
+### 1. Simulate a time series with 2 change-points
 
 ```{r}
 rm(list=ls(all=TRUE))
@@ -85,7 +85,7 @@ plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 head(df, 3)
 ```
 
-2. Segmentation
+### 2. Segmentation
 
 Run the segmentation with default parameters and no functional:
 
@@ -101,7 +101,7 @@ The `Tmu` dataframe contains, for each segment: the index of beginning and end, 
 seg$Tmu
 ```
 
-3. Visualization of the time series with segmentation results superposed
+### 3. Visualization of the time series with segmentation results superposed
 
 ```{r}
 PlotSeg(OneSeries = df, 
@@ -109,7 +109,7 @@ PlotSeg(OneSeries = df,
         FunctPart = FALSE)
 ```
 
-4. Validation of detected change-points with metadata
+### 4. Validation of detected change-points with metadata
 
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
