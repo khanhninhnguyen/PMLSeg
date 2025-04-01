@@ -1,0 +1,89 @@
+---
+output: github_document
+---
+
+<!-- Example3.md is generated from Example3.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+```
+
+## Example 1: time series clusters of CPs
+
+### 1. Simulate a time series with 2 clusters
+
+```{r}
+rm(list=ls(all=TRUE))
+library(PMLseg)
+
+# time series simulation function
+# Note: by convention the position of a change-point is the last point in the segment
+simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
+  time_series <- rep(0, length_series)
+  jump_indices <- c(1, cp_ind+1, length_series + 1)
+  offsets <- c(0, diff(segmt_mean))
+
+  changes <- rep(0, length_series)
+  changes[jump_indices[-length(jump_indices)]] <- offsets
+  changes[1] <- segmt_mean[1]
+
+  time_series <- cumsum(changes)
+  noise <- rnorm(n = length_series, mean = 0, sd = noise_stdev)
+  time_series <- time_series + noise
+
+  return(time_series)
+}
+
+# specify the simulation parameters
+n = 1000                    # length of time series
+cp_ind <- c(10, 200, 210, 580, 590, 600, 990)  # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
+segmt_mean <- c(-1, 1, 2)   # mean value of segments
+noise_stdev = 1             # noise std dev (identical for all months)
+set.seed(1)                 # initialise random generator
+
+# create a data frame of time series with 2 columns: date, signal
+mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
+mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+df = data.frame(date = mydate, signal = mysignal)
+plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+head(df, 3)
+```
+
+### 2. Segmentation
+
+Run the segmentation with default parameters and no functional:
+
+```{r}
+seg = Segmentation(OneSeries = df, 
+                   FunctPart = FALSE)
+str(seg)
+```
+
+```{r}
+seg$Tmu
+```
+
+### 3. Visualization of the time series with segmentation results superposed
+
+```{r}
+PlotSeg(OneSeries = df, 
+        SegRes = seg, 
+        FunctPart = FALSE)
+```
+
+### 4. Cluster screening 
+cluster_max_dist = 80             # max distance between CPs in a cluster
+screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
+screening
+
+# update the segmentation parameters
+seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
+seg_updated
+
+# Plot the time series with RemoveData option
+PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
