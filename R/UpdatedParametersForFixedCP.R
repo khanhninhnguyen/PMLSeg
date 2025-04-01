@@ -93,15 +93,6 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   UpdatePara$FitF  <-  funct
   UpdatePara$CoeffF <-  coeff
   UpdatePara$SSR <- sum(((UpdatedData$signal-mean.est.t)^2)/var.est.t,na.rm=TRUE)
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
-=======
-  
->>>>>>> 1ece07afaebf5d3c2a357a50e6a279af8ffae05e
   return(UpdatePara)
 
 }
