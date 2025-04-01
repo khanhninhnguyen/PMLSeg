@@ -84,18 +84,52 @@ Run the segmentation with default parameters and no functional:
 
 <img src="Example3_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
+Note that the segmentation is able to detect all CPs, even those close
+to the beginning and end of the time series.
+
 ### 4. Cluster screening
 
-cluster\_max\_dist = 80 \# max distance between CPs in a cluster
-screening = Cluster\_screening(Tmu = seg$Tmu, MaxDist =
-cluster\_max\_dist) screening
+    cluster_max_dist = 80             # max distance between CPs in a cluster
+    screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
+    screening
+    #> $UpdatedCP
+    #> [1] 206 591
+    #> 
+    #> $RemoveData
+    #>   begin  end
+    #> 1     1   11
+    #> 2   201  210
+    #> 3   581  600
+    #> 4   991 1000
+    #> 
+    #> $ChangeCP
+    #> [1] "Yes"
 
-# update the segmentation parameters
+Update the segmentation parameters
 
-seg\_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening
-= screening, FunctPart=FALSE) seg\_updated
+    seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
+    seg_updated
+    #> $MonthVar
+    #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480
+    #>  [8] 1.4346685 0.9308744 1.8745634 1.2375832 1.1062817
+    #> 
+    #> $Tmu
+    #>   begin  end       mean         se  np
+    #> 1     1  206 -0.9723087 0.07737455 189
+    #> 2   207  591  0.9855249 0.05651114 370
+    #> 3   592 1000  1.9801639 0.05477701 390
+    #> 
+    #> $FitF
+    #> [1] FALSE
+    #> 
+    #> $CoeffF
+    #> [1] FALSE
+    #> 
+    #> $SSR
+    #> [1] 860.383
 
-# Plot the time series with RemoveData option
+Plot the time series with RemoveData option
 
-PlotSeg(OneSeries = df, SegRes = seg\_updated, FunctPart = FALSE,
-RemoveData = screening$RemoveData)
+    PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+
+<img src="Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />

@@ -80,14 +80,22 @@ PlotSeg(OneSeries = df,
         FunctPart = FALSE)
 ```
 
+Note that the segmentation is able to detect all CPs, even those close to the beginning and end of the time series.
+
 ### 4. Cluster screening 
+```{r}
 cluster_max_dist = 80             # max distance between CPs in a cluster
 screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
 screening
+```
 
-# update the segmentation parameters
+Update the segmentation parameters
+```{r}
 seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
 seg_updated
+```
 
-# Plot the time series with RemoveData option
+Plot the time series with RemoveData option
+```{r}
 PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+```
