@@ -111,9 +111,9 @@ PlotSeg(OneSeries = df,
 
 4. Validation of detected change-points with metadata
 
-# Metadata is represented by a data frame with 2 columns: date, type
+Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
-# For the example, we create a fake metadata data frame with the true position of change-points
+For the example, we create a fake metadata data frame with the true position of change-points:
 
 ```{r}
 meta_ind = cp_ind               # index in time series of metadata information
@@ -123,7 +123,8 @@ metadata = data.frame(date = meta_date, type = meta_type)
 metadata
 ```
 
-# plot with metadata
+Plot with metadata:
+
 ```{r}
 PlotSeg(OneSeries = df, 
         SegRes = seg, 
@@ -131,7 +132,7 @@ PlotSeg(OneSeries = df,
         Metadata = metadata) 
 ```
 
-# Validate estimated change-point positions wrt metadata
+Validate estimated change-point positions wrt metadata:
 
 ```{r}
 valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
@@ -142,12 +143,13 @@ valid = Validation(OneSeries = df,
 valid
 ```
 
-# plot with metadata and validation results
+Plot with metadata and validation results:
+
 ```{r}
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
-
+## References
 
 
 

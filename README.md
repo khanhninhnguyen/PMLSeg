@@ -124,9 +124,10 @@ of valid (non-NA) data points `np` in the signal:
 
 1.  Validation of detected change-points with metadata
 
-# Metadata is represented by a data frame with 2 columns: date, type
+Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
-# For the example, we create a fake metadata data frame with the true position of change-points
+For the example, we create a fake metadata data frame with the true
+position of change-points:
 
     meta_ind = cp_ind               # index in time series of metadata information
     meta_date <- df$date[meta_ind]  # corresponding date 
@@ -137,7 +138,7 @@ of valid (non-NA) data points `np` in the signal:
     #> 1 2010-07-19    R
     #> 2 2011-08-23  RAD
 
-# plot with metadata
+Plot with metadata:
 
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
@@ -146,7 +147,7 @@ of valid (non-NA) data points `np` in the signal:
 
 <img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
 
-# Validate estimated change-point positions wrt metadata
+Validate estimated change-point positions wrt metadata:
 
     valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
@@ -160,11 +161,13 @@ of valid (non-NA) data points `np` in the signal:
     #> 1 2010-07-19 2010-07-19             0 R         1
     #> 2 2011-08-23 2011-08-23             0 RAD       1
 
-# plot with metadata and validation results
+Plot with metadata and validation results:
 
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="README_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="100%" />
+
+## References
 
 Quarello, Annarosa, Olivier Bock, and Emilie Lebarbier. 2022. “GNSSseg,
 a Statistical Method for the Segmentation of Daily GNSS IWV Time
