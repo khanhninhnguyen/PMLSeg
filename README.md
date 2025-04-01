@@ -1,179 +1,172 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# PMLseg
+# PMLSeg
 
-PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. It was initially developed for the detection of change-points in daily climate data with annual periodic bias and variance changing on monthly intervals. It is quite versatile and can be of more general-purpose usage. The package includes the segmentation function as well as auxiliary functions for the screening, validation and visualization of the segmentation results.
+PMLseg is a R package for the segmentation of univariate time series
+based on Penalized Maximum Likelihood. The method detects changes in the
+mean signal in the presence of a periodic bias and variance changing
+over prescribed intervals. It was initially developed for the detection
+of change-points in daily climate data with annual periodic bias and
+variance changing on monthly intervals. It is quite versatile and can be
+of more general-purpose usage. The package includes the segmentation
+function as well as auxiliary functions for the screening, validation
+and visualization of the segmentation results. The theoretical basis of
+the method was published in (Quarello, Bock, and Lebarbier 2022).
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Examples](#examples)
+-   [Installation](#installation)
+-   [Examples](#examples)
 
 ## Installation
 
 The development version of `PMLSeg` can be installed from GitHub with:
 
-``` r
 
-# Install devtools and tidyr if you haven't already
-install.packages("devtools")
-install.packages("tidyr")
+    # Install devtools and tidyr if you haven't already
+    install.packages("devtools")
+    install.packages("tidyr")
 
-# Install gfpop from
-https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
-install.packages("gfpop_1.1.1.tar.gz")
+    # Download and install gfpop from
+    https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
+    install.packages("gfpop_1.1.1.tar.gz")
 
-# Install the package from GitHub
-devtools::install_github("khanhninhnguyen/PMLSeg")
-```
+    # Install PMLseg from GitHub
+    devtools::install_github("khanhninhnguyen/PMLSeg")
 
-## Examples
+## Example 1
 
-1.  Creating a Time Series with Arbitrary Jumps
+1.  Simulate a time series with 2 change-points
 
-``` r
-library(PMLseg)
+<!-- -->
 
-set.seed(1)
-length_series = 1000
-df = data.frame(date = seq.Date(from = as.Date("2010-01-01"),
-                                to = as.Date("2010-01-01")+(length_series-1), 
-                                by = "day"),  
-                signal = rnorm(n = length_series, mean = 0, sd = 1))
-plot(df$date, df$signal, type = "l")
-```
+    rm(list=ls(all=TRUE))
+    library(PMLseg)
 
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" width="100%" />
+    # time series simulation function
+    # Note: by convention the position of a change-point is the last point in the segment
+    simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
+      time_series <- rep(0, length_series)
+      jump_indices <- c(1, cp_ind+1, length_series + 1)
+      offsets <- c(0, diff(segmt_mean))
 
-``` r
-head(df, 3)
-#>         date     signal
-#> 1 2010-01-01 -0.6264538
-#> 2 2010-01-02  0.1836433
-#> 3 2010-01-03 -0.8356286
-```
+      changes <- rep(0, length_series)
+      changes[jump_indices[-length(jump_indices)]] <- offsets
+      changes[1] <- segmt_mean[1]
 
-``` r
-# Adding 2 jumps 
-# Function to generate jump series
-generate_jump_series <- function(jump_indices, jump_amp, length_series) {
-  jump_series <- rep(0, length_series)
-  jump_indices <- c(1, jump_indices, length_series + 1)
-  
-  changes <- rep(0, length_series)
-  changes[jump_indices[-length(jump_indices)]] <- jump_amp
-  
-  jump_series <- cumsum(changes)
-  
-  return(jump_series)
-}
-# No cluster
-jump_ind <- c(200, 600)
-jump_amp <- c(0, 1, 1)
-jump_series <- generate_jump_series(jump_ind, jump_amp, length_series)
-df$signal <- df$signal + jump_series
-plot(df$date, df$signal, type = "l")
-```
+      time_series <- cumsum(changes)
+      noise <- rnorm(n = length_series, mean = 0, sd = noise_stdev)
+      time_series <- time_series + noise
 
-<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" width="100%" />
+      return(time_series)
+    }
 
-2.  Segmenting the Time Series
+    # specify the simulation parameters
+    n = 1000                    # length of time series
+    cp_ind <- c(200, 600)       # position of change points (index in time series)
+    segmt_mean <- c(-1, 1, 2)   # mean value of segments
+    noise_stdev = 1             # noise std dev (identical for all months)
+    set.seed(1)                 # initialise random generator
 
-Adjust the `FunctPart` parameter based on whether the series includes
-seasonal mean components. This code run with default option for : `Kmax`
-= 30 (maximum number of segments), `selectionK` = “BM_BJ” (recommended
-penalized criterion), etc.
+    # create a data frame of time series with 2 columns: date, signal
+    mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
+    mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+    df = data.frame(date = mydate, signal = mysignal)
+    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 
-``` r
-seg = Segmentation(OneSeries = df, 
-                   FunctPart = FALSE)
-str(seg)
-#> List of 5
-#>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
-#>   ..$ begin: int [1:3] 1 200 599
-#>   ..$ end  : int [1:3] 199 598 1000
-#>   ..$ mean : num [1:3] 0.0423 0.9973 1.969
-#>   ..$ se   : num [1:3] 0.075 0.0536 0.0527
-#>   ..$ np   : num [1:3] 199 399 402
-#>  $ FitF    : logi FALSE
-#>  $ CoeffF  : logi FALSE
-#>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
-#>  $ SSR     : num 933
-```
+<img src="README_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
-Main results: The beginning, end, mean value, standard deviation, and
-number of points of segments are provided in the `Tmu` dataframe:
+    head(df, 3)
+    #>         date     signal
+    #> 1 2010-01-01 -1.6264538
+    #> 2 2010-01-02 -0.8163567
+    #> 3 2010-01-03 -1.8356286
 
-``` r
-seg$Tmu
-#>   begin  end       mean         se  np
-#> 1     1  199 0.04231954 0.07503647 199
-#> 2   200  598 0.99732352 0.05361806 399
-#> 3   599 1000 1.96897996 0.05271989 402
-```
+1.  Segmentation
 
-3.  Visualizing Segmentation Results
+Run the segmentation with default parameters and no functional:
 
-``` r
-PlotSeg(OneSeries = df, 
-        SegRes = seg, 
-        FunctPart = FALSE)
-```
+    seg = Segmentation(OneSeries = df, 
+                       FunctPart = FALSE)
+    str(seg)
+    #> List of 5
+    #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
+    #>   ..$ begin: int [1:3] 1 201 601
+    #>   ..$ end  : int [1:3] 200 600 1000
+    #>   ..$ mean : num [1:3] -0.959 0.999 1.97
+    #>   ..$ se   : num [1:3] 0.075 0.0538 0.053
+    #>   ..$ np   : int [1:3] 200 400 400
+    #>  $ FitF    : logi FALSE
+    #>  $ CoeffF  : logi FALSE
+    #>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
+    #>  $ SSR     : num 926
 
-<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="100%" />
+The `Tmu` dataframe contains, for each segment: the index of beginning
+and end, the esitmated mean and its standard erreor `se`, and the number
+of valid (non-NA) data points `np` in the signal:
 
-4.  Validating Detected Change-Points with Metadata
+    seg$Tmu
+    #>   begin  end       mean         se  np
+    #> 1     1  200 -0.9590041 0.07503988 200
+    #> 2   201  600  0.9986774 0.05381478 400
+    #> 3   601 1000  1.9700134 0.05301899 400
 
-Change-points are validated if the segmentation finds them within
-`MinDist` points from the metadata. Default `MinDist` is 62.
+1.  Visualization of the time series with segmentation results
+    superposed
 
-``` r
-# Create a metadata for example 
-meta = data.frame(date = df$date[jump_ind],  
-                type = c("example1", "example2"))
-meta
-#>         date     type
-#> 1 2010-07-19 example1
-#> 2 2011-08-23 example2
-```
+<!-- -->
 
-``` r
-# Validate the segmentation result wrt metadata 
-Validation(OneSeries = df, 
-           Tmu = seg$Tmu,
-           MinDist = 30 ,
-           Metadata = meta)
-#> # A tibble: 2 × 5
-#>   CP         closestMetadata Distance type     valid
-#>   <date>     <date>             <dbl> <chr>    <dbl>
-#> 1 2010-07-18 2010-07-19             1 example1     1
-#> 2 2011-08-21 2011-08-23             2 example2     1
-```
+    PlotSeg(OneSeries = df, 
+            SegRes = seg, 
+            FunctPart = FALSE)
 
-5.  Detecting Clusters of Change-Points
+<img src="README_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
 
-Check for clusters of close change-points, which may due to outliers. In
-this example, there are no clusters of change-points, so
-Cluster_Screening returns the same change-points as in the segmentation.
+1.  Validation of detected change-points with metadata
 
-``` r
-# Validate the segmentation result wrt metadata 
-screening = Cluster_screening(Tmu = seg$Tmu,
-                              MaxDist = 80)
-screening
-#> $UpdatedCP
-#> [1] 199 598
-#> 
-#> $RemoveData
-#>   begin end
-#> 1    NA  NA
-#> 
-#> $ChangeCP
-#> [1] "No"
-```
+# Metadata is represented by a data frame with 2 columns: date, type
 
-If a cluster is detected, ClusterScreening indicates “Yes” to change the
-vector of change-points. In such a situation, it is necessary to run the
-UpdatedParametersForFixedCP function to re-estimate the mean with the
-updated change-points. For more details, please refer to the test.pdf.
+# For the example, we create a fake metadata data frame with the true position of change-points
+
+    meta_ind = cp_ind               # index in time series of metadata information
+    meta_date <- df$date[meta_ind]  # corresponding date 
+    meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+    metadata = data.frame(date = meta_date, type = meta_type)
+    metadata
+    #>         date type
+    #> 1 2010-07-19    R
+    #> 2 2011-08-23  RAD
+
+# plot with metadata
+
+    PlotSeg(OneSeries = df, 
+            SegRes = seg, 
+            FunctPart = FALSE, 
+            Metadata = metadata) 
+
+<img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+
+# Validate estimated change-point positions wrt metadata
+
+    valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
+    valid = Validation(OneSeries = df, 
+               Tmu = seg$Tmu,
+               MaxDist =  valid_max_dist,
+               Metadata = metadata)
+    valid
+    #> # A tibble: 2 × 5
+    #>   CP         closestMetadata Distance type  valid
+    #>   <date>     <date>             <dbl> <chr> <dbl>
+    #> 1 2010-07-19 2010-07-19             0 R         1
+    #> 2 2011-08-23 2011-08-23             0 RAD       1
+
+# plot with metadata and validation results
+
+    PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+
+<img src="README_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="100%" />
+
+Quarello, Annarosa, Olivier Bock, and Emilie Lebarbier. 2022. “GNSSseg,
+a Statistical Method for the Segmentation of Daily GNSS IWV Time
+Series.” *Remote Sensing* 14 (14): 3379.
+<https://doi.org/10.3390/rs14143379>.
