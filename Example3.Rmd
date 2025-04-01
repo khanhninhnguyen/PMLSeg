@@ -13,7 +13,11 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-## Example 1: time series clusters of CPs
+## Example 3: time series with clusters of CPs
+
+It can happen with real data that several CPs occur in a short period of time, either real or due to noise spikes.
+Despite the penalization, the segmentation can sometimes add unwanted changepoints.
+We included a screening function to remove cluster of close CPs.
 
 ### 1. Simulate a time series with 2 clusters
 
@@ -40,18 +44,18 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 # specify the simulation parameters
-n = 1000                    # length of time series
+n = 1000                                       # length of time series
 cp_ind <- c(10, 200, 210, 580, 590, 600, 990)  # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
-segmt_mean <- c(-1, 1, 2)   # mean value of segments
-noise_stdev = 1             # noise std dev (identical for all months)
-set.seed(1)                 # initialise random generator
+segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)      # mean of segments
+noise_stdev = 1                                # noise std dev (identical for all months)
+set.seed(1)                                    # initialise random generator
 
 # create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-head(df, 3)
+abline(v = mydate[cp_ind], col = "red", lty = 2)
 ```
 
 ### 2. Segmentation
