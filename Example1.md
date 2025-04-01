@@ -115,7 +115,7 @@ Plot with metadata:
 
 Validate estimated change-point positions wrt metadata:
 
-    valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
+    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,

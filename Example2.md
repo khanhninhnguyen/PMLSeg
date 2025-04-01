@@ -37,16 +37,20 @@
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
     # add NA's in the signal
-    NA_ind = seq(from = 100, to = 150, by = 1)  # gap in the 1st segment
+    NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
     mysignal[NA_ind] <- NA
-    NA_ind = seq(from = 580, to = 630, by = 1) # gap in the 2nd segment, superposed with 2nd change-point
+    NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
 
-    # plot signal
+    # plot signal and position of change-points (red dashed line)
     df = data.frame(date = mydate, signal = mysignal)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+    abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="Example2_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
+
+Note that the 1st gap lies within the 1st segment, while the 2nd gap is
+overlapping the 2nd and 3rd segments.
 
 ### 2. Segmentation
 
@@ -59,6 +63,12 @@ Run the segmentation with default parameters and no functional:
     #> 1     1  200 -0.8974084 0.08695923 149
     #> 2   201  636  1.0046283 0.05436229 385
     #> 3   637 1000  1.9698991 0.05627932 364
+
+The first CP is detected at the right position (index=200) but not the
+2nd (index=636) because of the gap.
+
+Note that `np` is the number of valid points, i.e. excluding the NA
+values, in each segment.
 
 ### 3. Visualization of the time series with segmentation results superposed
 
@@ -93,7 +103,7 @@ Plot with metadata:
 
 Validate estimated change-point positions wrt metadata:
 
-    valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
+    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,
@@ -104,6 +114,11 @@ Validate estimated change-point positions wrt metadata:
     #>   <date>     <date>             <dbl> <chr> <dbl>
     #> 1 2010-07-19 2010-07-19             0 R         1
     #> 2 2011-09-28 2011-08-23             5 RAD       1
+
+Note that the distance between the 2nd CP (index=636) and the nearest
+metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
+
+Hence both CPs are validated.
 
 Plot with metadata and validation results:
 

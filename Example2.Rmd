@@ -51,15 +51,18 @@ mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # add NA's in the signal
-NA_ind = seq(from = 100, to = 150, by = 1)  # gap in the 1st segment
+NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
 mysignal[NA_ind] <- NA
-NA_ind = seq(from = 580, to = 630, by = 1) # gap in the 2nd segment, superposed with 2nd change-point
+NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
 mysignal[NA_ind] <- NA
 
-# plot signal
+# plot signal and position of change-points (red dashed line)
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+abline(v = mydate[cp_ind], col = "red", lty = 2)
 ```
+
+Note that the 1st gap lies within the 1st segment, while the 2nd gap is overlapping the 2nd and 3rd segments.
 
 ### 2. Segmentation
 
@@ -70,6 +73,10 @@ seg = Segmentation(OneSeries = df,
                    FunctPart = FALSE)
 seg$Tmu
 ```
+
+The first CP is detected at the right position (index=200) but not the 2nd (index=636) because of the gap.
+
+Note that `np` is the number of valid points, i.e. excluding the NA values, in each segment.
 
 ### 3. Visualization of the time series with segmentation results superposed
 
@@ -103,7 +110,7 @@ PlotSeg(OneSeries = df,
 Validate estimated change-point positions wrt metadata:
 
 ```{r}
-valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
+valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
 valid = Validation(OneSeries = df, 
            Tmu = seg$Tmu,
            MaxDist =  valid_max_dist,
@@ -111,8 +118,14 @@ valid = Validation(OneSeries = df,
 valid
 ```
 
+Note that the distance between the 2nd CP (index=636) and the nearest metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
+
+Hence both CPs are validated.
+
 Plot with metadata and validation results:
 
 ```{r}
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
+
+
