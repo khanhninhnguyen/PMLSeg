@@ -71,12 +71,12 @@ Run the segmentation with default parameters:
 
     meta_ind = cp_ind               # index in time series of metadata information
     meta_date <- df$date[meta_ind]  # corresponding date 
-    meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+    meta_type <- c("true", "true")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
     metadata = data.frame(date = meta_date, type = meta_type)
     metadata
     #>         date type
-    #> 1 2010-07-19    R
-    #> 2 2011-08-23  RAD
+    #> 1 2010-07-19 true
+    #> 2 2011-08-23 true
 
     valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
@@ -87,11 +87,8 @@ Run the segmentation with default parameters:
     #> # A tibble: 2 × 5
     #>   CP         closestMetadata Distance type  valid
     #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-19 2010-07-19             0 R         1
-    #> 2 2011-08-24 2011-08-23             1 RAD       1
-
-Note: the segmentation detects well the position of change points
-despite the steep variations in the noise
+    #> 1 2010-07-19 2010-07-19             0 true      1
+    #> 2 2011-08-24 2011-08-23             1 true      1
 
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
@@ -103,10 +100,19 @@ despite the steep variations in the noise
 
 <img src="Example4_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
 
-### 5. Evaluate the RMS error of the estimated noise variance
+Note: the segmentation detects well the position of change points
+despite the steep variations in the noise
+
+### 5. Evaluate the error of the estimated noise variance
 
     error <- seg$MonthVar - noise_stdev ** 2
-    RMSE <- sqrt(mean(error^2))
+    error / noise_stdev
+    #>  [1]  0.008875807 -0.033963344  0.234134349  0.110731841  0.377754728
+    #>  [6]  0.340466809  0.366850887  0.402480519 -0.199188336  0.612194385
+    #> [11]  0.071274954  0.010628167
 
-Note: increasing the length of the time series (more years) would
-improve the accuracy of the noise variance estimation
+The relative error on some months is quite large.
+
+Increasing the length of the time series (i.e. including more years)
+would improve the accuracy of the noise variance estimation, although it
+is not critical for the segmentation.

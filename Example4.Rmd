@@ -74,7 +74,7 @@ seg$Tmu
 ```{r}
 meta_ind = cp_ind               # index in time series of metadata information
 meta_date <- df$date[meta_ind]  # corresponding date 
-meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+meta_type <- c("true", "true")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
 metadata = data.frame(date = meta_date, type = meta_type)
 metadata
 
@@ -86,8 +86,6 @@ valid = Validation(OneSeries = df,
 valid
 ```
 
-Note: the segmentation detects well the position of change points despite the steep variations in the noise 
-
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
 ```{r}
@@ -98,10 +96,14 @@ PlotSeg(OneSeries = df,
         Validated_CP_Meta = valid)
 ```
 
-### 5. Evaluate the RMS error of the estimated noise variance
+Note: the segmentation detects well the position of change points despite the steep variations in the noise 
+
+### 5. Evaluate the error of the estimated noise variance
 ```{r}
 error <- seg$MonthVar - noise_stdev ** 2
-RMSE <- sqrt(mean(error^2))
+error / noise_stdev
 ```
 
-Note: increasing the length of the time series (more years) would improve the accuracy of the noise variance estimation
+The relative error on some months is quite large.
+
+Increasing the length of the time series (i.e. including more years) would improve the accuracy of the noise variance estimation, although it is not critical for the segmentation.
