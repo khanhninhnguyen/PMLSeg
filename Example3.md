@@ -45,7 +45,8 @@ screening function to remove cluster of close CPs.
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
     df = data.frame(date = mydate, signal = mysignal)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    abline(v = mydate[cp_ind], col = "grey", lty = 2)
+    abline(v = mydate[true_cp_ind], col = "red", lty = 2)
 
 <img src="Example3_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
