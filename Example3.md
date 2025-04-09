@@ -37,6 +37,9 @@ screening function to remove cluster of close CPs.
     noise_stdev = 1                                # noise std dev (identical for all months)
     set.seed(1)                                    # initialise random generator
 
+    # we assume the true CPs we are seeking are at index 200 and 600
+    true_cp_ind <- c(200, 600)                     # only 2 true CPs 
+
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
@@ -82,12 +85,15 @@ Run the segmentation with default parameters and no functional:
             SegRes = seg, 
             FunctPart = FALSE)
 
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
+<img src="Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
 Note that the segmentation is able to detect all CPs, even those close
 to the beginning and end of the time series.
 
 ### 4. Cluster screening
+
+We want to remove the segments smaller than 80 days, either isolated or
+in clusters.
 
     cluster_max_dist = 80             # max distance between CPs in a cluster
     screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
@@ -105,7 +111,10 @@ to the beginning and end of the time series.
     #> $ChangeCP
     #> [1] "Yes"
 
-Update the segmentation parameters
+The Cluster\_screening function returns information to update the
+segmentation dataframe.
+
+Now, update the segmentation parameters
 
     seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
     seg_updated
@@ -128,8 +137,33 @@ Update the segmentation parameters
     #> $SSR
     #> [1] 860.383
 
-Plot the time series with RemoveData option
+Plot the time series with the updated segmentation and RemoveData
+information
 
     PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+
+<img src="Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
+
+Note: the data in the clusters are hidden by the Plot function with the
+RemoveData option, but they are still in the time series dataframe. To
+actually remove the data do the following:
+
+    # Cleanup the time series dataframe
+    df_screened <- df
+    for (i in 1:(length(screening$RemoveData))) {
+        df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
+    }
+
+    ### 5. Validation of detected change-points with metadata
+    true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
+    valid_max_dist = 10               # max distance between CP and metadata for the validation
+    valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+    valid
+    #> # A tibble: 2 × 5
+    #>   CP         closestMetadata Distance type  valid
+    #>   <date>     <date>             <dbl> <chr> <dbl>
+    #> 1 2010-07-25 2010-07-19             6 True      1
+    #> 2 2011-08-14 2011-08-23             9 True      1
+    PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
 <img src="Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
