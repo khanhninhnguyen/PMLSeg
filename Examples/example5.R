@@ -6,7 +6,7 @@ library(PMLseg)
 
 simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
   time_series <- rep(0, length_series)
-  cp_indices <- c(1, cp_ind, length_series + 1)
+  cp_indices <- c(1, cp_ind+1, length_series + 1)
   offsets <- c(0, diff(segmt_mean))
 
   changes <- rep(0, length_series)
@@ -47,27 +47,25 @@ mysignal <- mysignal + f
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l")
 
-# run segmentation
-seg.SSR=c()
-for (k in 2:30){
-  seg = Segmentation(OneSeries = df, FunctPart = TRUE,selectionK="none",Kmax = k)
-  seg.SSR[k]=seg$SSR
-}
+# run segmentation without functional part
+seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
+seg_nofunc$Tmu
+PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = TRUE)
 
+# run segmentation with functional
+seg = Segmentation(OneSeries = df, FunctPart = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
 seg$SSR
-
 sum(seg$CoeffF^2)
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 
-# run segmentation with selection of statistically significant Fourier coefficients
+# run segmentation with functional and selection of statistically significant coefficients
 seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
 seg$SSR
-
 sum(seg$CoeffF^2)
-
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
