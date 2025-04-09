@@ -70,7 +70,7 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 ### 2. Segmentation
 
-Run segmentation without functional part
+a. Run the segmentation without the functional part to see what happens...
 
 ```{r}
 seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
@@ -78,7 +78,9 @@ seg_nofunc$Tmu
 PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = TRUE)
 ```
 
-Run segmentation with functional
+The segmenation captures the periodic signal.
+
+b. Run the segmentation with the functional part.
 
 ```{r}
 seg = Segmentation(OneSeries = df, FunctPart = TRUE)
@@ -90,7 +92,9 @@ sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 ```
 
-Run segmentation with functional and selection of statistically significant coefficients
+The periodic signal is now captured by the functional part but the segmentation fails to capture the CPs.
+
+c. Run segmentation with functional and selection of statistically significant coefficients
 
 ```{r}
 seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
@@ -101,3 +105,5 @@ seg$SSR
 sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 ```
+
+The periodic signal is captured by the functional part and the segmentation now captures the CPs.

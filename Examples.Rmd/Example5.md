@@ -57,7 +57,10 @@
 
 ### 2. Segmentation
 
-Run segmentation without functional part
+1.  Run the segmentation without the functional part to see what
+    happens…
+
+<!-- -->
 
     seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
     seg_nofunc$Tmu
@@ -74,7 +77,11 @@ Run segmentation without functional part
 
 <img src="Example5_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
-Run segmentation with functional
+The segmenation captures the periodic signal.
+
+1.  Run the segmentation with the functional part.
+
+<!-- -->
 
     seg = Segmentation(OneSeries = df, FunctPart = TRUE)
     seg$Tmu
@@ -97,8 +104,13 @@ Run segmentation with functional
 
 <img src="Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-Run segmentation with functional and selection of statistically
-significant coefficients
+The periodic signal is now captured by the functional part but the
+segmentation fails to capture the CPs.
+
+1.  Run segmentation with functional and selection of statistically
+    significant coefficients
+
+<!-- -->
 
     seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
     seg$Tmu
@@ -120,3 +132,6 @@ significant coefficients
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 
 <img src="Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
+
+The periodic signal is captured by the functional part and the
+segmentation now captures the CPs.
