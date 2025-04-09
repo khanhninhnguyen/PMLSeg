@@ -155,7 +155,8 @@ actually remove the data do the following:
         df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
     }
 
-    ### 5. Validation of detected change-points with metadata
+### 5. Validation of detected change-points with metadata
+
     true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
     valid_max_dist = 10               # max distance between CP and metadata for the validation
     valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
@@ -167,4 +168,4 @@ actually remove the data do the following:
     #> 2 2011-08-14 2011-08-23             9 True      1
     PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+<img src="Example3_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
