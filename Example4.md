@@ -67,25 +67,46 @@ Run the segmentation with default parameters:
     #> 2   201  601  0.9995062 0.01246875 401
     #> 3   602 1000  1.9948656 0.01244232 399
 
-### 3. Visualization of the time series with segmentation results superposed
+### 3. Validate estimated change-point positions wrt metadata:
+
+    meta_ind = cp_ind               # index in time series of metadata information
+    meta_date <- df$date[meta_ind]  # corresponding date 
+    meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+    metadata = data.frame(date = meta_date, type = meta_type)
+    metadata
+    #>         date type
+    #> 1 2010-07-19    R
+    #> 2 2011-08-23  RAD
+
+    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
+    valid = Validation(OneSeries = df, 
+               Tmu = seg$Tmu,
+               MaxDist =  valid_max_dist,
+               Metadata = metadata)
+    valid
+    #> # A tibble: 2 × 5
+    #>   CP         closestMetadata Distance type  valid
+    #>   <date>     <date>             <dbl> <chr> <dbl>
+    #> 1 2010-07-19 2010-07-19             0 R         1
+    #> 2 2011-08-24 2011-08-23             1 RAD       1
+
+Note: the segmentation detects well the position of change points
+despite the steep variations in the noise
+
+### 4. Visualization of the time series with segmentation and validation results superposed
 
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
-            FunctPart = FALSE)
+            FunctPart = FALSE,
+            Metadata = metadata, 
+            Validated_CP_Meta = valid)
 
-<img src="Example4_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
+<img src="Example4_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
 
-Note: the segmentation works well despite the steep variations in the
-noise variance
+### 5. Evaluate the RMS error of the estimated noise variance
 
-### Compare estimated noise variance vs truth
-
-    seg$MonthVar - noise_stdev ** 2
-    #>  [1]  0.0008875807 -0.0101890032  0.1638940441  0.1328782098  0.6799585110
-    #>  [6]  0.6809336179  0.7337017734  0.7244649334 -0.2390260031  0.4285360695
-    #> [11]  0.0213824862  0.0010628167
-    sd(seg$MonthVar - noise_stdev ^ 2)^2
-    #> [1] 0.1233949
+    error <- seg$MonthVar - noise_stdev ** 2
+    RMSE <- sqrt(mean(error^2))
 
 Note: increasing the length of the time series (more years) would
 improve the accuracy of the noise variance estimation
