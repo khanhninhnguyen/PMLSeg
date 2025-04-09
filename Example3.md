@@ -151,7 +151,7 @@ actually remove the data do the following:
 
     # Cleanup the time series dataframe
     df_screened <- df
-    for (i in 1:(length(screening$RemoveData))) {
+    for (i in 1:(nrow(screening$RemoveData))) {
         df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
     }
 
