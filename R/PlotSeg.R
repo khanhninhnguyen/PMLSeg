@@ -38,6 +38,9 @@ PlotSeg <- function(OneSeries,
   MaxPoint = max(OneSeries$signal, na.rm = TRUE) + 0.5
   MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE)) - 0.5
 
+  if (!is.null(RemoveData) && is.na(RemoveData$begin[1])) {
+    RemoveData = NULL
+  }
   Month <- c()
   type <- c()
   value <- c()

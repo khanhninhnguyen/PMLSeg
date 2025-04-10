@@ -70,7 +70,7 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 ### 2. Segmentation
 
-a. Run the segmentation without the functional part to see what happens...
+#### a. Run the segmentation without the functional part to see what happens...
 
 ```{r}
 seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
@@ -80,7 +80,7 @@ PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = TRUE)
 
 The segmenation captures the periodic signal.
 
-b. Run the segmentation with the functional part.
+#### b. Run the segmentation with the functional part.
 
 ```{r}
 seg = Segmentation(OneSeries = df, FunctPart = TRUE)
@@ -94,7 +94,7 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 
 The periodic signal is now captured by the functional part but the segmentation fails to capture the CPs.
 
-c. Run segmentation with functional and selection of statistically significant coefficients
+#### c. Run segmentation with functional and selection of statistically significant coefficients
 
 ```{r}
 seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
