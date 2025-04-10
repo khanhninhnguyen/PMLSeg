@@ -6,9 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    source("E:\\0github\\PMLSeg\\R\\PlotSeg.R")
-    source("E:\\0github\\PMLSeg\\R\\UpdatedParametersForFixedCP.R")
-    library(ggplot2)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
