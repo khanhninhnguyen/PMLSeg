@@ -61,15 +61,16 @@
 
     # create df with full signal
     df = data.frame(date = mydate, signal = mysignal)
+
+    # plot signal and position of change-points (red dashed line)
     plot(df$date, df$signal, type = "l")
+    abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-1.  Run the segmentation with default parameters:
-
-<!-- -->
+#### a. Run the segmentation with default parameters:
 
     seg = Segmentation(OneSeries = df, FunctPart = TRUE)
     seg$Tmu
@@ -93,10 +94,7 @@
 
 <img src="Example6_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
-1.  run segmentation with selection of statistically significant Fourier
-    coefficients
-
-<!-- -->
+#### b. run segmentation with selection of statistically significant Fourier coefficients
 
     seg_selectF = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
     seg_selectF$Tmu
