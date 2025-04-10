@@ -1,4 +1,4 @@
-<!-- Example5.md is generated from Example5.Rmd. Please edit that file -->
+<!-- Example6.md is generated from Example6.Rmd. Please edit that file -->
 
 ## Example 6: time series with periodic bias, monthly variance, and gaps
 
@@ -6,6 +6,9 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    source("E:\\0github\\PMLSeg\\R\\PlotSeg.R")
+    source("E:\\0github\\PMLSeg\\R\\UpdatedParametersForFixedCP.R")
+    library(ggplot2)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -38,12 +41,13 @@
     # specify the simulation parameters
     date_begin <- as.Date("2010-03-01")             # date of first data point
     n = 1000                                        # length of time series
-    cp_ind <- c(200, 600)                           # position of CPs (index in time series)
-    segmt_mean <- c(-1, 1, 2)                       # mean value of segments
-    true_cp_ind <- c(200, 600)                      # only 2 true CPs 
+    #cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
+    #segmt_mean <- c(-1, 1, 2, 0)                    # mean value of segments
+    cp_ind <- c(200, 600)                      # position of CPs (index in time series)
+    segmt_mean <- c(-1, 1, 2)                    # mean value of segments
     noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
     coeff <- c(1, 0, 0, 0)                          # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
-    set.seed(1)                 # initialise random generator
+    set.seed(1)                                     # initialise random generator
 
     # create a time series with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
@@ -110,17 +114,43 @@
     #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.05640351 0.01868164
     seg_selectF$SSR
     #> [1] 850.5983
-    sum(seg$CoeffF^2)
-    #> [1] 1.156968
+    sum(seg_selectF$CoeffF^2)
+    #> [1] 0.9854471
     PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE)
 
 <img src="Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-### 3. validate updated CP position wrt metadata
+### 3. Cluster screening
 
+It is safe to always run the cluster screening after the segmentation.
+
+    # run the cluster screening
+    cluster_max_dist = 80             # max distance between CPs in a cluster
+    screening = Cluster_screening(Tmu = seg_selectF$Tmu, MaxDist = cluster_max_dist)
+    screening
+    #> $UpdatedCP
+    #> [1] 199 574
+    #> 
+    #> $RemoveData
+    #>   begin end
+    #> 1    NA  NA
+    #> 
+    #> $ChangeCP
+    #> [1] "No"
+
+    # update the segmentation dataframe if CPs have changed
+    if (screening$ChangeCP=="Yes") {
+        seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
+    } else {
+        seg_updated = seg_selectF
+    }
+
+### 4. validate updated CP position wrt metadata
+
+    true_cp_ind = cp_ind
     true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
     valid_max_dist = 10               # max distance between CP and metadata for the validation
-    valid = Validation(OneSeries = df, Tmu = seg_selectF$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+    valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
     valid
     #> # A tibble: 2 × 5
     #>   CP         closestMetadata Distance type  valid
@@ -128,8 +158,12 @@
     #> 1 2010-09-15 2010-09-16             1 True      1
     #> 2 2011-09-25 2011-10-21             5 True      1
 
-### 4. Plot the time series
+### 5. Plot the time series
 
-    PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)
 
-<img src="Example6_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
+<img src="Example6_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
+
+Remember that the data in the clusters are hidden in the Plot but are
+still in the time series dataframe. To remove them from the data see
+Example3.md.
