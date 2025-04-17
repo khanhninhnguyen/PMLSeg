@@ -23,7 +23,7 @@ This may include:
 \itemize{
 \item \code{Tmu}: the segmentation results
 \item \code{FitF}: the estimated functional part. If the function is not taking into account in the model, \code{FitF} is FALSE
-\item \code{MonthVar}: the estimated variances of each month
+\item \code{MonthStd}: the estimated standard deviations of each month
 }}
 
 \item{FunctPart}{a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed}

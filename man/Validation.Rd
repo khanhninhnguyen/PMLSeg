@@ -4,25 +4,25 @@
 \alias{Validation}
 \title{Validation of change-points using metadata}
 \usage{
-Validation(OneSeries, Tmu, MinDist = 62, Metadata)
+Validation(OneSeries, Tmu, MaxDist = 62, Metadata)
 }
 \arguments{
-\item{OneSeries}{a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date}
+\item{OneSeries}{is a time series data frame with 2 columns, $signal and $date, each of size n x 1}
 
-\item{Tmu}{the segmentation results}
+\item{Tmu}{is a data frame containing segmentation results (see segmentation.R)}
 
-\item{MinDist}{the minimum distance from change-points to known changes to be validated}
+\item{MaxDist}{is the maximum distance (number of valid days) between a change-point and the nearest metadata to be valid}
 
-\item{Metadata}{a data frame with two columns: $date that is the known change in same format as date of \code{OneSeries} and the $type that is the type the change}
+\item{Metadata}{is a data frame with two columns, $date and $type, they represent changes at the station which observed the OneSeries time series}
 }
 \value{
 a data frame with four columns :
 \itemize{
-\item \code{CP} that is the change-points expressed in date to be validated
-\item \code{closestMetadata} that is the closest date of a known change
-\item \code{Distance} that is the distance between \code{CP} and \code{closestMetadata}
-\item \code{type} that is the type of the known change
-\item \code{valid} that takes the value 1 if the change-point is validated, 0 otherwise using a distance of \code{MinDist}
+\item \code{CP} are the dates of the change-points contained in \code{Tmu}
+\item \code{closestMetadata} are the nearest dates found in \code{Metadata}
+\item \code{Distance} is the distance between \code{CP} and \code{Metadata}
+\item \code{type} is the corresponding type of change from \code{Metadata}
+\item \code{valid} is the validation result: 1 if \code{Distance} is smaller than \code{MaxDist}, 0 otherwise
 }
 }
 \description{
