@@ -10,7 +10,8 @@ Segmentation(
   Kmax = 30,
   selectionK = "BM_BJ",
   FunctPart = TRUE,
-  selectionF = FALSE
+  selectionF = FALSE,
+  initf = "ascendent"
 )
 }
 \arguments{
@@ -21,14 +22,16 @@ Note: the $date variable should be continous. If the original data has gaps, NAs
 
 \item{Kmax}{is the maximal number of segments (Kmax < n). Default value is 30. Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.}
 
-\item{selectionK}{specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{mBIC}, \code{Lav}, \code{BM_BJ} or \code{BM_slope}).
-If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. Default is \code{"BM_BJ"}.}
+\item{selectionK}{specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}).
+If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. If \code{selection.K="All"}, the results for the four possible criteria are given. Default is \code{"BM_BJ"}.}
 
 \item{FunctPart}{specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE.
 Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way; with \code{FunctPart=FALSE}, only one segmentation is performed.
 If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.}
 
 \item{selectionF}{is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.}
+
+\item{initf}{refers how the functional part is initialized in the iterative inference procedure. \code{"each"} means that the functional part is estimated at each K, \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1, \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1 and \code{"both"} means that the \code{"ascendent"} is used first for K from 1 to Kmax, then \code{"descendent"} is tested from Kmax/2 to 1 (if the solution is better, it replaced the \code{"ascendent"} solution. Default is \code{"ascendent"}.}
 }
 \value{
 \itemize{
@@ -39,7 +42,9 @@ The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date i
 Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 \item \code{SSR} is the Sum of Squared Residuals of the fit.
+\item \code{SSR_All} is the Sum of Squared Residuals for the fit for all K=1,...,,Kmax
 }
+If \code{selectionK="All"}, the outputs are each a list containing the corresponding results obtained for all the model selection criteria
 }
 \description{
 Fit a segmentation model comprising one mean per segment, a global functional (Fourier series of order 4), and IID noise with variance changing over fixed intervals.

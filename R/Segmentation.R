@@ -479,18 +479,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
           if (res$SSwg <= resulta[[i]]$SSwg) {resulta[[i]] <- res}
         }
 
-        #SSR <- map_dbl(result, "SSwg")
-        #Kseq <- 1:Kmax
-        #K_for_New <- chull(Kseq, SSR) %>% rev()
-        #if (max(K_for_New)!=Kmax) {K_for_New <- c(K_for_New,Kmax)}
-        #missing_vals <- setdiff(min(K_for_New):max(K_for_New), K_for_New)
-        #for (i in missing_vals){
-        #  initfK <- result[[i + 1]]$f  # Résultat du précédent
-        #  SSR_i_before <- result[[i]]$SSwg
-        #  res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
-        #  SSR_i_after <- res$SSwg
-         # if (SSR_i_after <= SSR_i_before) {result[[i]] <- res}
-        #}
+
         result <- resulta
       }
   return(result)
