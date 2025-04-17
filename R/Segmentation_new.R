@@ -24,7 +24,7 @@
 #'    Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 #' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 #' \item \code{SSR} is the Sum of Squared Residuals of the fit.
-#' \item \code{SSR_All} is the Sum of Squared Residuals for the fit all K=1,...,,Kmax
+#' \item \code{SSR_All} is the Sum of Squared Residuals for the fit for all K=1,...,,Kmax
 #' }
 #'If \code{selectionK="All"}, the outputs are each a list containing the corresponding results obtained for all the model selection criteria
 #'
