@@ -1,23 +1,23 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
-#' Fit a segmentation model comprising one mean per segment, a global functional (Fourier series of order 4), and IID noise with variance changing over fixed intervals. 
+#' Fit a segmentation model comprising one mean per segment, a global functional (Fourier series of order 4), and IID noise with variance changing over fixed intervals.
 #' The time series should be given with a daily resolution, the functional has a fundamental period of 1 year, and the variances are estimated on monthly intervals.
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
 #' Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.
 #' @param lmin is the minimum length of the segments. Default value is 1.
 #' @param Kmax is the maximal number of segments (Kmax < n). Default value is 30. Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.
-#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}). 
+#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax). Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}).
 #' If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. If \code{selection.K="All"}, the results for the four possible criteria are given. Default is \code{"BM_BJ"}.
-#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE. 
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE.
 #'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way; with \code{FunctPart=FALSE}, only one segmentation is performed.
 #'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
 #' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.
 #' @param initf refers how the functional part is initialized in the iterative inference procedure. \code{"each"} means that the functional part is estimated at each K, \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1, \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1 and \code{"both"} means that the \code{"ascendent"} is used first for K from 1 to Kmax, then \code{"descendent"} is tested from Kmax/2 to 1 (if the solution is better, it replaced the \code{"ascendent"} solution. Default is \code{"ascendent"}.
 #'
-#' @return 
+#' @return
 #' \itemize{
-#' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series. 
+#' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series.
 #'    The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
 #' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 #' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
@@ -29,12 +29,12 @@
 #'If \code{selectionK="All"}, the outputs are each a list containing the corresponding results obtained for all the model selection criteria
 #'
 #' @details
-#' The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022). 
+#' The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022).
 #' The inference procedure consists in three steps:
 #' \enumerate{
 #' \item The monthly variances are estimated using a robust method following Bock et al. (2020).
 #' \item The segmentation parameters (change-point positions and segments' means) and the functional parameters (Fourier coefficients) are estimated iteratively, for a fixed number of segments \code{K = 1..Kmax}.
-#' The estimation method is based on maximum likelihood with known variance (from step 1). 
+#' The estimation method is based on maximum likelihood with known variance (from step 1).
 #' The segmentation and functional parameters are estimated separately, which allows to use the Dynamical Programming algorithm for the search of the optimal change-point positions and segment means.
 #' \item The optimal number of segments is obtained by model selection using one of the following penalty criteria:
 #'   \itemize{
@@ -104,7 +104,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
     cond4 <- FALSE
     warning("Kmax=1 means no segmentation")
   }
-  
+
 
 
   if ((cond1==TRUE) & (cond2==TRUE) & (cond3==TRUE) & (cond4==TRUE)){
@@ -187,7 +187,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct <- res.segfunct.with.NA$f
         coeff <- res.segfunct$coeff
       }
-      
+
       # if (selectionK=="BM_BJ_Old"){
       #   res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
       #   SSwg  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
@@ -227,7 +227,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct <- res.segfunct.with.NA$f
         coeff <- res.segfunct$coeff
       }
-      
+
       if (selectionK=="All"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
         res   <- vapply(res.LoopK, function(e) c(SSwg = e$SSwg, LogLg = e$LogLg), numeric(2))
@@ -239,7 +239,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct <- list()
         coeff <- list()
         SSwg <- list()
-        
+
         #1=mBIC
         Kh$mBIC <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
         res.segfunct <- c()
@@ -249,7 +249,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct$mBIC <- res.segfunct.mBIC$f
         coeff$mBIC <- res.segfunct$coeff
         SSwg$mBIC <- SSwg_All[Kh$mBIC]
-        
+
         #2=ML
         Kh$Lav <- MLcriterion(SSwg_All, Kseq,S)
         res.segfunct <- c()
@@ -259,7 +259,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct$Lav <- res.segfunct.ML$f
         coeff$Lav <- res.segfunct$coeff
         SSwg$Lav <- SSwg_All[Kh$Lav]
-        
+
         #3=BM_BJ
         Kh$BM_BJ <- BMcriterion(SSwg_All,pen)
         res.segfunct <- c()
@@ -269,7 +269,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct$BM_BJ <- res.segfunct.BM_BJ$f
         coeff$BM_BJ <- res.segfunct$coeff
         SSwg$BM_BJ <- SSwg_All[Kh$BM_BJ]
-        
+
         # #3bis=BM_BJOld
         # Kh$BM_BJ_Old <- BMcriterionOld(SSwg,pen)
         # res.segfunct <- c()
@@ -278,8 +278,8 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         # Tmu$BM_BJ_Old <- res.segfunct.BM_BJ_Old$Tmu
         # funct$BM_BJ_Old <- res.segfunct.BM_BJ_Old$f
         # coeff$BM_BJ_Old <- res.segfunct$coeff
-        # 
-        
+        #
+
         #4=BM slope
         DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh$BM_slope <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
@@ -290,7 +290,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct$BM_slope <- res.segfunct.BM_slope$f
         coeff$BM_slope <- res.segfunct$coeff
         SSwg$BM_slope <- SSwg_All[Kh$BM_slope]
-        
+
     }
 
     } else {
@@ -327,7 +327,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         Tmu <- res.seg.with.NA$Tmu
         SSwg <- SSwg_All[Kh]
       }
-      
+
       # if (selectionK=="BM_BJ_Old"){
       #   Kh <- BMcriterionOld(SSwg,pen)
       #   res.seg.sol <- c()
@@ -354,13 +354,13 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         Tmu <- res.seg.with.NA$Tmu
         SSwg <- SSwg_All[Kh]
       }
-      
+
       if (selectionK=="All"){
         Tmu <- list()
         Kh  <- list()
         funct <- list()
         coeff <- list()
-        
+
         #1=mBIC
         Kh$mBIC <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
         res.seg.sol <- c()
@@ -368,7 +368,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         res.seg.sol.mBIC <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$mBIC    <- res.seg.sol.mBIC$Tmu
         SSwg$mBIC <- SSwg_All[Kh$mBIC]
-        
+
         #2=ML
         Kh$Lav <- MLcriterion(SSwg_All, Kseq,S)
         res.seg.sol <- c()
@@ -376,8 +376,8 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         res.seg.sol.ML <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$Lav   <- res.seg.sol.ML$Tmu
         SSwg$Lav <- SSwg_All[Kh$Lav]
-        
-        
+
+
         #3=BM_BJ
         Kh$BM_BJ <- BMcriterion(SSwg_All,pen)
         res.seg.sol <- c()
@@ -385,17 +385,17 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         res.seg.sol.BM_BJ <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$BM_BJ   <- res.seg.sol.BM_BJ$Tmu
         SSwg$BM_BJ <- SSwg_All[Kh$BM_BJ]
-        
-        
-        
+
+
+
         # #3bis=BM_BJ_Old
         # Kh$BM_BJ_Old <- BMcriterion(SSwg,pen)
         # res.seg.sol <- c()
         # res.seg.sol <- res.LoopK[[Kh$BM_BJ_Old]]
         # res.seg.sol.BM_BJ_Old <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         # Tmu$BM_BJ_Old   <- res.seg.sol.BM_BJ_Old$Tmu
-        # 
-        
+        #
+
         #4=BM slope
         DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh$BM_slope <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
@@ -404,9 +404,9 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         res.seg.sol.BM_slope <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$BM_slope   <- res.seg.sol.BM_slope$Tmu
         SSwg$BM_slope <- SSwg_All[Kh$BM_slope]
-        
+
       }
-      
+
     }
 
     #Obtained segmentation
@@ -417,8 +417,8 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
     result$MonthVar <- var.est.month
     result$SSR <- SSwg
     result$SSR_All <- SSwg_All
-    
-    
+
+
  #   if (length(SSwg)==1){
 #      result$SSR <- SSwg
 #    } else {result$SSR <- SSwg[Kh]}
@@ -439,7 +439,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
   result <- vector("list", Kmax)
   resulta <- vector("list", Kmax)
   resultd <- vector("list", Kmax)
-  
+
   func <- get(Used.function)  # Used.function est une chaîne de caractères, donc on récupère la fonction
   # Si initf est "each", on applique directement la fonction pour chaque valeur de i
   if (initf == "each") {
@@ -469,7 +469,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
           res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
           resulta[[i]] <- res
         }
-       
+
        # resultd[[Kmax]] <- func(Data, var.est.month, 1, myGraph[[Kmax]], lmin, lyear, threshold, tol, initf = "each")
         # Appliquer la fonction de manière récursive en utilisant map
         for (i in seq(round(Kmax/2),1,-1)){
@@ -477,7 +477,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
           res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
           if (res$SSwg <= resulta[[i]]$SSwg) {resulta[[i]] <- res}
         }
-       
+
         #SSR <- map_dbl(result, "SSwg")
         #Kseq <- 1:Kmax
         #K_for_New <- chull(Kseq, SSR) %>% rev()
@@ -494,7 +494,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
       }
   return(result)
 }
-  
+
 
 
 Loop.K.seg.procedure = function(Data,var.est.month,lyear,lmin,Kmax,myGraph){
@@ -527,13 +527,13 @@ BMcriterion<-function(J,pen)
 {
   Kmax=length(J)
   Kseq=1:Kmax
-  kv <- chull(pen, J) 
+  kv <- chull(pen, J)
   rg_kv <- which(diff(kv)>0)
-  if (length(rg) > 0) {
+  if (length(rg_kv) > 0) {
     kv <- kv[-(rg_kv+1)]
   }
 
-  
+
   pv <- -diff(J[kv])/diff(pen[kv])  #%>% rev()
   rg <- which(pv < 0)
   # Supprimer uniquement si rg n'est pas vide
@@ -544,19 +544,19 @@ BMcriterion<-function(J,pen)
   # Toujours inverser pv et kv, même si aucune suppression n'a eu lieu
   pv <- rev(pv)
   kv <- rev(kv)
-  
+
   if (length(pv) == 1) {
     stop("Erreur : le contraste n'est pas décroissant")
   }
-  
-  # kv_for_dv <- kv %>% 
+
+  # kv_for_dv <- kv %>%
   #   { if (last(.) != Kmax) c(., Kmax) else . }
   dv <- diff(kv)
-  dmax <- max(dv)  
-  rt <- which.max(dv)  
-  alpha <- pv[rt] 
-  alpha_opt <- 2 * alpha  
-  
+  dmax <- max(dv)
+  rt <- which.max(dv)
+  alpha <- pv[rt]
+  alpha_opt <- 2 * alpha
+
   km <- kv[alpha_opt >= pv] %>% first()
   Kh =Kseq[km]
   return(Kh)
@@ -585,7 +585,7 @@ BMcriterionOld<-function(J,pen)
     } #end
     k=k+dm
   } #end
-  
+
   pv=c(pv,0)
   kv=c(kv,Kmax)
   dv=diff(kv);
@@ -690,7 +690,7 @@ Seg_funct_selbK <-function(Data,var.est.month,K,graphK,lmin,lyear,threshold,tol,
   auxiliar_data <- Data
   auxiliar_data$signal <- Data$signal-funct.esti
   segmentation <- SegMonthlyVarianceK(auxiliar_data,K,graphK,lmin,var.est.t)
-  
+
 
   maxIter = 100
   Diff  = 2*tol

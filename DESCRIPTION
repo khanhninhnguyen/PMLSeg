@@ -1,6 +1,6 @@
 Package: PMLseg
 Title: Segmentation of time series by Penalized Maximum Likelihood 
-Version: 0.0.0.9003
+Version: 0.0.0.9004
 Authors@R: c(person("Annarosa", "Quarello", role = c("aut")),
     person("Emilie", "Lebarbier", email = "emilie.lebarbier@parisnanterre.fr", role = c("aut", "cre")),
     person("Ninh", "Nguyen", email = "ninh.nguyen.cva@gmail.com", role = c("aut")),
@@ -9,7 +9,7 @@ Description: PMLseg is a R package for the detection of change-points (segmentat
 Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
-Imports: robustbase, capushe, gfpop, dplyr, ggplot2, tidyr
+Imports: robustbase, capushe, gfpop, dplyr, ggplot2, tidyr, purrr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 NeedsCompilation: no
