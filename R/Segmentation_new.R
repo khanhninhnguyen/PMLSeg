@@ -24,6 +24,7 @@
 #'    Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 #' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 #' \item \code{SSR} is the Sum of Squared Residuals of the fit.
+#' \item \code{SSR_All} is the Sum of Squared Residuals for the fit all K=1,...,,Kmax
 #' }
 #'If \code{selectionK="All"}, the outputs are each a list containing the corresponding results obtained for all the model selection criteria
 #'
@@ -158,13 +159,15 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         funct <- res.segfunct.with.NA$f
         coeff <- res.segfunct$coeff
         SSwg  <- res.segfunct$SSwg
+        SSwg_All  <- res.segfunct$SSwg
         Kh    <- Kmax
       }
 
       if (selectionK=="Lav"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
-        SSwg  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
-        Kh    <- MLcriterion(SSwg, Kseq,S)
+        SSwg_All  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
+        Kh    <- MLcriterion(SSwg_All, Kseq,S)
+        SSwg  <- SSwg_All[Kh]
         res.segfunct <- res.LoopK[[Kh]]
         res.segfunct.with.NA <- add_NA(res.segfunct,present.data,n.OneSeries,segf=TRUE)
         Tmu   <- res.segfunct.with.NA$Tmu
@@ -174,9 +177,10 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
 
       if (selectionK=="BM_BJ"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
-        SSwg  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
+        SSwg_All  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
         pen   <- 5*Kseq+2*Kseq*log(n.X/Kseq)
-        Kh    <- BMcriterion(SSwg,pen)
+        Kh    <- BMcriterion(SSwg_All,pen)
+        SSwg  <- SSwg_All[Kh]
         res.segfunct <- res.LoopK[[Kh]]
         res.segfunct.with.NA <- add_NA(res.segfunct,present.data,n.OneSeries,segf=TRUE)
         Tmu   <- res.segfunct.with.NA$Tmu
@@ -198,10 +202,11 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
 
       if (selectionK=="BM_slope"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
-        SSwg  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
+        SSwg_All  <- vapply(res.LoopK, function(e) e$SSwg, numeric(1))
         pen<-5*Kseq+2*Kseq*log(n.X/Kseq)
-        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg)
+        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
+        SSwg  <- SSwg_All[Kh]
         res.segfunct <- res.LoopK[[Kh]]
         res.segfunct.with.NA <- add_NA(res.segfunct,present.data,n.OneSeries,segf=TRUE)
         Tmu   <- res.segfunct.with.NA$Tmu
@@ -212,9 +217,10 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
       if (selectionK=="mBIC"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
         res   <- vapply(res.LoopK, function(e) c(SSwg = e$SSwg, LogLg = e$LogLg), numeric(2))
-        SSwg  <- res["SSwg", ]
+        SSwg_All  <- res["SSwg", ]
         LogLg <- res["LogLg", ]
-        Kh <- mBICcriterion(SSwg,LogLg,n.X,Kseq)$Kh
+        Kh <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
+        SSwg  <- SSwg_All[Kh]
         res.segfunct <- res.LoopK[[Kh]]
         res.segfunct.with.NA <- add_NA(res.segfunct,present.data,n.OneSeries,segf=TRUE)
         Tmu   <- res.segfunct.with.NA$Tmu
@@ -225,40 +231,44 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
       if (selectionK=="All"){
         res.LoopK <- Loop.K.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph,Used.function,threshold,tol,initf)
         res   <- vapply(res.LoopK, function(e) c(SSwg = e$SSwg, LogLg = e$LogLg), numeric(2))
-        SSwg  <- res["SSwg", ]
+        SSwg_All  <- res["SSwg", ]
         LogLg <- res["LogLg", ]
         pen <- 5*Kseq+2*Kseq*log(n.X/Kseq)
         Tmu <- list()
         Kh <- list()
         funct <- list()
         coeff <- list()
+        SSwg <- list()
         
         #1=mBIC
-        Kh$mBIC <- mBICcriterion(SSwg,LogLg,n.X,Kseq)$Kh
+        Kh$mBIC <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
         res.segfunct <- c()
         res.segfunct <- res.LoopK[[Kh$mBIC]]
         res.segfunct.mBIC <-  add_NA(res.segfunct, present.data, n.OneSeries, segf = TRUE)
         Tmu$mBIC <- res.segfunct.mBIC$Tmu
         funct$mBIC <- res.segfunct.mBIC$f
         coeff$mBIC <- res.segfunct$coeff
+        SSwg$mBIC <- SSwg_All[Kh$mBIC]
         
         #2=ML
-        Kh$Lav <- MLcriterion(SSwg, Kseq,S)
+        Kh$Lav <- MLcriterion(SSwg_All, Kseq,S)
         res.segfunct <- c()
         res.segfunct <- res.LoopK[[Kh$Lav]]
         res.segfunct.ML <-  add_NA(res.segfunct, present.data, n.OneSeries, segf = TRUE)
         Tmu$Lav <- res.segfunct.ML$Tmu
         funct$Lav <- res.segfunct.ML$f
         coeff$Lav <- res.segfunct$coeff
+        SSwg$Lav <- SSwg_All[Kh$Lav]
         
         #3=BM_BJ
-        Kh$BM_BJ <- BMcriterion(SSwg,pen)
+        Kh$BM_BJ <- BMcriterion(SSwg_All,pen)
         res.segfunct <- c()
         res.segfunct <- res.LoopK[[Kh$BM_BJ]]
         res.segfunct.BM_BJ <-  add_NA(res.segfunct, present.data, n.OneSeries, segf = TRUE)
         Tmu$BM_BJ <- res.segfunct.BM_BJ$Tmu
         funct$BM_BJ <- res.segfunct.BM_BJ$f
         coeff$BM_BJ <- res.segfunct$coeff
+        SSwg$BM_BJ <- SSwg_All[Kh$BM_BJ]
         
         # #3bis=BM_BJOld
         # Kh$BM_BJ_Old <- BMcriterionOld(SSwg,pen)
@@ -271,7 +281,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         # 
         
         #4=BM slope
-        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg)
+        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh$BM_slope <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
         res.segfunct <- c()
         res.segfunct <- res.LoopK[[Kh$BM_slope]]
@@ -279,6 +289,8 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         Tmu$BM_slope <- res.segfunct.BM_slope$Tmu
         funct$BM_slope <- res.segfunct.BM_slope$f
         coeff$BM_slope <- res.segfunct$coeff
+        SSwg$BM_slope <- SSwg_All[Kh$BM_slope]
+        
     }
 
     } else {
@@ -287,7 +299,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
 
       res.LoopK <-Loop.K.seg.procedure(OneSeries.X,var.est.month,lyear,lmin,Kmax,myGraph)
       res   <- vapply(res.LoopK, function(e) c(SSwg = e$SSwg, LogLg = e$LogLg), numeric(2))
-      SSwg  <- res["SSwg", ]
+      SSwg_All  <- res["SSwg", ]
       LogLg <- res["LogLg", ]
       pen<-5*Kseq+2*Kseq*log(n.X/Kseq)
 
@@ -295,22 +307,25 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         res.seg.with.NA <- add_NA(res.LoopK[[Kmax]],present.data,n.OneSeries,segf=FALSE)
         Tmu <- res.seg.with.NA$Tmu
         Kh  <- Kmax
+        SSwg <- SSwg_All[Kh]
       }
 
       if (selectionK=="Lav"){
-        Kh <- MLcriterion(SSwg, Kseq,S)
+        Kh <- MLcriterion(SSwg_All, Kseq,S)
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh]]
         res.seg.with.NA <- add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu <- res.seg.with.NA$Tmu
+        SSwg <- SSwg_All[Kh]
       }
 
       if (selectionK=="BM_BJ"){
-        Kh <- BMcriterion(SSwg,pen)
+        Kh <- BMcriterion(SSwg_All,pen)
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh]]
         res.seg.with.NA <- add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu <- res.seg.with.NA$Tmu
+        SSwg <- SSwg_All[Kh]
       }
       
       # if (selectionK=="BM_BJ_Old"){
@@ -322,20 +337,22 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
       # }
 
       if (selectionK=="BM_slope"){
-        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg)
+        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh]]
         res.seg.with.NA <- add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu <- res.seg.with.NA$Tmu
+        SSwg <- SSwg_All[Kh]
       }
 
       if (selectionK=="mBIC"){
-        Kh <- mBICcriterion(SSwg,LogLg,n.X,Kseq)$Kh
+        Kh <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh]]
         res.seg.with.NA <- add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu <- res.seg.with.NA$Tmu
+        SSwg <- SSwg_All[Kh]
       }
       
       if (selectionK=="All"){
@@ -345,27 +362,29 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         coeff <- list()
         
         #1=mBIC
-        Kh$mBIC <- mBICcriterion(SSwg,LogLg,n.X,Kseq)$Kh
+        Kh$mBIC <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh$mBIC]]
         res.seg.sol.mBIC <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$mBIC    <- res.seg.sol.mBIC$Tmu
-        
+        SSwg$mBIC <- SSwg_All[Kh$mBIC]
         
         #2=ML
-        Kh$Lav <- MLcriterion(SSwg, Kseq,S)
+        Kh$Lav <- MLcriterion(SSwg_All, Kseq,S)
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh$Lav]]
         res.seg.sol.ML <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$Lav   <- res.seg.sol.ML$Tmu
+        SSwg$Lav <- SSwg_All[Kh$Lav]
         
         
         #3=BM_BJ
-        Kh$BM_BJ <- BMcriterion(SSwg,pen)
+        Kh$BM_BJ <- BMcriterion(SSwg_All,pen)
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh$BM_BJ]]
         res.seg.sol.BM_BJ <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$BM_BJ   <- res.seg.sol.BM_BJ$Tmu
+        SSwg$BM_BJ <- SSwg_All[Kh$BM_BJ]
         
         
         
@@ -378,12 +397,13 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         # 
         
         #4=BM slope
-        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg)
+        DataForCa <- data.frame(model=paste("K=",Kseq),pen=pen,complexity=Kseq,contrast=SSwg_All)
         Kh$BM_slope <- Kseq[which(capushe::DDSE(DataForCa)@model==DataForCa$model)]
         res.seg.sol <- c()
         res.seg.sol <- res.LoopK[[Kh$BM_slope]]
         res.seg.sol.BM_slope <-  add_NA(res.seg.sol,present.data,n.OneSeries,segf=FALSE)
         Tmu$BM_slope   <- res.seg.sol.BM_slope$Tmu
+        SSwg$BM_slope <- SSwg_All[Kh$BM_slope]
         
       }
       
@@ -396,6 +416,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
     #Global results
     result$MonthVar <- var.est.month
     result$SSR <- SSwg
+    result$SSR_All <- SSwg_All
     
     
  #   if (length(SSwg)==1){
