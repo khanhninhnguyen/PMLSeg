@@ -360,6 +360,7 @@ Segmentation_new <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPa
         Kh  <- list()
         funct <- list()
         coeff <- list()
+        SSwg <- list()
 
         #1=mBIC
         Kh$mBIC <- mBICcriterion(SSwg_All,LogLg,n.X,Kseq)$Kh
