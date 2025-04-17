@@ -528,8 +528,13 @@ BMcriterion<-function(J,pen)
   Kmax=length(J)
   Kseq=1:Kmax
   kv <- chull(pen, J) 
-  pv <- -diff(J[kv])/diff(pen[kv])  #%>% rev()
+  rg_kv <- which(diff(kv)>0)
+  if (length(rg) > 0) {
+    kv <- kv[-(rg_kv+1)]
+  }
+
   
+  pv <- -diff(J[kv])/diff(pen[kv])  #%>% rev()
   rg <- which(pv < 0)
   # Supprimer uniquement si rg n'est pas vide
   if (length(rg) > 0) {
