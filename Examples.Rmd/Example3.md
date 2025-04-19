@@ -32,10 +32,10 @@ significant.
     }
 
     # specify the simulation parameters
-    n = 1000                                       # length of time series
+    n <- 1000                                       # length of time series
     cp_ind <- c(10, 200, 210, 580, 590, 600, 990)  # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
     segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)      # mean of segments
-    noise_stdev = 1                                # noise std dev (identical for all months)
+    noise_stdev <- 1                                # noise std dev (identical for all months)
     set.seed(1)                                    # initialise random generator
 
     # let's assume the true CPs are at index 200 and 600
@@ -44,7 +44,7 @@ significant.
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df = data.frame(date = mydate, signal = mysignal)
+    df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
@@ -60,7 +60,7 @@ Run the segmentation with default parameters and no functional:
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
     str(seg)
-    #> List of 5
+    #> List of 6
     #>  $ Tmu     :'data.frame':    8 obs. of  5 variables:
     #>   ..$ begin: int [1:8] 1 12 201 211 581 591 601 991
     #>   ..$ end  : int [1:8] 11 200 210 580 590 600 990 1000
@@ -71,6 +71,7 @@ Run the segmentation with default parameters and no functional:
     #>  $ CoeffF  : logi FALSE
     #>  $ MonthVar: num [1:12] 1.065 0.887 1.334 1.092 1.21 ...
     #>  $ SSR     : num 901
+    #>  $ SSR_All : num [1:30] 2372 1568 1404 1183 1027 ...
 
     seg$Tmu
     #>   begin  end       mean         se  np
@@ -99,8 +100,8 @@ to the beginning and end of the time series.
 We want to remove the segments smaller than 80 days, either isolated or
 in clusters.
 
-    cluster_max_dist = 80             # max distance between CPs in a cluster
-    screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
+    cluster_max_dist <- 80             # max distance between CPs in a cluster
+    screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
     screening
     #> $UpdatedCP
     #> [1] 206 591
@@ -120,7 +121,7 @@ segmentation dataframe.
 
 Now, update the segmentation parameters
 
-    seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
+    seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
     seg_updated
     #> $MonthVar
     #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480
@@ -160,15 +161,17 @@ To actually remove the data, do the following:
 
 ### 5. Validation of detected change-points with metadata
 
-    true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-    valid_max_dist = 10               # max distance between CP and metadata for the validation
-    valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+    true_cp_df <- data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
+    valid_max_dist <- 10               # max distance between CP and metadata for the validation
+    valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
     valid
     #> # A tibble: 2 × 5
     #>   CP         closestMetadata Distance type  valid
     #>   <date>     <date>             <dbl> <chr> <dbl>
     #> 1 2010-07-25 2010-07-19             6 True      1
     #> 2 2011-08-14 2011-08-23             9 True      1
+
+    # plot the time series with validation results
     PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
 <img src="Example3_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />

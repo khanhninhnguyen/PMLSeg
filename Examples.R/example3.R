@@ -27,41 +27,50 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 # specify time series simulation parameters and analysis parameters
-n = 1000                                       # length of time series
+n <- 1000                                       # length of time series
 cp_ind <- c(10, 200, 210, 580, 590, 600, 990)  # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
 segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)      # mean of segments
-noise_stdev = 1                                # noise std dev
+noise_stdev <- 1                                # noise std dev (identical for all months)
+set.seed(1)                                    # initialise random generator
+
+# let's assume the true CPs are at index 200 and 600
 true_cp_ind <- c(200, 600)                     # only 2 true CPs 
 
-# create a time series df
-set.seed(1)                 # initialise random generator
+# create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-df = data.frame(date = mydate, signal = mysignal)
+df <- data.frame(date = mydate, signal = mysignal)
 
-# Create metadata df for the true CP positions
-true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-
-# plot signal
+# plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+abline(v = mydate[cp_ind], col = "grey", lty = 2)
+abline(v = mydate[true_cp_ind], col = "red", lty = 2)
 
-# run segmentation
+# 2. run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
 seg
+
+# 3. Visualization of the time series with segmentation results superposed
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE)
 
 # Note: the segmentation detects all CPs
 
-# cluster screening 
-cluster_max_dist = 80             # max distance between CPs in a cluster
-screening = Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
+# 4. cluster screening 
+cluster_max_dist <- 80             # max distance between CPs in a cluster
+screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
 screening
 
 # update the segmentation parameters
-seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
+seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
 seg_updated
 
-# validate updated CP position wrt metadata
+# Plot the time series with the updated segmentation and RemoveData information
+PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+
+# Create metadata df for the true CP positions
+true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
+
+# 5. Validate updated CP position wrt metadata
 valid_max_dist = 62               # max distance between CP and metadata for the validation
 valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 valid
