@@ -65,7 +65,7 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata)
 
 # Validate estimated CP position wrt metadata
 valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist =  valid_max_dist Metadata = metadata)
+valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist =  valid_max_dist, Metadata = metadata)
 valid
 
 # Note: valid$Distance gives the distance between estimated CP and metadata
@@ -75,12 +75,20 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Va
 
 # Validated change-points are inducated by a filled triangle at the bottom line.
 
-# To further explore the sensitivity of segmentation results to signal and noise parameters:
-# Study the Impact of sample size on estimated parameters
-  # a) run again with n = 4000 and observe that:
-    # - the position of change-points is the same as with n=1000
-    # - the seg$Tmu$mean value the last segment (longer than with n=1000) is more accurate and seg$Tmu$se is smaller
-    # - the seg$MonthVar values are closer to the true value (1)
-  # b) run again with n = 500
-# Study the impact of noise_std:
-  # c) run again with noise_std = 0.01, 0.1, 10
+### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
+
+#### Impact of sample size on estimated parameters
+
+#  a) run again with `n = 4000` and observe that:
+#    - the position of change-points is the same as with `n = 1000`
+#    - the `seg$Tmu$mean` value the last segment (longer than with `n = 1000`) is more accurate and `seg$Tmu$se` is smaller
+#    - the `seg$MonthVar` values are closer to the true value (1)
+
+#  b) run again with `n = 500`
+
+#### Impact of signal to noise ratio on estimated parameters
+
+#  c) run again with `noise_std = 0.01, 0.1` these are easy cases
+
+#  d) run again with `noise_std = 10` this is a difficult case
+

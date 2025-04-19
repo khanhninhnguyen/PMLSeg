@@ -138,10 +138,9 @@ Plot with metadata and validation results:
 Validated change-points are inducated by a filled triangle at the bottom
 line.
 
-To further explore the sensitivity of segmentation results to signal and
-noise parameters:
+### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
 
-Study the Impact of sample size on estimated parameters
+#### Impact of sample size on estimated parameters
 
 1.  run again with `n = 4000` and observe that: - the position of
     change-points is the same as with `n = 1000` - the `seg$Tmu$mean`
@@ -151,6 +150,8 @@ Study the Impact of sample size on estimated parameters
 
 2.  run again with `n = 500`
 
-Study the impact of `noise_std`:
+#### Impact of signal to noise ratio on estimated parameters
 
-1.  run again with `noise_std = 0.01, 0.1, 10`
+1.  run again with `noise_std = 0.01, 0.1` these are easy cases
+
+2.  run again with `noise_std = 10` this is a difficult case
