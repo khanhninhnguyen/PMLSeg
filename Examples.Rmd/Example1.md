@@ -154,6 +154,6 @@ line.
 #### Impact of signal to noise ratio on estimated parameters
 
 1.  run again with `noise_std = 0.1` and observe that the the
-    `seg$Tmu$mean` and \`seg$MonthVar estimates are more precise.
+    `seg$Tmu$mean` and `seg$MonthVar` estimates are more precise.
 
 2.  run again with `noise_std = 10` and observe the opposite.
