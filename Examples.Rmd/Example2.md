@@ -27,22 +27,22 @@
     }
 
     # specify the simulation parameters
-    n = 1000                    # length of time series
+    n <- 1000                    # length of time series
     cp_ind <- c(200, 600)       # position of change points (index in time series)
     segmt_mean <- c(-1, 1, 2)   # mean value of segments
-    noise_stdev = 1             # noise std dev (identical for all months)
+    noise_stdev <- 1             # noise std dev (identical for all months)
     set.seed(1)                 # initialise random generator
 
-    # create a data frame of time series with 2 columns: date, signal
+    # create a time series df
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
     # add NA's in the signal
-    NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
+    NA_ind <- seq(from = 100, to = 150, by = 1)  # 1st gap
     mysignal[NA_ind] <- NA
-    NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
+    NA_ind <- seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
-    df = data.frame(date = mydate, signal = mysignal)
+    df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
