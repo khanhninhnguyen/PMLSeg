@@ -32,8 +32,8 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
   changes[1] <- segmt_mean[1]
   time_series <- cumsum(changes)
 
-  noise <- rnorm(n = length_series, mean = 0, sd = 1)
   sd = noise_stdev[as.numeric(format(mydate, "%m"))]
+  noise <- rnorm(n = length_series, mean = 0, sd = 1)
   time_series <- time_series + noise * sd
 
   return(time_series)
@@ -41,10 +41,10 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 
 # specify the simulation parameters
 date_begin <- as.Date("2010-03-01") # date of first data point
-n = 1000                            # length of time series
+n <- 1000                            # length of time series
 cp_ind <- c(200, 600)               # position of change points (index in time series)
 segmt_mean <- c(-1, 1, 2)           # mean value of segments
-noise_stdev <- rep(0.01, 12)         # noise variance (Jan to Dec)
+noise_stdev <- rep(1, 12)         # noise variance (Jan to Dec)
 coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
 set.seed(1)
 
@@ -53,15 +53,15 @@ mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # create a periodic function (Fourier series)
-T = 365.25                             # reference period (unit days)
-t = as.numeric(mydate)                 # time variable for periodic function
-t0 = as.numeric(mydate[1])             # reference date of periodic function is first date of time series
-p = length(coeff) / 2                  # order of Fourier Series
-f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
+T <- 365.25                             # reference period (unit days)
+t <- as.numeric(mydate)                 # time variable for periodic function
+t0 <- as.numeric(mydate[1])             # reference date of periodic function is first date of time series
+p <- length(coeff) / 2                  # order of Fourier Series
+f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
 
 # add periodic function to the signal
 mysignal <- mysignal + f
-df = data.frame(date = mydate, signal = mysignal)
+df <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
@@ -73,17 +73,17 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 #### a. Run the segmentation without the functional part to see what happens...
 
 ```{r}
-seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
+seg_nofunc <- Segmentation(OneSeries = df, FunctPart = FALSE)
 seg_nofunc$Tmu
-PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = TRUE)
+PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = FALSE)
 ```
 
-The segmenation captures the periodic signal.
+The segmentation captures the periodic signal.
 
 #### b. Run the segmentation with the functional part.
 
 ```{r}
-seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+seg <- Segmentation(OneSeries = df, FunctPart = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
@@ -92,7 +92,7 @@ sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 ```
 
-The periodic signal is now captured by the functional part but the segmentation fails to capture the CPs.
+The segmentation now captures the CPs but the periodic signal is not well estimated by the functional part.
 
 #### c. Run segmentation with functional and selection of statistically significant coefficients
 
@@ -106,4 +106,4 @@ sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 ```
 
-The periodic signal is captured by the functional part and the segmentation now captures the CPs.
+The functional part now correctly captures the periodic signal.

@@ -63,10 +63,7 @@ Run the segmentation with default parameters:
 ```{r}
 seg = Segmentation(OneSeries = df, 
                    FunctPart = FALSE)
-str(seg)
-```
 
-```{r}
 seg$Tmu
 ```
 
@@ -107,4 +104,4 @@ error / noise_stdev
 
 The relative error on some months is quite large.
 
-Increasing the length of the time series (i.e. including more years) would improve the accuracy of the noise variance estimation, although it is not critical for the segmentation.
+Increasing the length of the time series (i.e. including more years) would improve the accuracy of the noise variance estimation.

@@ -23,37 +23,39 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 
 # specify time series simulation parameters
 date_begin <- as.Date("2010-03-01") # date of first data point
-n = 1000                            # length of time series
+n <- 1000                            # length of time series
 cp_ind <- c(200, 600)               # position of change points (index in time series)
 segmt_mean <- c(-1, 1, 2)           # mean value of segments
-noise_stdev <- rep(0.01, 12)         # noise variance (Jan to Dec)
+noise_stdev <- rep(1, 12)         # noise variance (Jan to Dec)
 coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
+set.seed(1)
 
 # create a time series df with jumps and noise
-set.seed(1)
 mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # create a periodic function (Fourier series)
-T = 365.25                             # reference period (unit days)
-t = as.numeric(mydate)                 # time variable for periodic function
-t0 = as.numeric(mydate[1])             # reference date of periodic function is first date of time series
-p = length(coeff) / 2                  # order of Fourier Series
-f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
-plot(mydate, f, type = "l")
+T <- 365.25                             # reference period (unit days)
+t <- as.numeric(mydate)                 # time variable for periodic function
+t0 <- as.numeric(mydate[1])             # reference date of periodic function is first date of time series
+p <- length(coeff) / 2                  # order of Fourier Series
+f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
 
-# full signal
+# add periodic function to the signal
 mysignal <- mysignal + f
-df = data.frame(date = mydate, signal = mysignal)
-plot(df$date, df$signal, type = "l")
+df <- data.frame(date = mydate, signal = mysignal)
+
+# plot signal and position of change-points (red dashed line)
+plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 # run segmentation without functional part
-seg_nofunc = Segmentation(OneSeries = df, FunctPart = FALSE)
+seg_nofunc <- Segmentation(OneSeries = df, FunctPart = FALSE)
 seg_nofunc$Tmu
-PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = TRUE)
+PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = FALSE)
 
-# run segmentation with functional
-seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+# run segmentation with functional part
+seg <- Segmentation(OneSeries = df, FunctPart = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
@@ -62,7 +64,7 @@ sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 
 # run segmentation with functional and selection of statistically significant coefficients
-seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
+seg <- Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar

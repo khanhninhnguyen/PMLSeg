@@ -41,7 +41,7 @@
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
-<img src="Example4_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
+<img src="../Examples.md/Example4_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
@@ -49,19 +49,6 @@ Run the segmentation with default parameters:
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
-    str(seg)
-    #> List of 6
-    #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
-    #>   ..$ begin: int [1:3] 1 201 602
-    #>   ..$ end  : int [1:3] 200 601 1000
-    #>   ..$ mean : num [1:3] -0.985 1 1.995
-    #>   ..$ se   : num [1:3] 0.0175 0.0125 0.0124
-    #>   ..$ np   : int [1:3] 200 401 399
-    #>  $ FitF    : logi FALSE
-    #>  $ CoeffF  : logi FALSE
-    #>  $ MonthVar: num [1:12] 0.0109 0.0798 0.6539 1.5729 3.92 ...
-    #>  $ SSR     : num 930
-    #>  $ SSR_All : num [1:30] 20261 4123 930 926 918 ...
 
     seg$Tmu
     #>   begin  end       mean         se  np
@@ -100,7 +87,7 @@ Run the segmentation with default parameters:
             Metadata = metadata, 
             Validated_CP_Meta = valid)
 
-<img src="Example4_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
+<img src="../Examples.md/Example4_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
 Note: the segmentation detects well the position of change points
 despite the steep variations in the noise
@@ -116,5 +103,4 @@ despite the steep variations in the noise
 The relative error on some months is quite large.
 
 Increasing the length of the time series (i.e. including more years)
-would improve the accuracy of the noise variance estimation, although it
-is not critical for the segmentation.
+would improve the accuracy of the noise variance estimation.

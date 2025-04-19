@@ -41,6 +41,8 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
 seg
 
+seg$Tmu
+
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE)
 
 # Create metadata for the true CP positions
