@@ -142,13 +142,14 @@ line.
 
 #### Impact of sample size on estimated parameters
 
-1.  run again with `n = 4000` and observe that: - the position of
-    change-points is the same as with `n = 1000` - the `seg$Tmu$mean`
-    value the last segment (longer than with `n = 1000`) is more
-    accurate and `seg$Tmu$se` is smaller - the `seg$MonthVar` values are
-    closer to the true value (1)
+1.  run again with `n = 4000` and observe that:
 
-2.  run again with `n = 500`
+-   the position of change-points is the same as with `n = 1000`
+-   the `seg$Tmu$mean` value the last segment (longer than with
+    `n = 1000`) is more accurate and `seg$Tmu$se` is smaller
+-   the `seg$MonthVar` values are closer to the true value (1)
+
+1.  run again with `n = 500`
 
 #### Impact of signal to noise ratio on estimated parameters
 
