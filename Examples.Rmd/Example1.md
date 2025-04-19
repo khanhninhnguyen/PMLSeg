@@ -139,10 +139,18 @@ Validated change-points are inducated by a filled triangle at the bottom
 line.
 
 To further explore the sensitivity of segmentation results to signal and
-noise parameters: Study the Impact of sample size on estimated
-parameters a) run again with n = 4000 and observe that: - the position
-of change-points is the same as with n=1000 - the seg*T**m**u*mean value
-the last segment (longer than with n=1000) is more accurate and
-seg*T**m**u*se is smaller - the seg$MonthVar values are closer to the
-true value (1) b) run again with n = 500 Study the impact of noise\_std:
-c) run again with noise\_std = 0.01, 0.1, 10
+noise parameters:
+
+Study the Impact of sample size on estimated parameters
+
+1.  run again with `n = 4000` and observe that: - the position of
+    change-points is the same as with `n = 1000` - the `seg$Tmu$mean`
+    value the last segment (longer than with `n = 1000`) is more
+    accurate and `seg$Tmu$se` is smaller - the `seg$MonthVar` values are
+    closer to the true value (1)
+
+2.  run again with `n = 500`
+
+Study the impact of `noise_std`:
+
+1.  run again with `noise_std = 0.01, 0.1, 10`
