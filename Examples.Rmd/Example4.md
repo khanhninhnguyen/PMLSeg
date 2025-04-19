@@ -26,7 +26,7 @@
     }
 
     # specify the simulation parameters
-    n = 1000                            # length of time series
+    n <- 1000                            # length of time series
     cp_ind <- c(200, 600)               # position of change points (index in time series)
     segmt_mean <- c(-1, 1, 2)           # mean value of segments
     noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
@@ -35,7 +35,7 @@
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df = data.frame(date = mydate, signal = mysignal)
+    df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
@@ -50,7 +50,7 @@ Run the segmentation with default parameters:
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
     str(seg)
-    #> List of 5
+    #> List of 6
     #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
     #>   ..$ begin: int [1:3] 1 201 602
     #>   ..$ end  : int [1:3] 200 601 1000
@@ -61,6 +61,7 @@ Run the segmentation with default parameters:
     #>  $ CoeffF  : logi FALSE
     #>  $ MonthVar: num [1:12] 0.0109 0.0798 0.6539 1.5729 3.92 ...
     #>  $ SSR     : num 930
+    #>  $ SSR_All : num [1:30] 20261 4123 930 926 918 ...
 
     seg$Tmu
     #>   begin  end       mean         se  np
@@ -70,17 +71,17 @@ Run the segmentation with default parameters:
 
 ### 3. Validate estimated change-point positions wrt metadata:
 
-    meta_ind = cp_ind               # index in time series of metadata information
+    meta_ind <- cp_ind               # index in time series of metadata information
     meta_date <- df$date[meta_ind]  # corresponding date 
     meta_type <- c("true", "true")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
-    metadata = data.frame(date = meta_date, type = meta_type)
+    metadata <- data.frame(date = meta_date, type = meta_type)
     metadata
     #>         date type
     #> 1 2010-07-19 true
     #> 2 2011-08-23 true
 
-    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-    valid = Validation(OneSeries = df, 
+    valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
+    valid <- Validation(OneSeries = df, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,
                Metadata = metadata)
