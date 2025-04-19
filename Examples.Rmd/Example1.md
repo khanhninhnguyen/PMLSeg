@@ -7,7 +7,7 @@
     rm(list=ls(all=TRUE))
     library(PMLseg)
 
-    # Note 1: by convention the position of a change-point is the last point in the segment
+    # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in a the segment
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -27,19 +27,19 @@
     }
 
     # specify the simulation parameters
-    n = 1000                    # length of time series
+    n <- 1000                    # length of time series
     cp_ind <- c(200, 600)       # position of CPs (index in time series)
     segmt_mean <- c(-1, 1, 2)   # mean value of segments
-    noise_stdev = 1             # noise std dev (identical for all months)
+    noise_stdev <- 1             # noise std dev (identical for all months)
     set.seed(1)                 # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df = data.frame(date = mydate, signal = mysignal)
+    df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+    plot(df$date, df$signal, type = "l", xlab = "Date", ylab = "signal")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="Example1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -51,7 +51,7 @@ Run the segmentation with default parameters and no functional:
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
     str(seg)
-    #> List of 5
+    #> List of 6
     #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
     #>   ..$ begin: int [1:3] 1 201 601
     #>   ..$ end  : int [1:3] 200 600 1000
@@ -62,6 +62,7 @@ Run the segmentation with default parameters and no functional:
     #>  $ CoeffF  : logi FALSE
     #>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
     #>  $ SSR     : num 926
+    #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
 
 The `Tmu` dataframe contains, for each segment: the index of beginning
 and end, the esitmated mean and its standard erreor `se`, and the number
@@ -125,6 +126,9 @@ Validate estimated change-point positions wrt metadata:
     #> 1 2010-07-19 2010-07-19             0 R         1
     #> 2 2011-08-23 2011-08-23             0 RAD       1
 
+Note: valid$Distance gives the distance between estimated CP and
+metadata
+
 Plot with metadata and validation results:
 
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
@@ -133,3 +137,12 @@ Plot with metadata and validation results:
 
 Validated change-points are inducated by a filled triangle at the bottom
 line.
+
+To further explore the sensitivity of segmentation results to signal and
+noise parameters: Study the Impact of sample size on estimated
+parameters a) run again with n = 4000 and observe that: - the position
+of change-points is the same as with n=1000 - the seg*T**m**u*mean value
+the last segment (longer than with n=1000) is more accurate and
+seg*T**m**u*se is smaller - the seg$MonthVar values are closer to the
+true value (1) b) run again with n = 500 Study the impact of noise\_std:
+c) run again with noise\_std = 0.01, 0.1, 10
