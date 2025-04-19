@@ -37,9 +37,10 @@ fourier_series <- function(mydate, coeff) {
 # specify time series simulation parameters
 date_begin <- as.Date("2010-03-01")             # date of first data point
 n = 1000                                        # length of time series
-cp_ind <- c(200, 600)                           # position of CPs (index in time series)
-segmt_mean <- c(-1, 1, 2)                       # mean value of segments
-true_cp_ind <- c(200, 600)                      # only 2 true CPs 
+# cp_ind <- c(200, 600)                           # position of CPs (index in time series)
+# segmt_mean <- c(-1, 1, 2)                       # mean value of segments
+cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
+segmt_mean <- c(-1, 1, 2, 0)                    # mean value of segments
 noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
 coeff <- c(1, 0, 0, 0)                          # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
 set.seed(1)                 # initialise random generator
@@ -61,6 +62,7 @@ mysignal <- mysignal + f
 # create df with full signal
 df = data.frame(date = mydate, signal = mysignal)
 plot(df$date, df$signal, type = "l")
+abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 # run segmentation with functional part
 seg = Segmentation(OneSeries = df, FunctPart = TRUE)

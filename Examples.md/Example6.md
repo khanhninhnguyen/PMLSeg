@@ -39,7 +39,7 @@
     date_begin <- as.Date("2010-03-01")             # date of first data point
     n <- 1000                                        # length of time series
     cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
-    segmt_mean <- c(-1, 1, 2, 0)                    # mean value of segments
+    segmt_mean <- c(-1, 1, 2, -1)                    # mean value of segments
     noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
     coeff <- c(1, 0, 0, 0)                          # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
     set.seed(1)                                     # initialise random generator
@@ -74,23 +74,23 @@
     seg = Segmentation(OneSeries = df, FunctPart = TRUE)
     seg$Tmu
     #>   begin  end       mean         se  np
-    #> 1     1  199 -0.8967482 0.09561914 148
-    #> 2   200  571  0.9125619 0.01369619 372
-    #> 3   572  701  1.8605504 0.01494423  79
-    #> 4   702  989  2.0041980 0.03642282 288
-    #> 5   990 1000 -0.1444396 0.07603715  11
+    #> 1     1  199 -0.8967092 0.09561914 148
+    #> 2   200  571  0.9128602 0.01369619 372
+    #> 3   572  701  1.8608640 0.01494423  79
+    #> 4   702  989  2.0044065 0.03642282 288
+    #> 5   990 1000 -1.1441469 0.07603715  11
     seg$CoeffF
-    #>         cos1         sin1         cos2         sin2         cos3         sin3 
-    #>  1.047188699 -0.115140528  0.026801793  0.020032666 -0.056344432  0.024211490 
-    #>         cos4         sin4 
-    #> -0.008003053 -0.027978280
+    #>        cos1        sin1        cos2        sin2        cos3        sin3 
+    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 
+    #>        cos4        sin4 
+    #> -0.00800733 -0.02794739
     seg$MonthVar
     #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
     #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg$SSR
-    #> [1] 835.1449
+    #> [1] 835.1317
     sum(seg$CoeffF^2)
-    #> [1] 1.115589
+    #> [1] 1.115087
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
@@ -99,21 +99,21 @@
 
     seg_selectF = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
     seg_selectF$Tmu
-    #>   begin  end        mean         se  np
-    #> 1     1  199 -0.89654784 0.09561914 148
-    #> 2   200  574  1.01923850 0.01369372 375
-    #> 3   575  989  1.98829768 0.01382827 364
-    #> 4   990 1000 -0.05284836 0.07603715  11
+    #>   begin  end       mean         se  np
+    #> 1     1  199 -0.8965279 0.09561914 148
+    #> 2   200  574  1.0192571 0.01369372 375
+    #> 3   575  989  1.9883168 0.01382827 364
+    #> 4   990 1000 -1.0528552 0.07603715  11
     seg_selectF$CoeffF
     #>     cos1 
-    #> 1.004199
+    #> 1.004161
     seg_selectF$MonthVar
     #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
     #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg_selectF$SSR
-    #> [1] 841.1571
+    #> [1] 841.1567
     sum(seg_selectF$CoeffF^2)
-    #> [1] 1.008416
+    #> [1] 1.008339
     PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
