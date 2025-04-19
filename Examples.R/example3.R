@@ -33,9 +33,6 @@ segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)      # mean of segments
 noise_stdev <- 1                                # noise std dev (identical for all months)
 set.seed(1)                                    # initialise random generator
 
-# let's assume the true CPs are at index 200 and 600
-true_cp_ind <- c(200, 600)                     # only 2 true CPs 
-
 # create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
@@ -44,7 +41,6 @@ df <- data.frame(date = mydate, signal = mysignal)
 # plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 abline(v = mydate[cp_ind], col = "grey", lty = 2)
-abline(v = mydate[true_cp_ind], col = "red", lty = 2)
 
 # 2. run segmentation
 seg = Segmentation(OneSeries = df, FunctPart = FALSE)
@@ -67,17 +63,6 @@ seg_updated
 # Plot the time series with the updated segmentation and RemoveData information
 PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
 
-# Create metadata df for the true CP positions
-true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-
-# 5. Validate updated CP position wrt metadata
-valid_max_dist = 62               # max distance between CP and metadata for the validation
-valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
-valid
-
-# Plot the time series with RemoveData option
-PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData, Metadata = true_cp_df, Validated_CP_Meta = valid)
-
 # Note: the data in the clusters are not shown by the Plot function with the RemoveData option, but they are still in the time series
 
 # Screen also the time series before further use
@@ -85,4 +70,4 @@ df_screened <- df
 for (i in 1:(length(screening$RemoveData))) {
     df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
 }
-PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE)

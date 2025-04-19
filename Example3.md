@@ -38,9 +38,6 @@ significant.
     noise_stdev <- 1                                # noise std dev (identical for all months)
     set.seed(1)                                    # initialise random generator
 
-    # let's assume the true CPs are at index 200 and 600
-    true_cp_ind <- c(200, 600)                     # only 2 true CPs 
-
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
@@ -49,9 +46,8 @@ significant.
     # plot signal and position of change-points (red dashed line)
     plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
     abline(v = mydate[cp_ind], col = "grey", lty = 2)
-    abline(v = mydate[true_cp_ind], col = "red", lty = 2)
 
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
+<img src="../Example3_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
@@ -59,19 +55,6 @@ Run the segmentation with default parameters and no functional:
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
-    str(seg)
-    #> List of 6
-    #>  $ Tmu     :'data.frame':    8 obs. of  5 variables:
-    #>   ..$ begin: int [1:8] 1 12 201 211 581 591 601 991
-    #>   ..$ end  : int [1:8] 11 200 210 580 590 600 990 1000
-    #>   ..$ mean : num [1:8] 0.167 -0.971 5.527 0.986 -4.664 ...
-    #>   ..$ se   : num [1:8] 0.3111 0.0774 0.3594 0.0563 0.3837 ...
-    #>   ..$ np   : int [1:8] 11 189 10 370 10 10 390 10
-    #>  $ FitF    : logi FALSE
-    #>  $ CoeffF  : logi FALSE
-    #>  $ MonthVar: num [1:12] 1.065 0.887 1.334 1.092 1.21 ...
-    #>  $ SSR     : num 901
-    #>  $ SSR_All : num [1:30] 2372 1568 1404 1183 1027 ...
 
     seg$Tmu
     #>   begin  end       mean         se  np
@@ -90,7 +73,7 @@ Run the segmentation with default parameters and no functional:
             SegRes = seg, 
             FunctPart = FALSE)
 
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
+<img src="../Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
 Note that the segmentation is able to detect all CPs, even those close
 to the beginning and end of the time series.
@@ -147,10 +130,11 @@ information
 
     PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
 
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
+<img src="../Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 Note that the data in the clusters are hidden by the Plot function with
 the RemoveData option, but they are still in the time series dataframe.
+
 To actually remove the data, do the following:
 
     # Cleanup the time series dataframe
@@ -158,20 +142,3 @@ To actually remove the data, do the following:
     for (i in 1:(nrow(screening$RemoveData))) {
         df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
     }
-
-### 5. Validation of detected change-points with metadata
-
-    true_cp_df <- data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-    valid_max_dist <- 10               # max distance between CP and metadata for the validation
-    valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
-    valid
-    #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type  valid
-    #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-25 2010-07-19             6 True      1
-    #> 2 2011-08-14 2011-08-23             9 True      1
-
-    # plot the time series with validation results
-    PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = true_cp_df, Validated_CP_Meta = valid)
-
-<img src="Example3_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
