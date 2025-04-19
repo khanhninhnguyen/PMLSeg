@@ -77,18 +77,19 @@ PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Va
 
 ### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
 
+### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
+
 #### Impact of sample size on estimated parameters
 
-#  a) run again with `n = 4000` and observe that:
-#    - the position of change-points is the same as with `n = 1000`
-#    - the `seg$Tmu$mean` value the last segment (longer than with `n = 1000`) is more accurate and `seg$Tmu$se` is smaller
-#    - the `seg$MonthVar` values are closer to the true value (1)
+#1. run again with `n = 4000` and observe that:
+#- the position of change-points is the same as with `n = 1000`
+#- the `seg$Tmu$mean` value the last segment (longer than with `n = 1000`) is more accurate and `seg$Tmu$se` is smaller
+#- the `seg$MonthVar` values are closer to the true value (1)
 
-#  b) run again with `n = 500`
+#2. run again with `n = 500`
 
 #### Impact of signal to noise ratio on estimated parameters
 
-#  c) run again with `noise_std = 0.01, 0.1` these are easy cases
-
-#  d) run again with `noise_std = 10` this is a difficult case
-
+#3. run again with `noise_std = 0.1` and observe that the the `seg$Tmu$mean` and `seg$MonthVar estimates are more precise.
+  
+#4. run again with `noise_std = 10` and observe the opposite.
