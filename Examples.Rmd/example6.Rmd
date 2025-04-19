@@ -40,18 +40,18 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 fourier_series <- function(mydate, coeff) {
-    T = 365.25                             # base period (unit days)
-    t = as.numeric(mydate)                 # time variable for periodic function
-    t0 = as.numeric(mydate[1])             # reference date of periodic function is first date of time series
-    p = length(coeff) / 2                  # order of Fourier Series
-    f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
+    T <- 365.25                             # base period (unit days)
+    t <- as.numeric(mydate)                 # time variable for periodic function
+    t0 <- as.numeric(mydate[1])             # reference date of periodic function is first date of time series
+    p <- length(coeff) / 2                  # order of Fourier Series
+    f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
 
     return(f)
 }
 
 # specify the simulation parameters
 date_begin <- as.Date("2010-03-01")             # date of first data point
-n = 1000                                        # length of time series
+n <- 1000                                        # length of time series
 #cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
 #segmt_mean <- c(-1, 1, 2, 0)                    # mean value of segments
 cp_ind <- c(200, 600)                      # position of CPs (index in time series)
@@ -75,7 +75,7 @@ f <- fourier_series(mydate, coeff)
 mysignal <- mysignal + f
 
 # create df with full signal
-df = data.frame(date = mydate, signal = mysignal)
+df <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l")
@@ -114,25 +114,25 @@ It is safe to always run the cluster screening after the segmentation.
 
 ```{r}
 # run the cluster screening
-cluster_max_dist = 80             # max distance between CPs in a cluster
-screening = Cluster_screening(Tmu = seg_selectF$Tmu, MaxDist = cluster_max_dist)
+cluster_max_dist <- 80             # max distance between CPs in a cluster
+screening <- Cluster_screening(Tmu = seg_selectF$Tmu, MaxDist = cluster_max_dist)
 screening
 
 # update the segmentation dataframe if CPs have changed
-if (screening$ChangeCP=="Yes") {
-    seg_updated = UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
+if (screening$ChangeCP == "Yes") {
+    seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
 } else {
-    seg_updated = seg_selectF
+    seg_updated <- seg_selectF
 }
 ```
 
 ### 4. validate updated CP position wrt metadata
 
 ```{r}
-true_cp_ind = cp_ind
-true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-valid_max_dist = 10               # max distance between CP and metadata for the validation
-valid = Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+true_cp_ind <- cp_ind
+true_cp_df <- data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
+valid_max_dist <- 10               # max distance between CP and metadata for the validation
+valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 valid
 ```
 
