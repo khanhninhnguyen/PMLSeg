@@ -1,10 +1,14 @@
-# example2: time series with gaps (NA values)
+# Example2: time series with missing data
 #
 # Note: the df$date must be continuous, gaps in the data must be introduced as NA's in df$signal
 
 rm(list=ls(all=TRUE))
 
 library(PMLseg)
+
+# Note 2: the time series must have continue time, missing data are included as NA values
+
+# define simulation function
 
 simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
   time_series <- rep(0, length_series)
@@ -23,24 +27,24 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 # specify time series simulation parameters and analysis parameters
-n = 1000                     # length of time series
-cp_ind <- c(200, 600)        # position of change points (index in time series)
-segmt_mean <- c(-1, 1, 2)    # mean value of segments
-noise_stdev = 1              # noise std dev
+n <- 1000                    # length of time series
+cp_ind <- c(200, 600)       # position of change points (index in time series)
+segmt_mean <- c(-1, 1, 2)   # mean value of segments
+noise_stdev <- 1             # noise std dev (identical for all months)
+set.seed(1)                 # initialise random generator
 
 # create a time series df
-set.seed(1)                 # initialise random generator
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # add NA's in the signal
-NA_ind = seq(from = 100, to = 150, by = 1)  # gap in the 1st segment
+NA_ind <- seq(from = 100, to = 150, by = 1)  # gap in the 1st segment
 mysignal[NA_ind] <- NA
-NA_ind = seq(from = 580, to = 630, by = 1) # gap in the 2nd segment, superposed with 2nd change-point
+NA_ind <- seq(from = 580, to = 630, by = 1) # gap in the 2nd segment, superposed with 2nd change-point
 mysignal[NA_ind] <- NA
+df <- data.frame(date = mydate, signal = mysignal)
 
-# plot signal
-df = data.frame(date = mydate, signal = mysignal)
+# plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
 abline(v = mydate[cp_ind], col = "red", lty = 2)
 
