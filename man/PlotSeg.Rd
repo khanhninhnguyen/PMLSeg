@@ -18,25 +18,19 @@ PlotSeg(
 \arguments{
 \item{OneSeries}{a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date}
 
-\item{SegRes}{A list containing the results of the segmentation process.
-This may include:
-\itemize{
-\item \code{Tmu}: the segmentation results
-\item \code{FitF}: the estimated functional part. If the function is not taking into account in the model, \code{FitF} is FALSE
-\item \code{MonthStd}: the estimated standard deviations of each month
-}}
+\item{SegRes}{result from the segmentation funtion.}
 
-\item{FunctPart}{a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed}
+\item{FunctPart}{a boolean, specifies if the functional part should be plotted. Default is FALSE.}
 
-\item{RemoveData}{a data frame including the beginning and the end positions (time index) of the segments to be deleted after filtering}
+\item{RemoveData}{a data frame including the beginning and the end positions (time index) of the segments to be removed.}
 
-\item{Metadata}{a data frame with two columns: $date that is the known change in same format as date of \code{OneSeries} and the $type that is the type the change}
+\item{Metadata}{a data frame with two columns: $date (in date format) and $type (label in string format)}
 
-\item{Validated_CP_Meta}{the results from the Validation function. Default is NULL}
+\item{Validated_CP_Meta}{the results from the Validation function. Default is NULL.}
 
-\item{labelx}{a name representing the label of the x-axis}
+\item{labelx}{a string for the label of the x-axis}
 
-\item{labely}{a name representing the label of the y-axis}
+\item{labely}{a string for the label of the y-axis}
 }
 \value{
 a object of class \code{\link[ggplot2]{ggplot}} representing the

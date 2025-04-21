@@ -1,19 +1,13 @@
 #' Plot the time series with segmentation results: change-point positions, estimatedmean , with the monthly variance and function (if specified in the model)
 #'
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
-#' @param SegRes A list containing the results of the segmentation process.
-#'   This may include:
-#'   \itemize{
-#'     \item \code{Tmu}: the segmentation results
-#'     \item \code{FitF}: the estimated functional part. If the function is not taking into account in the model, \code{FitF} is FALSE
-#'     \item \code{MonthStd}: the estimated standard deviations of each month
-#'   }
-#' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
-#' @param RemoveData  a data frame including the beginning and the end positions (time index) of the segments to be deleted after filtering
-#' @param Validated_CP_Meta the results from the Validation function. Default is NULL
-#' @param Metadata a data frame with two columns: $date that is the known change in same format as date of \code{OneSeries} and the $type that is the type the change
-#' @param labelx a name representing the label of the x-axis
-#' @param labely a name representing the label of the y-axis
+#' @param SegRes result from the segmentation funtion.
+#' @param FunctPart a boolean, specifies if the functional part should be plotted. Default is FALSE.
+#' @param RemoveData a data frame including the beginning and the end positions (time index) of the segments to be removed.
+#' @param Validated_CP_Meta the results from the Validation function. Default is NULL.
+#' @param Metadata a data frame with two columns: $date (in date format) and $type (label in string format)
+#' @param labelx a string for the label of the x-axis
+#' @param labely a string for the label of the y-axis
 #'
 #' @return a object of class \code{\link[ggplot2]{ggplot}} representing the
 #'   time series plot with segmentation and validation results overlaid.
