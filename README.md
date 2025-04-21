@@ -5,17 +5,21 @@
 PMLseg is a R package for the segmentation of univariate time series
 based on Penalized Maximum Likelihood. The method detects changes in the
 mean signal in the presence of a periodic bias and variance changing
-over prescribed intervals. It was initially developed for the detection
-of change-points in daily climate data with annual periodic bias and
-variance changing on monthly intervals. It is quite versatile and can be
-of more general-purpose usage. The package includes the segmentation
-function as well as auxiliary functions for the screening, validation
-and visualization of the segmentation results. The theoretical basis of
-the method was published in (Quarello, Bock, and Lebarbier 2022).
+over prescribed intervals. A preliminary version was published under the
+name `GNSSseg` which was developed for the detection of change-points in
+daily GNSS minus reanalysis IWV time series with annual periodic bias
+and variance changing on monthly intervals. PMLseg is more versatile and
+can be used with time series provided in a data frame containing two
+columns (date and signal). The package includes the segmentation
+function as well as auxiliary functions for the validation with
+metadata, cluster screening, and visualization of the time series with
+segmentation results. The theoretical basis of the method can be found
+in (Quarello, Bock, and Lebarbier 2022).
 
 ## Table of Contents
 
 -   [Installation](#installation)
+-   [Functions](#functions)
 -   [Examples](#examples)
 
 ## Installation
@@ -23,9 +27,10 @@ the method was published in (Quarello, Bock, and Lebarbier 2022).
 The development version of `PMLSeg` can be installed from GitHub with:
 
 
-    # Install devtools and tidyr if you haven't already
+    # Install devtools, tidyr, and purr if you haven't already
     install.packages("devtools")
     install.packages("tidyr")
+    install.packages("purr")
 
     # Download and install gfpop from
     https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
@@ -34,15 +39,69 @@ The development version of `PMLSeg` can be installed from GitHub with:
     # Install PMLseg from GitHub
     devtools::install_github("khanhninhnguyen/PMLSeg")
 
-## Example 1
+# Functions
 
-### 1. Simulate a time series with 2 change-points
+The package contains the following functions:
+
+    Segmentation(
+      OneSeries,            # data frame, n x 2, $signal, $date in Date format
+      lmin = 1,             # minimum length of the segments
+      Kmax = 30,            # maximal number of segments
+      selectionK = "BM_BJ", # penalty criterion used for the model selection
+      FunctPart = TRUE,     # include the functional part in the model 
+      selectionF = FALSE,   # select only significant coefficients in the functional
+      initf="ascendent"     # initialization in the iterative inference procedure.
+    )
+
+    Validation(
+      OneSeries,            # data frame, n x 2, $signal, $date in Date format
+      Tmu,                  # segmentation results
+      MaxDist = 62,         # maximum distance (in days) between detected CP in Tmu and known events in Metadata
+      Metadata              # data frame with two columns: $date and the $type
+    )
+
+    Cluster_screening(
+      Tmu,                  # segmentation results
+      MaxDist = 80,         # maximal number of days between change-points within a cluster
+      alpha = 0.05,         # significance level of test
+      detail = FALSE        # if TRUE the output contains a $detail field with additional information on the test
+    )
+
+    UpdatedParametersForFixedCP(
+      OneSeries,            # data frame, n x 2, $signal, $date in Date format
+      ResScreening,         # output from Cluster_screening function
+      FunctPart = TRUE,     # update functional part
+      selectionF = FALSE,   # select only significant coefficients in the functional
+    )
+
+    PlotSeg(
+      OneSeries,            # data frame, n x 2, $signal, $date in Date format
+      SegRes,               # output from Segmentation function
+      FunctPart = TRUE,     # plot functional
+      RemoveData = NULL,    # remove screened data
+      Metadata = NULL,      # plot metadata
+      Validated_CP_Meta = NULL, # plot validation result
+      labelx = "Date",
+      labely = "signal"
+    )
+
+Usage and help on functions can be found by ?“function” in R console,
+e.g.
+
+    ?Segmentation
+
+## Examples
+
+Several examples are given in the `Examples.md/` folder. Below we
+provide an excerpt of example1.md
+
+### Simulation of a time series with changes in the mean and homogeneous variance
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    library(purrr)
 
-    # time series simulation function
-    # Note: by convention the position of a change-point is the last point in the segment
+    # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
       time_series <- rep(0, length_series)
       jump_indices <- c(1, cp_ind+1, length_series + 1)
@@ -60,34 +119,23 @@ The development version of `PMLSeg` can be installed from GitHub with:
     }
 
     # specify the simulation parameters
-    n = 1000                    # length of time series
-    cp_ind <- c(200, 600)       # position of change points (index in time series)
+    n <- 1000                    # length of time series
+    cp_ind <- c(200, 600)       # position of CPs (index in time series)
     segmt_mean <- c(-1, 1, 2)   # mean value of segments
-    noise_stdev = 1             # noise std dev (identical for all months)
+    noise_stdev <- 1             # noise std dev (identical for all months)
     set.seed(1)                 # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df = data.frame(date = mydate, signal = mysignal)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
+    df <- data.frame(date = mydate, signal = mysignal)
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
-
-    head(df, 3)
-    #>         date     signal
-    #> 1 2010-01-01 -1.6264538
-    #> 2 2010-01-02 -0.8163567
-    #> 3 2010-01-03 -1.8356286
-
-### 2. Segmentation
-
-Run the segmentation with default parameters and no functional:
+### Segmentation
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
     str(seg)
-    #> List of 5
+    #> List of 6
     #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
     #>   ..$ begin: int [1:3] 1 201 601
     #>   ..$ end  : int [1:3] 200 600 1000
@@ -98,6 +146,7 @@ Run the segmentation with default parameters and no functional:
     #>  $ CoeffF  : logi FALSE
     #>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
     #>  $ SSR     : num 926
+    #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
 
 The `Tmu` dataframe contains, for each segment: the index of beginning
 and end, the esitmated mean and its standard erreor `se`, and the number
@@ -109,15 +158,21 @@ of valid (non-NA) data points `np` in the signal:
     #> 2   201  600  0.9986774 0.05381478 400
     #> 3   601 1000  1.9700134 0.05301899 400
 
-### 3. Visualization of the time series with segmentation results superposed
+The time series with segmentation results superposed can be plotted with
+the `PlotSeg` function:
 
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
 
-### 4. Validation of detected change-points with metadata
+The plot shows the signal (grey line), the estimated means (red line),
+the estimated noise std (cyan line). The y-intercept of the noise is the
+lower black line. Dashed vertical lines show the estimated times of the
+change-points.
+
+### Validation of detected change-points with metadata
 
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
@@ -140,11 +195,11 @@ Plot with metadata:
             FunctPart = FALSE, 
             Metadata = metadata) 
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="100%" />
 
 Validate estimated change-point positions wrt metadata:
 
-    valid_max_dist = 62             # maximum distance wrt metadata for a CP to be validated
+    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,
@@ -156,11 +211,22 @@ Validate estimated change-point positions wrt metadata:
     #> 1 2010-07-19 2010-07-19             0 R         1
     #> 2 2011-08-23 2011-08-23             0 RAD       1
 
+Note: valid$Distance gives the distance between estimated CP and
+metadata
+
 Plot with metadata and validation results:
 
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-12-1.png" width="100%" />
+
+Validated change-points are indicated by a filled triangle at the bottom
+line.
+
+### Other examples
+
+See the other examples with more complex signals in the `Examples.md/`
+folder.
 
 ## References
 
