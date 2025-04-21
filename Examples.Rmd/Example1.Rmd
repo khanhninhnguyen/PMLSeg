@@ -126,7 +126,7 @@ Plot with metadata and validation results:
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
-Validated change-points are inducated by a filled triangle at the bottom line.
+Validated change-points are indicated by a filled triangle at the bottom line.
 
 ### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
 

@@ -6,6 +6,7 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -80,11 +81,13 @@
     #> 4   702  989  2.0044065 0.03642282 288
     #> 5   990 1000 -1.1441469 0.07603715  11
     seg$CoeffF
-    #>        cos1        sin1        cos2        sin2        cos3        sin3        cos4        sin4 
-    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 -0.00800733 -0.02794739
+    #>        cos1        sin1        cos2        sin2        cos3        sin3 
+    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 
+    #>        cos4        sin4 
+    #> -0.00800733 -0.02794739
     seg$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075
-    #>  [9] 1.55847031 0.76260594 0.06359813 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg$SSR
     #> [1] 835.1317
     sum(seg$CoeffF^2)
@@ -127,8 +130,8 @@ number of CPs may be wanted. Therefore, try the segmentation with
     #>     cos1 
     #> 1.004161
     seg_selectF$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075
-    #>  [9] 1.55847031 0.76260594 0.06359813 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg_selectF$SSR
     #> [1] 841.1567
     sum(seg_selectF$CoeffF^2)
@@ -149,8 +152,8 @@ number of CPs may be wanted. Therefore, try the segmentation with
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-The selection helps to reduce the confusion between periodic signal and
-segmentation.
+The solution with selection does not have the spurious CP. Selection
+helps to reduce the confusion between periodic signal and segmentation.
 
 ### 3. Cluster screening
 
@@ -174,14 +177,26 @@ time series.
     # update the segmentation dataframe if CPs have changed
     if (screening$ChangeCP == "Yes") {
         seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
-        seg_updated$Tmu
-        seg_updated$CoeffF
-        seg_updated$MonthVar
-        seg_updated$SSR
-        sum(seg_updated$CoeffF^2)
     } else {
         seg_updated <- seg_selectF
     }
+
+    seg_updated$Tmu
+    #>   begin  end       mean         se  np
+    #> 1     1  199 -0.3753573 0.09561914 148
+    #> 2   200  574  1.5044014 0.01370054 375
+    #> 3   575 1000  2.4872546 0.01383366 364
+    seg_updated$CoeffF
+    #>         cos1         sin1         cos2         sin2         cos3         sin3 
+    #>  1.000218275 -0.032170957  0.029128339  0.022356609 -0.029292154  0.010483136 
+    #>         cos4         sin4 
+    #> -0.005033549 -0.009957806
+    seg_updated$MonthVar
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
+    seg_updated$SSR
+    #> [1] 831.79
+    sum(seg_updated$CoeffF^2)
     #> [1] 1.003912
 
     # plot the series with updated segmentation dataframe
@@ -196,14 +211,24 @@ significant Fourier coefficients:
     # update the segmentation dataframe with seletection
     if (screening$ChangeCP == "Yes") {
         seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE, selectionF = TRUE)
-        seg_updated$Tmu
-        seg_updated$CoeffF
-        seg_updated$MonthVar
-        seg_updated$SSR
-        sum(seg_updated$CoeffF^2)
     } else {
         seg_updated <- seg_selectF
     }
+
+    seg_updated$Tmu
+    #>   begin  end       mean         se  np
+    #> 1     1  199 -0.3753573 0.09561914 148
+    #> 2   200  574  1.5044014 0.01370054 375
+    #> 3   575 1000  2.4872546 0.01383366 364
+    seg_updated$CoeffF
+    #>      cos1      sin1 
+    #>  1.064122 -0.107252
+    seg_updated$MonthVar
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
+    seg_updated$SSR
+    #> [1] 831.79
+    sum(seg_updated$CoeffF^2)
     #> [1] 1.143859
 
     # plot the series with updated segmentation dataframe

@@ -125,7 +125,7 @@ valid
 PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 ```
 
-The selection helps to reduce the confusion  between periodic signal and segmentation.
+The solution with selection does not have the spurious CP. Selection helps to reduce the confusion between periodic signal and segmentation.
 
 ### 3. Cluster screening 
 
@@ -140,14 +140,15 @@ screening
 # update the segmentation dataframe if CPs have changed
 if (screening$ChangeCP == "Yes") {
     seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
-    seg_updated$Tmu
-    seg_updated$CoeffF
-    seg_updated$MonthVar
-    seg_updated$SSR
-    sum(seg_updated$CoeffF^2)
 } else {
     seg_updated <- seg_selectF
 }
+
+seg_updated$Tmu
+seg_updated$CoeffF
+seg_updated$MonthVar
+seg_updated$SSR
+sum(seg_updated$CoeffF^2)
 
 # plot the series with updated segmentation dataframe
 valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
@@ -160,14 +161,15 @@ The ```UpdatedParametersForFixedCP``` has an option to statistically significant
 # update the segmentation dataframe with seletection
 if (screening$ChangeCP == "Yes") {
     seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE, selectionF = TRUE)
-    seg_updated$Tmu
-    seg_updated$CoeffF
-    seg_updated$MonthVar
-    seg_updated$SSR
-    sum(seg_updated$CoeffF^2)
 } else {
     seg_updated <- seg_selectF
 }
+
+seg_updated$Tmu
+seg_updated$CoeffF
+seg_updated$MonthVar
+seg_updated$SSR
+sum(seg_updated$CoeffF^2)
 
 # plot the series with updated segmentation dataframe
 valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)

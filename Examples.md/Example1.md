@@ -6,6 +6,7 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    library(purrr)
 
     # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in a the segment
 
@@ -135,7 +136,7 @@ Plot with metadata and validation results:
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
 
-Validated change-points are inducated by a filled triangle at the bottom
+Validated change-points are indicated by a filled triangle at the bottom
 line.
 
 ### 5. Further explore the sensitivity of segmentation results to signal and noise parameters
