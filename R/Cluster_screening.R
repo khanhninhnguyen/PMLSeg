@@ -1,16 +1,19 @@
-#' Post-processing, called screening, of the detected change-points
+#' Post-processing of the segmentation results aiming to remove clusters of change-points (CPs)
 #'
-#' (1) detection of cluster of change-points (formed by consecutive change-points separated by a maximum number of days)
-#' (2) testing the variation of mean before and after the cluster
-#'
-#' The post-processing rule is the following: the cluster is removed if the mean difference is unsignificant whereas the cluster is replaced by a change-point in the middle if the mean difference is significant. In both cases, some data will be to removed in the next step of the analysis
+#' Method:
+#' (1) detection of cluster of CPs, i.e. consecutive CPs closer than MaxDist days
+#' (2) test of the change in mean before and after the cluster with significance level alpha
+#' (3) removal of all the CPs in the cluster if the change in mean is unsignificant 
+#' (4) add a new change-point in the middle of the cluster if the change in mean is significant. 
+#' 
+#' Note: it is recommended to replace the data inside the cluster(s) by NA in the general homogenization process
 #
 #' @param Tmu the segmentation results obtained from the Segmentation function
-#' @param MaxDist the maximal number of days between change-points used to determinate the cluster. Default is 80
-#' @param detail any object indicating to have detail of test as output. Defaul is NULL, do not include the details.
-#' @param p_val a number from 0 to 1 indicating the threshold for p-value
+#' @param MaxDist the maximal number of days between change-points within a cluster. Default is 80.
+#' @param detail: if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
+#' @param alpha: significance level of the test (value between 0 and 1). Default is 0.05.
 #'
-#' @return A list of four variables (RemoveData, UpdatedCP, ChangeCP, and detail):
+#' @return 
 #' \itemize{
 #' \item \code{UpdatedCP}: The change-points remaining after screening.
 #' \item \code{RemoveData}: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
@@ -26,7 +29,7 @@
 #' @export
 
 
-Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
+Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
 
   RemoveData <-  c()
   UpdatedCP <-  c()
@@ -88,10 +91,10 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
                  np_R = Tmu$np[SegmentsTest$end],
                  tstat = TValues,
                  pval = PValues,
-                 signif = ifelse(PValues > p_val, 0, 1))
+                 signif = ifelse(PValues > alpha, 0, 1))
         # Update the segmentation result -----------------------------------------
         ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
-          if (PValues[i] < p_val) {
+          if (PValues[i] < alpha) {
             ceiling((Tmu$end[SegmentsTest$begin[i]] +
                        Tmu$begin[SegmentsTest$end[i]]) / 2)
           }
@@ -123,7 +126,7 @@ Cluster_screening <- function(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL) {
              RemoveData = RemoveData,
              ChangeCP = ChangeCP)
 
-  if(!is.null(detail)){
+  if(detail == TRUE){
     Out$detail = SegmentsTestOut
   }
 

@@ -2,21 +2,20 @@
 % Please edit documentation in R/Cluster_screening.R
 \name{Cluster_screening}
 \alias{Cluster_screening}
-\title{Post-processing, called screening, of the detected change-points}
+\title{Post-processing of the segmentation results aiming to remove clusters of change-points (CPs)}
 \usage{
-Cluster_screening(Tmu, p_val = 0.05, MaxDist = 80, detail = NULL)
+Cluster_screening(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE)
 }
 \arguments{
 \item{Tmu}{the segmentation results obtained from the Segmentation function}
 
-\item{p_val}{a number from 0 to 1 indicating the threshold for p-value}
+\item{MaxDist}{the maximal number of days between change-points within a cluster. Default is 80.}
 
-\item{MaxDist}{the maximal number of days between change-points used to determinate the cluster. Default is 80}
+\item{detail:}{if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.}
 
-\item{detail}{any object indicating to have detail of test as output. Defaul is NULL, do not include the details.}
+\item{alpha:}{significance level of the test (value between 0 and 1). Default is 0.05.}
 }
 \value{
-A list of four variables (RemoveData, UpdatedCP, ChangeCP, and detail):
 \itemize{
 \item \code{UpdatedCP}: The change-points remaining after screening.
 \item \code{RemoveData}: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
@@ -31,9 +30,12 @@ A list of four variables (RemoveData, UpdatedCP, ChangeCP, and detail):
 }
 }
 \description{
-(1) detection of cluster of change-points (formed by consecutive change-points separated by a maximum number of days)
-(2) testing the variation of mean before and after the cluster
+Method:
+(1) detection of cluster of CPs, i.e. consecutive CPs closer than MaxDist days
+(2) test of the change in mean before and after the cluster with significance level alpha
+(3) removal of all the CPs in the cluster if the change in mean is unsignificant
+(4) add a new change-point in the middle of the cluster if the change in mean is significant.
 }
 \details{
-The post-processing rule is the following: the cluster is removed if the mean difference is unsignificant whereas the cluster is replaced by a change-point in the middle if the mean difference is significant. In both cases, some data will be to removed in the next step of the analysis
+Note: it is recommended to replace the data inside the cluster(s) by NA in the general homogenization process
 }

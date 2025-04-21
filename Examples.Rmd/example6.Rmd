@@ -20,6 +20,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 ```{r}
 rm(list=ls(all=TRUE))
 library(PMLseg)
+library(purrr)
 
 # define simulation function
 simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -94,19 +95,17 @@ sum(seg$CoeffF^2)
 
 # validate updated CP position wrt metadata
 true_cp_df <- data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
-valid_max_dist <- 10               # max distance between CP and metadata for the validation
-valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
-valid
-
-# validate updated CP position wrt metadata
-valid = Validation(OneSeries = df, Tmu = seg_selectF$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+valid_max_dist <- 10
+valid <- Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 valid
 
 # Plot the time series with RemoveData option
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 ```
 
-A spurious CP is detected, due to confusion between noise, periodic signal and segmentation.
+A spurious CP is detected, due to confusion between noise, periodic signal and segmentation. 
+Although the jump has a small amplitude, and thus a small impact on the predicted signal, a solution with a smaller number of CPs may be wanted.
+Therefore, try the segmentation with ```selectionF = TRUE```.
 
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
@@ -126,11 +125,11 @@ valid
 PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 ```
 
-The selection helps to separate the periodic signal and segmentation.
+The selection helps to reduce the confusion  between periodic signal and segmentation.
 
 ### 3. Cluster screening 
 
-It is safe to always run the cluster screening after the segmentation.
+Now run the cluster screening to remove the small segment at the end of time series.
 
 ```{r}
 # run the cluster screening
@@ -141,11 +140,40 @@ screening
 # update the segmentation dataframe if CPs have changed
 if (screening$ChangeCP == "Yes") {
     seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
+    seg_updated$Tmu
+    seg_updated$CoeffF
+    seg_updated$MonthVar
+    seg_updated$SSR
+    sum(seg_updated$CoeffF^2)
 } else {
     seg_updated <- seg_selectF
 }
 
+# plot the series with updated segmentation dataframe
+valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)
 ```
 
-Remember that the data in the clusters are hidden in the Plot but are still in the time series dataframe. To remove them from the data see Example3.md.
+The ```UpdatedParametersForFixedCP``` has an option to statistically significant Fourier coefficients:
+
+```{r}
+# update the segmentation dataframe with seletection
+if (screening$ChangeCP == "Yes") {
+    seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE, selectionF = TRUE)
+    seg_updated$Tmu
+    seg_updated$CoeffF
+    seg_updated$MonthVar
+    seg_updated$SSR
+    sum(seg_updated$CoeffF^2)
+} else {
+    seg_updated <- seg_selectF
+}
+
+# plot the series with updated segmentation dataframe
+valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)
+```
+
+Remember that the data in the clusters are hidden in the plot but are still in the time series dataframe. To remove them from the data see Example3.md.
+
+

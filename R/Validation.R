@@ -4,7 +4,8 @@
 #' @param Tmu is a data frame containing segmentation results (see segmentation.R)
 #' @param MaxDist is the maximum distance (number of valid days) between a change-point and the nearest metadata to be valid
 #' @param Metadata is a data frame with two columns, $date and $type, they represent changes at the station which observed the OneSeries time series
-#' @return a data frame with four columns :
+#' 
+#' @return
 #' \itemize{
 #' \item \code{CP} are the dates of the change-points contained in \code{Tmu}
 #' \item \code{closestMetadata} are the nearest dates found in \code{Metadata}

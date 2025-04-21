@@ -16,7 +16,6 @@ Validation(OneSeries, Tmu, MaxDist = 62, Metadata)
 \item{Metadata}{is a data frame with two columns, $date and $type, they represent changes at the station which observed the OneSeries time series}
 }
 \value{
-a data frame with four columns :
 \itemize{
 \item \code{CP} are the dates of the change-points contained in \code{Tmu}
 \item \code{closestMetadata} are the nearest dates found in \code{Metadata}

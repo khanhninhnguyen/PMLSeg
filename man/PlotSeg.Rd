@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlotSeg.R
 \name{PlotSeg}
 \alias{PlotSeg}
-\title{Plot the segmentation results with the monthly variance and the function (if specified in the model)}
+\title{Plot the time series with segmentation results: change-point positions, estimatedmean , with the monthly variance and function (if specified in the model)}
 \usage{
 PlotSeg(
   OneSeries,
@@ -43,5 +43,5 @@ a object of class \code{\link[ggplot2]{ggplot}} representing the
 time series plot with segmentation and validation results overlaid.
 }
 \description{
-Plot the segmentation results with the monthly variance and the function (if specified in the model)
+Plot the time series with segmentation results: change-point positions, estimatedmean , with the monthly variance and function (if specified in the model)
 }

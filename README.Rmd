@@ -17,11 +17,12 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 
 # PMLSeg
 
-PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. It was initially developed for the detection of change-points in daily climate data with annual periodic bias and variance changing on monthly intervals. It is quite versatile and can be of more general-purpose usage. The package includes the segmentation function as well as auxiliary functions for the screening, validation and visualization of the segmentation results. The theoretical basis of the method was published in [@Quarello2022]. 
+PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. A preliminary version was published under the name `GNSSseg` which was developed for the detection of change-points in daily GNSS minus reanalysis IWV time series with annual periodic bias and variance changing on monthly intervals. PMLseg is more versatile and can be used with time series provided in a data frame containing two columns (date and signal). The package includes the segmentation function as well as auxiliary functions for the validation with metadata, cluster screening, and visualization of the time series with segmentation results. The theoretical basis of the method can be found in [@Quarello2022]. 
  
 ## Table of Contents
 
 - [Installation](#installation)
+- [Functions](#functions)
 - [Examples](#examples)
 
 ## Installation
@@ -30,7 +31,7 @@ The development version of `PMLSeg` can be installed from GitHub with:
 
 ```{r, eval=FALSE}
 
-# Install devtools, tidyr, purr if you haven't already
+# Install devtools, tidyr, and purr if you haven't already
 install.packages("devtools")
 install.packages("tidyr")
 install.packages("purr")
@@ -43,65 +44,63 @@ install.packages("gfpop_1.1.1.tar.gz")
 devtools::install_github("khanhninhnguyen/PMLSeg")
 ```
 
-## Functions
+# Functions
 
 The package contains the following functions:
 
+```{r, eval=FALSE}
 Segmentation(
-  OneSeries,
-  lmin = 1,
-  Kmax = 30,
-  selectionK = "BM_BJ",
-  FunctPart = TRUE,
-  selectionF = FALSE
-)
-
-
-PlotSeg(
-  OneSeries,
-  SegRes,
-  FunctPart = TRUE,
-  RemoveData = NULL,
-  Metadata = NULL,
-  Validated_CP_Meta = NULL,
-  labelx = "Date",
-  labely = "signal"
-)
-
-Cluster_screening(Tmu, 
-    p_val = 0.05, 
-    MaxDist = 80, 
-    detail = NULL)
-
-=> output:
- - UpdatedCP: The change-points remaining after screening.
- - RemoveData: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
- - ChangeCP: "Yes" or "No", indicating whether the list of change-points changed after cluster screening.
- - detail: A data frame containing the results of the significance test of the mean difference before and after the cluster, including the following columns:
-    mu_L, mu_R: Means of the segments before and after the cluster.
-    se_L, se_R: Standard errors of the means of the segments before and after the cluster.
-    np_L, np_R: Number of points before and after the cluster.
-    tstat, pval, signif: t-values, p-values, and significance codes of the test.
-
-UpdatedParametersForFixedCP(
-  OneSeries,
-  ResScreening,
-  FunctPart = TRUE,
-  selectionF = FALSE
+  OneSeries,            # data frame, n x 2, $signal, $date in Date format
+  lmin = 1,             # minimum length of the segments
+  Kmax = 30,            # maximal number of segments
+  selectionK = "BM_BJ", # penalty criterion used for the model selection
+  FunctPart = TRUE,     # include the functional part in the model 
+  selectionF = FALSE,   # select only significant coefficients in the functional
+  initf="ascendent"     # initialization in the iterative inference procedure.
 )
 
 Validation(
-  OneSeries,        # data frame, n x 2, $signal, $dates in Date format
-  Tmu,              # segmentation results
-  MinDist = 62,     # maximum distance (in days) between detected CP in Tmu$ and known events in Metadata to be valid
-  Metadata          # data frame with two columns: $date that is the known change in same format as date of OneSeries} and the $type that is the type the change
+  OneSeries,            # data frame, n x 2, $signal, $date in Date format
+  Tmu,                  # segmentation results
+  MaxDist = 62,         # maximum distance (in days) between detected CP in Tmu and known events in Metadata
+  Metadata              # data frame with two columns: $date and the $type
 )
+
+Cluster_screening(
+  Tmu,                  # segmentation results
+  MaxDist = 80,         # maximal number of days between change-points within a cluster
+  alpha = 0.05,         # significance level of test
+  detail = FALSE        # if TRUE the output contains a $detail field with additional information on the test
+)
+
+UpdatedParametersForFixedCP(
+  OneSeries,            # data frame, n x 2, $signal, $date in Date format
+  ResScreening,         # output from Cluster_screening function
+  FunctPart = TRUE,     # update functional part
+  selectionF = FALSE,   # select only significant coefficients in the functional
+)
+
+PlotSeg(
+  OneSeries,            # data frame, n x 2, $signal, $date in Date format
+  SegRes,               # output from Segmentation function
+  FunctPart = TRUE,     # plot functional
+  RemoveData = NULL,    # remove screened data
+  Metadata = NULL,      # plot metadata
+  Validated_CP_Meta = NULL, # plot validation result
+  labelx = "Date",
+  labely = "signal"
+)
+```
+
+Usage and help on functions can be found by ?"function" in R console, e.g.
+
+```{r, eval=FALSE}
+?Segmentation
+```
 
 ## Examples
 
-Preview the examples given in the .md files.
-
-The full .R codes are given in the folder Examples.
+Preview the examples given in the `Examples.md/` folder.
 
 ## References
 

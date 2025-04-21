@@ -20,6 +20,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 ```{r}
 rm(list=ls(all=TRUE))
 library(PMLseg)
+library(purrr)
 
 # Note 2: the time series must have continue time, missing data are included as NA values
 

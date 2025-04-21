@@ -20,6 +20,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 ```{r}
 rm(list=ls(all=TRUE))
 library(PMLseg)
+library(purrr)
 
 # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in a the segment
 

@@ -1,4 +1,4 @@
-#' Plot the segmentation results with the monthly variance and the function (if specified in the model)
+#' Plot the time series with segmentation results: change-point positions, estimatedmean , with the monthly variance and function (if specified in the model)
 #'
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param SegRes A list containing the results of the segmentation process.

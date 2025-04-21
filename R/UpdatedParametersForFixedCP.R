@@ -1,21 +1,23 @@
-#' update the segmentation parameters from the screening result
+#' update the segmentation parameters based on the screening result
 #'
-#' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
-#' @param ResScreening the output of the Cluster_screening function
-#' @param FunctPart a boolean indicating if the functional part is taking into account in the model. Default is TRUE and note that if \code{FunctPart=FALSE}, only a segmentation is performed
-#' @param selectionF a boolean indicating if a selection on the functions of the Fourier decomposition of order 4 is performed. The level of the test is by default 0.001. Default is FALSE
+#' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1
+#' @param ResScreening the output of the Cluster_screening() function
+#' @param FunctPart a boolean indicating if the functional part should be modelled. Default is TRUE.
+#' @param selectionF a boolean indicating if the statistically significant parameters of the functional part should be selected. The level of the test is by default 0.001. Default is FALSE.
 #'
-#' @return A file containing
+#' @return
 #' \itemize{
-#' \item \code{Tmu} that is a data frame containing the estimation of the segmentation parameters: for each segment, we get the beginning and the end positions (time index), the estimated mean (mean), the standard deviation of the mean (se) and the number of "valid" points (np) i.e. non-NA values in the segment
-#' \item \code{FitF} that corresponds to the estimation of the functional part. If \code{FunctPart=FALSE}, \code{FitF} is FALSE
-#' \item \code{CoeffF} that corresponds to the estimation of the coefficients of the Fourier decomposition. The vector contains 8 coefficients if \code{selectionF=FALSE} or as many coefficients as the number of selected functions if \code{selectionF=TRUE}. If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE
-#' \item \code{MonthVar} that corresponds to the estimated variances of each fixed interval (each month)
+#' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series.
+#'   The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
+#' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
+#' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
+#'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. 
+#'         If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
+#' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 #' \item \code{SSR} is the Sum of Squared Residuals of the fit.
 #' }
 #'
 #' @export
-
 
 UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE, selectionF=FALSE){
 
