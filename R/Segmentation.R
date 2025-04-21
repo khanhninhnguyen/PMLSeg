@@ -454,7 +454,8 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
       initfK <- result[[i - 1]]$f  # Résultat du précédent
       res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
       result[[i]] <- res
-    }} else if (initf=="descendent") {    #pour initf="decendant"
+    }
+  } else if (initf=="descendent") {    #pour initf="decendant"
       # Dernier appel avec initf = "each"
       result[[Kmax]] <- func(Data, var.est.month, 1, myGraph[[Kmax]], lmin, lyear, threshold, tol, initf = "each")
       # Appliquer la fonction de manière récursive en utilisant map
@@ -462,7 +463,8 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
         initfK <- result[[i + 1]]$f  # Résultat du précédent
         res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
         result[[i]] <- res
-      }} else if (initf=="both") {    #pour initf="decendant"
+      }
+    } else if (initf=="both") {    #pour initf="decendant"
         # Dernier appel avec initf = "each"
         resulta[[1]] <- func(Data, var.est.month, 1, myGraph[[1]], lmin, lyear, threshold, tol, initf = "each")
         # Appliquer la fonction de manière récursive en utilisant map
@@ -479,8 +481,6 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
           res <- func(Data, var.est.month, .x, myGraph[[i]], lmin, lyear, threshold, tol, initf = initfK)
           if (res$SSwg <= resulta[[i]]$SSwg) {resulta[[i]] <- res}
         }
-
-
         result <- resulta
       }
   return(result)

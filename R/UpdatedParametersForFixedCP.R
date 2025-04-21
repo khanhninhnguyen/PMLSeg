@@ -19,36 +19,33 @@
 
 UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE, selectionF=FALSE){
 
-  UpdatedData <- OneSeries
+  UpdatedSeries <- OneSeries
 
   if (ResScreening$ChangeCP=="No") {
     warning("Screening did not change segmentation results")
     return(NULL)
   }
 
+  # Remove data in cluster
   segments <- sapply(1:nrow(ResScreening$RemoveData), function(i) {
     ResScreening$RemoveData$begin[i]:ResScreening$RemoveData$end[i]
   })
-  # Remove data in cluster
   for (seg in segments) {
-    UpdatedData$signal[seg] <- NA
+    UpdatedSeries$signal[seg] <- NA
   }
 
-  # UpdatedData <- na.omit(UpdatedData)
+  # Estimate monthly variance parameters
+  UpdatedSeries$year <- as.factor(format(UpdatedSeries$date,format='%Y'))
+  UpdatedSeries$month <- as.factor(format(UpdatedSeries$date,format='%m'))
+  UpdatedSeries$month <-  droplevels(UpdatedSeries$month)
+  UpdatedSeries$year   <-  droplevels(UpdatedSeries$year)
+  MonthVar <- RobEstiMonthlyVariance(UpdatedSeries)^2
+  
+  # Compute time series of monthly variance
+  var.est.t = MonthVar[as.numeric(UpdatedSeries$month)]
+  var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
 
-  # Calculation of the monthly variances
-  UpdatedData$year <- as.factor(format(UpdatedData$date,format='%Y'))
-  UpdatedData$month <- as.factor(format(UpdatedData$date,format='%m'))
-  UpdatedData$month <-  droplevels(UpdatedData$month)
-  UpdatedData$year   <-  droplevels(UpdatedData$year)
-
-  # New estimation of the monthly variances
-  MonthVar <- RobEstiMonthlyVariance(UpdatedData)^2
-  var.est.t = MonthVar[as.numeric(UpdatedData$month)]
-  var.est.t[which(is.na(UpdatedData$signal))] <- NA
-
-
-  # New estimation of the Tmu
+  # Update begin and end of segments
   if(length(ResScreening$UpdatedCP)>0){
     begin = c(1, ResScreening$UpdatedCP + 1)
     end =  c(ResScreening$UpdatedCP, nrow(OneSeries))
@@ -57,55 +54,65 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     end = nrow(OneSeries)
   }
 
-  # update according to the result of screening
-  UpdatedCP = which(UpdatedData$date %in% OneSeries$date[ResScreening$UpdatedCP])
-  UpdatedCP <- c(UpdatedCP, nrow(UpdatedData))
-
-  # New estimation of f
+  # Update CPs
+  UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreening$UpdatedCP])
+  UpdatedCP <- c(UpdatedCP, nrow(UpdatedSeries))
+  # print(UpdatedCP)
+  
+  # Re-estimate means of segments and functional part
   if (FunctPart==TRUE){
     lyear <- 365.25
+    coeff <- c()
+    funct <- c()
+    predicted_signal <- c()
+    
+    UpdatedSignalModel <- periodic_estimation_all(Data = UpdatedSeries, CP = UpdatedCP, var.est.t = var.est.t, lyear = lyear)
 
-    res.funct <- c()
-    res.funct = periodic_estimation_all(Data = UpdatedData,
-                                          CP = UpdatedCP,
-                                          var.est.t = var.est.t,
-                                          lyear = 365.25)
-
-    funct <- res.funct$predict
-    coeff <- res.funct$coeff
-
-    auxilary_Data <- UpdatedData
-    auxilary_Data$signal <- auxilary_Data$signal-funct
-    Tmu <- FormatOptSegK(UpdatedCP,auxilary_Data,var.est.t)
-    mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))+funct
-
-  } else {
-    Tmu <- FormatOptSegK(UpdatedCP,UpdatedData,var.est.t)
+    predicted_signal <- UpdatedSignalModel$predict
+    coeff <- UpdatedSignalModel$coeff
+    funct <- UpdatedSignalModel$FitF
+        
+    Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
-
+    
+    if (selectionF==TRUE){
+        auxiliar_data <- UpdatedSeries
+        auxiliar_data$signal <- predicted_signal-mean.est.t
+        period <- periodic_estimation_selb_init(auxiliar_data,var.est.t,lyear)
+        funct <- period$predict
+        coeff <- period$coeff
+    }
+  } else {
     funct <- FALSE
     coeff <- FALSE
+    Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
+    predicted_signal = mean.est.t
   }
+  
+  # compute SSR
+  SSR <- sum(((UpdatedSeries$signal-predicted_signal)^2)/var.est.t,na.rm=TRUE)
 
-
-  UpdatePara <- c()
-  UpdatePara$MonthVar <- MonthVar
-  UpdatePara$Tmu   <-  Tmu
-  UpdatePara$FitF  <-  funct
-  UpdatePara$CoeffF <-  coeff
-  UpdatePara$SSR <- sum(((UpdatedData$signal-mean.est.t)^2)/var.est.t,na.rm=TRUE)
-  return(UpdatePara)
+  UpdatedPara <- c()
+  UpdatedPara$MonthVar <- MonthVar
+  UpdatedPara$Tmu   <-  Tmu
+  UpdatedPara$FitF  <-  funct
+  UpdatedPara$CoeffF <-  coeff
+  UpdatedPara$SSR <- SSR
+  return(UpdatedPara)
 
 }
 
-
+# This function estimates the coefficient of the periodic function at the same time as the segment means, for fixed CP positions
 periodic_estimation_all = function(Data,CP,var.est.t,lyear){
   DataF=Data
-  DataF$t=c(as.numeric(DataF$date-DataF$date[1]))+1
-  for (i in 1:4){
-    cosX=cos(i*DataF$t*(2*pi)/lyear)
-    sinX=sin(i*DataF$t*(2*pi)/lyear)
+  t=c(as.numeric(DataF$date))
+  t0=c(as.numeric(DataF$date[1]))
+
+  p <- 4
+  for (i in 1:p){
+    cosX=cos(i*(t-t0)*(2*pi)/lyear)
+    sinX=sin(i*(t-t0)*(2*pi)/lyear)
     DataF=cbind(DataF,cosX,sinX)
     colnames(DataF)[(dim(DataF)[2]-1):(dim(DataF)[2])]=c(paste0('cos',i),paste0('sin',i))
   }
@@ -123,16 +130,28 @@ periodic_estimation_all = function(Data,CP,var.est.t,lyear){
     new_col[start_index:end_index] <- 1
     return(new_col)
   })
-
   names(new_columns) <- paste0("mean_", 1:length(CP))
+  
+  # prep data for regression with lm()
   DataF <- DataF %>%
     select(signal,cos1, sin1, cos2, sin2, cos3, sin3, cos4, sin4)
   DataF <- cbind(DataF, new_columns)
-
+  # print(DataF)
+  
+  # regression
   reg=stats::lm(signal~-1+.,weights=1/var.est.t,data=DataF)
-  coeff=base::summary(reg)$coefficients[,1]
+  coeff_all <- base::summary(reg)$coefficients[,1]
+
+  # coeff of functional part
+  coeff <- coeff_all[1:(2*p)]
+  
+  # compute functional part
+  f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/lyear) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/lyear)))
+
   result=list()
   result$predict=stats::predict(reg,DataF)
+  result$coeff_all=coeff_all
   result$coeff=coeff
+  result$FitF=f
   return(result)
 }

@@ -3,8 +3,9 @@
 rm(list=ls(all=TRUE))
 
 library(PMLseg)
-#library(tidyr)
-#source("E:\\0github\\PMLSeg\\R\\Segmentation.R")
+rm(UpdatedParametersForFixedCP)
+source("E:\\0github\\PMLSeg\\R\\UpdatedParametersForFixedCP.R")
+source("E:\\0github\\PMLSeg\\R\\Segmentation.R")
 
 simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
     time_series <- rep(0, length_series)
@@ -24,26 +25,26 @@ simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series)
 }
 
 fourier_series <- function(mydate, coeff) {
-    T = 365.25                             # base period (unit days)
-    t = as.numeric(mydate)                 # time variable for periodic function
-    t0 = as.numeric(mydate[1])             # reference date of periodic function is first date of time series
-    p = length(coeff) / 2                  # order of Fourier Series
-    f = rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
+    T <- 365.25                             # base period (unit days)
+    t <- as.numeric(mydate)                 # time variable for periodic function
+    t0 <- as.numeric(mydate[1])             # reference date of periodic function is first date of time series
+    p <- length(coeff) / 2                  # order of Fourier Series
+    f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/T)))
 
     return(f)
 }
 
 
-# specify time series simulation parameters
+# specify the simulation parameters
 date_begin <- as.Date("2010-03-01")             # date of first data point
-n = 1000                                        # length of time series
-# cp_ind <- c(200, 600)                           # position of CPs (index in time series)
-# segmt_mean <- c(-1, 1, 2)                       # mean value of segments
+n <- 1000                                        # length of time series
 cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
 segmt_mean <- c(-1, 1, 2, 0)                    # mean value of segments
+# cp_ind <- c(200, 600)                      # position of CPs (index in time series)
+# segmt_mean <- c(-1, 1, 2)                    # mean value of segments
 noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
 coeff <- c(1, 0, 0, 0)                          # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
-set.seed(1)                 # initialise random generator
+set.seed(1)                                     # initialise random generator
 
 # create a time series with jumps and noise
 mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
@@ -60,18 +61,27 @@ f <- fourier_series(mydate, coeff)
 mysignal <- mysignal + f
 
 # create df with full signal
-df = data.frame(date = mydate, signal = mysignal)
+df <- data.frame(date = mydate, signal = mysignal)
+
+# plot signal and position of change-points (red dashed line)
 plot(df$date, df$signal, type = "l")
 abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 # run segmentation with functional part
-seg = Segmentation(OneSeries = df, FunctPart = TRUE)
-seg$Tmu
-seg$CoeffF
-seg$MonthVar
-seg$SSR
-sum(seg$CoeffF^2)
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
+# seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+# seg$Tmu
+# seg$CoeffF
+# seg$MonthVar
+# seg$SSR
+# sum(seg$CoeffF^2)
+
+# validate updated CP position wrt metadata
+# true_cp_df = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
+# valid_max_dist = 10               # max distance between CP and metadata for the validation
+# valid = Validation(OneSeries = df, Tmu = seg$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+# valid
+
+# PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
 # run segmentation with selection of statistically significant Fourier coefficients
 seg_selectF = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
@@ -79,16 +89,27 @@ seg_selectF$Tmu
 seg_selectF$CoeffF
 seg_selectF$MonthVar
 seg_selectF$SSR
-sum(seg$CoeffF^2)
-PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE)
+sum(seg_selectF$CoeffF^2)
 
-# validate updated CP position wrt metadata
-true_cp_df = data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
+# PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE)
+true_cp_df = data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
 valid_max_dist = 10               # max distance between CP and metadata for the validation
 valid = Validation(OneSeries = df, Tmu = seg_selectF$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
 valid
 
 # Plot the time series with RemoveData option
-PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
+# PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 
+# run the cluster screening
+cluster_max_dist <- 80             # max distance between CPs in a cluster
+screening <- Cluster_screening(Tmu = seg_selectF$Tmu, MaxDist = cluster_max_dist)
+screening
 
+# update the segmentation dataframe if CPs have changed
+if (screening$ChangeCP == "Yes") {
+    seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=TRUE)
+} else {
+    seg_updated <- seg_selectF
+}
+
+PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)

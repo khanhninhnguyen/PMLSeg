@@ -91,8 +91,22 @@ seg$CoeffF
 seg$MonthVar
 seg$SSR
 sum(seg$CoeffF^2)
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
+
+# validate updated CP position wrt metadata
+true_cp_df <- data.frame(date = df$date[cp_ind], type = rep("True", (length(cp_ind))))
+valid_max_dist <- 10               # max distance between CP and metadata for the validation
+valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+valid
+
+# validate updated CP position wrt metadata
+valid = Validation(OneSeries = df, Tmu = seg_selectF$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+valid
+
+# Plot the time series with RemoveData option
+PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 ```
+
+A spurious CP is detected, due to confusion between noise, periodic signal and segmentation.
 
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
@@ -103,8 +117,16 @@ seg_selectF$CoeffF
 seg_selectF$MonthVar
 seg_selectF$SSR
 sum(seg_selectF$CoeffF^2)
-PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE)
+
+# validate updated CP position wrt metadata
+valid = Validation(OneSeries = df, Tmu = seg_selectF$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
+valid
+
+# Plot the time series with RemoveData option
+PlotSeg(OneSeries = df, SegRes = seg_selectF, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid)
 ```
+
+The selection helps to separate the periodic signal and segmentation.
 
 ### 3. Cluster screening 
 
@@ -122,20 +144,7 @@ if (screening$ChangeCP == "Yes") {
 } else {
     seg_updated <- seg_selectF
 }
-```
 
-### 4. validate updated CP position wrt metadata
-
-```{r}
-true_cp_ind <- cp_ind
-true_cp_df <- data.frame(date = df$date[true_cp_ind], type = rep("True", (length(true_cp_ind))))
-valid_max_dist <- 10               # max distance between CP and metadata for the validation
-valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = true_cp_df)
-valid
-```
-
-### 5. Plot the time series
-```{r}
 PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)
 ```
 
