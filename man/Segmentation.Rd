@@ -20,10 +20,10 @@ Note: the $date variable should be continous. If the original data has gaps, NAs
 
 \item{lmin}{is the minimum length of the segments. Default value is 1.}
 
-\item{Kmax}{is the maximal number of segments (Kmax < n). Default value is 30.
+\item{Kmax}{is the maximal number of segments. Default value is 30.
 Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.}
 
-\item{selectionK}{specifies the penalty criterion used for the model selection (selection of the number of segments K <= Kmax).
+\item{selectionK}{specifies the penalty criterion used for the model selection (selection of the number of segments K).
 Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}). Default is \code{"BM_BJ"}.
 If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}.
 If \code{selectionK = "All"}, the results for the four possible criteria are given.}
@@ -36,16 +36,16 @@ If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster
 \item{selectionF}{is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.}
 
 \item{initf}{refers how the functional part is initialized in the iterative inference procedure.
-Options: \code{"each"} means that the functional part is estimated at each K,
+Options: \code{"each"} means that the functional part is estimated from scratch at each K,
 \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1,
 \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
-\code{"both"} means that the \code{"ascendent"} is used first for K from 1 to Kmax, then \code{"descendent"} is tested from Kmax/2 to 1 (if the solution is better, it replaced the \code{"ascendent"} solution.
+\code{"both"} means that \code{"ascendent"} is used first for K = 1 to Kmax, then \code{"descendent"} is tested for K = Kmax/2 to 1 and if the latter solution is better it replaces \code{"ascendent"} solution.
 Default is \code{"ascendent"}.}
 }
 \value{
 \itemize{
 \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series.
-The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
+The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}) in a segment (valid means not NA).
 \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
 Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
@@ -54,14 +54,12 @@ If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 \item \code{SSR} is the Sum of Squared Residuals of the fit.
 \item \code{SSR_All} is the Sum of Squared Residuals for the fit for all K=1,...,Kmax
 }
-If \code{selectionK="All"}, the outputs are each a list containing the corresponding results obtained for all the model selection criteria
+If \code{selectionK="All"}, the outputs \code{Tmu}, \code{FitF}, \code{CoeffF}, and \code{SSR} are lists, containing the corresponding results obtained for each of the model selection criteria.
 }
 \description{
-Method: estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals.
+Method: estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variances are chaning on monthly intervals.
 }
 \details{
-The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variances are chaning on monthly intervals.
-
 The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022).
 The inference procedure consists in three steps:
 \enumerate{
