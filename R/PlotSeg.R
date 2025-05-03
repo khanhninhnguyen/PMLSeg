@@ -72,18 +72,24 @@ PlotSeg <- function(OneSeries,
     OneSeries[RemoveInd, c("signal", "Mean")] <- NA
   }
 
-  IndNA <- which(is.na(OneSeries$signal))
-  if(length(IndNA) > 0){
-    if (FunctPart==TRUE){
-      OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
-      OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
-      OneSeries$FitF[which(is.na(OneSeries$signal))] <- NA
-      } else {
-        OneSeries$MonthStd[which(is.na(OneSeries$signal))] <- NA
-        OneSeries$Mean[which(is.na(OneSeries$signal))] <- NA
-        }
+  is_na_signal <- is.na(OneSeries$signal)
+  if(sum(is_na_signal) > 0){
+    if (FunctPart) {
+      cols_to_update <- c("MonthStd", "Mean", "FitF")
+    } else {
+      cols_to_update <- c("MonthStd", "Mean")
     }
 
+    if(all(cols_to_update %in% names(OneSeries))) {
+      OneSeries[is_na_signal, cols_to_update] <- NA
+    } else {
+      warning("One or more columns specified in cols_to_update do not exist in OneSeries.")
+    }
+  }
+
+  # Expand the series to be continuous
+  OneSeries <- OneSeries %>%
+    tidyr::complete(date = seq(min(date), max(date), by = "day"))
 
   # Add metadata
   if (!is.null(Metadata)) {
@@ -108,15 +114,14 @@ PlotSeg <- function(OneSeries,
 
   variable_names <- names(OneSeries)[-1]  # Exclude the first column which is 'date'
 
-  long_data <- stats::reshape(OneSeries,
-                              varying = variable_names,         # Use explicit column names
-                              v.names = "value",                # Name for the new 'value' column
-                              timevar = "variable",             # Name for the new 'variable' column
-                              idvar = "date",                   # 'date' is the identifier variable
-                              direction = "long",               # Reshape from wide to long
-                              new.row.names = 1:1e7)
-  long_data$variable = as.factor(variable_names[long_data$variable])
-  long_data$variable = as.factor(long_data$variable)
+  long_data <- OneSeries %>%
+    tidyr::pivot_longer(
+      cols = all_of(variable_names), # Specify the columns to pivot
+      names_to = "variable",       # Name of the new column holding the original column names
+      values_to = "value"          # Name of the new column holding the values
+      # 'date' column is automatically kept as an identifier
+    )
+  long_data$variable = factor(long_data$variable, levels = variable_names)
 
   p <- ggplot2::ggplot(long_data, aes(x = date, y = value, colour = variable, shape = variable)) +
     theme_bw() +
@@ -171,7 +176,7 @@ PlotSeg <- function(OneSeries,
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.background = element_blank()
-      ) 
+      )
   } else {
     p <- p +
       scale_x_date(
@@ -187,8 +192,6 @@ PlotSeg <- function(OneSeries,
         panel.background = element_blank()
       )
   }
-
-  
 
   p
   return(p)
