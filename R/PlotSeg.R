@@ -40,7 +40,8 @@ PlotSeg <- function(OneSeries,
   shapes <- c()
 
   colors <- c("signal" = "gray", "Mean" = "red", "FitF" = "purple", "MonthStd" = "cyan")
-
+  metadata_colors <- c("A" = "green", "R" = "magenta")
+  
   # mutate OneSeries
   OneSeries <- OneSeries %>%
     mutate(Mean = rep(SegRes$Tmu$mean, times = (SegRes$Tmu$end - SegRes$Tmu$begin + 1)),
@@ -158,7 +159,7 @@ PlotSeg <- function(OneSeries,
   if (!is.null(Metadata)) {
     if (!is.null(Metadata$type)) {
       p <- p +
-        geom_point(data = subset(long_data, variable %in% types), aes(shape = variable, color = variable),
+        geom_point(data = subset(long_data, variable %in% types), color = "gray", aes(shape = variable), 
                    size = 2, na.rm = TRUE)
     } else {
       p <- p +
