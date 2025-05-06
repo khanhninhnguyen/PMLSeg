@@ -6,6 +6,7 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
