@@ -34,16 +34,20 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
   RemoveData <-  c()
   UpdatedCP <-  c()
   ChangeCP <- c()
-  SegmentsTestOut <- NA
+  ClusterTestOut <- c()
 
   if(nrow(Tmu) > 1) {
     flag <- integer(length(Tmu$np))
     flag[Tmu$np<MaxDist] <- 1
 
-    ClusterBegInd = which(diff(flag) == 1)+1
-    NormalSegInd = which(flag == 0)
+    # index of first segment in each cluster
+    ClusterBegInd = which(diff(c(0, flag)) == 1)
 
     if (length(ClusterBegInd) > 0){
+
+      NormalSegInd = which(flag == 0)
+
+      # index of segment before and after each cluster (NA if first or last segment)
       SegBefInd = sapply(ClusterBegInd, function(x) {
         if (any(NormalSegInd < x)) max(NormalSegInd[NormalSegInd < x]) else NA
       })
@@ -51,64 +55,58 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
         if (any(NormalSegInd > x)) min(NormalSegInd[NormalSegInd > x]) else NA
       })
 
-      ClusterEndInd <-  SegAftInd - 1
+      # index of last segment in each cluster
+      ClusterEndInd <- SegAftInd - 1
       ClusterEndInd[is.na(ClusterEndInd)] <- length(flag)
 
+      # range of data points which are in each cluster that shall be removed
       RemoveData <- data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
-      # add the first cluster ----------------------------------------------
-      if(flag[1] == 1){
-        FirstClusterEnd <- which(flag == 0)[1]-1
-        FirstCluster <- data.frame(begin = Tmu$begin[1:FirstClusterEnd],end = Tmu$end[1:FirstClusterEnd])
-        RemoveData <- FirstCluster %>%
-          rbind(RemoveData)
-      }
+      
+      # list of segments before and after that can be used for the test
+      SegmentsTest = data.frame(begin = SegBefInd, end = SegAftInd)
 
-      SegmentsTest = stats::na.omit(data.frame(begin = SegBefInd,end = SegAftInd))
-      SegmentsTestOut = data.frame(begin = Tmu$begin[ClusterBegInd],
-                                   end = Tmu$end[ClusterEndInd])
-      ind_removed = which(is.na(SegBefInd) | is.na(SegAftInd))
-      if(length(ind_removed) > 0) {
-        SegmentsTestOut = SegmentsTestOut[-ind_removed,]
-      }
       UpdatedCP = Tmu$end[-unique(stats::na.omit(c(which(flag!=0), SegBefInd)))]
-      # Test difference in mean before and after cluster if needed ----
+      
+      ### Test difference in mean before and after each cluster
       if(nrow(SegmentsTest) > 0) {
         TValues <- sapply(1:nrow(SegmentsTest), function(x) {
-          Den = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
-          Nor = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
+          if (is.na(SegmentsTest$begin[x]) | is.na(SegmentsTest$end[x])) NA else 
+          {
+            D = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
+            SD = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
                        Tmu$se[SegmentsTest$end[x]]^2)
-          Den / Nor
+            D / SD
+          }
         })
         PValues <- sapply(TValues, function(x) {
           (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
         })
-        SegmentsTestOut <- SegmentsTestOut %>%
-          mutate(mu_L = Tmu$mean[SegmentsTest$begin],
-                 mu_R = Tmu$mean[SegmentsTest$end],
-                 se_L = Tmu$se[SegmentsTest$begin],
-                 se_R = Tmu$se[SegmentsTest$end],
-                 np_L = Tmu$np[SegmentsTest$begin],
-                 np_R = Tmu$np[SegmentsTest$end],
-                 tstat = TValues,
-                 pval = PValues,
-                 signif = ifelse(PValues > alpha, 0, 1))
-        # Update the segmentation result -----------------------------------------
-        ReplacedCP = sapply(1:nrow(SegmentsTest), function(i) {
-          if (PValues[i] < alpha) {
-            ceiling((Tmu$end[SegmentsTest$begin[i]] +
-                       Tmu$begin[SegmentsTest$end[i]]) / 2)
-          }
-        })
-        # Update of list of changepoints ------------------------------------------
+        ### save test details in ClusterTestOut df
+        ClusterTestOut <- data.frame(
+            mu_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$mean[SegmentsTest$begin]),
+            mu_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$mean[SegmentsTest$end]),
+            se_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$se[SegmentsTest$begin]),
+            se_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$se[SegmentsTest$end]),
+            np_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$np[SegmentsTest$begin]),
+            np_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$np[SegmentsTest$end]),
+            tstat = TValues,
+            pval = PValues,
+            signif = ifelse(PValues > alpha, 0, 1)
+         )
+
+        ### Update the CPs which have a significant change in mean
+        ind_signif = which(PValues < alpha)
+        ReplacedCP = ceiling((Tmu$end[SegmentsTest$begin[ind_signif]] + Tmu$begin[SegmentsTest$end[ind_signif]]) / 2)
+        
+        # Update of list of CPs
         UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
-        # remove the last point ----------------------------------------------
         if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
           UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
         }
       }
 
-      if(nrow(SegmentsTestOut) == 0){
-        SegmentsTestOut <- NA
+      if(nrow(ClusterTestOut) == 0){
+        ClusterTestOut <- NA
       }
       ChangeCP <- "Yes"
     } else {
@@ -127,7 +125,7 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
              ChangeCP = ChangeCP)
 
   if(detail == TRUE){
-    Out$detail = SegmentsTestOut
+    Out$detail = ClusterTestOut
   }
 
   return(Out)
