@@ -6,6 +6,7 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
+    library(purrr)
 
     # Note 2: the time series must have continue time, missing data are included as NA values
 
