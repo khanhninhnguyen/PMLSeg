@@ -3,9 +3,9 @@
 #' Method:
 #' (1) detection of cluster of CPs, i.e. consecutive CPs closer than MaxDist days
 #' (2) test of the change in mean before and after the cluster with significance level alpha
-#' (3) removal of all the CPs in the cluster if the change in mean is unsignificant 
-#' (4) add a new change-point in the middle of the cluster if the change in mean is significant. 
-#' 
+#' (3) removal of all the CPs in the cluster if the change in mean is unsignificant
+#' (4) add a new change-point in the middle of the cluster if the change in mean is significant.
+#'
 #' Note: it is recommended to replace the data inside the cluster(s) by NA in the general homogenization process
 #
 #' @param Tmu the segmentation results obtained from the Segmentation function
@@ -13,7 +13,7 @@
 #' @param detail: if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
 #' @param alpha: significance level of the test (value between 0 and 1). Default is 0.05.
 #'
-#' @return 
+#' @return
 #' \itemize{
 #' \item \code{UpdatedCP}: The change-points remaining after screening.
 #' \item \code{RemoveData}: A data frame containing the beginning and end positions (time index) of the segments to be deleted after filtering.
@@ -61,16 +61,16 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
 
       # range of data points which are in each cluster that shall be removed
       RemoveData <- data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
-      
+
       # list of segments before and after that can be used for the test
       SegmentsTest = data.frame(begin = SegBefInd, end = SegAftInd)
 
       UpdatedCP = Tmu$end[-unique(stats::na.omit(c(which(flag!=0), SegBefInd)))]
-      
+
       ### Test difference in mean before and after each cluster
       if(nrow(SegmentsTest) > 0) {
         TValues <- sapply(1:nrow(SegmentsTest), function(x) {
-          if (is.na(SegmentsTest$begin[x]) | is.na(SegmentsTest$end[x])) NA else 
+          if (is.na(SegmentsTest$begin[x]) | is.na(SegmentsTest$end[x])) NA else
           {
             D = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
             SD = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
@@ -97,11 +97,13 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
         ### Update the CPs which have a significant change in mean
         ind_signif = which(PValues < alpha)
         ReplacedCP = ceiling((Tmu$end[SegmentsTest$begin[ind_signif]] + Tmu$begin[SegmentsTest$end[ind_signif]]) / 2)
-        
+
         # Update of list of CPs
         UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
-        if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
-          UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
+        if (length(UpdatedCP)>0){
+          if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
+            UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
+          }
         }
       }
 
