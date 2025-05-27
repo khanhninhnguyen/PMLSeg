@@ -115,6 +115,7 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
       UpdatedCP = Tmu$end[-nrow(Tmu)]
       RemoveData = data.frame(begin = NA,end = NA)
       ChangeCP <- "No"
+      ClusterTestOut <- NA
     }
 
   } else {
