@@ -100,7 +100,7 @@ Note: the segmentation detects well the position of change points despite the st
 ### 5. Evaluate the error of the estimated noise variance
 ```{r}
 error <- seg$MonthVar - noise_stdev ** 2
-error / noise_stdev
+error / (noise_stdev ** 2)
 ```
 
 The relative error on some months is quite large.

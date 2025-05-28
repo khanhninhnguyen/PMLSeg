@@ -96,10 +96,9 @@ despite the steep variations in the noise
 ### 5. Evaluate the error of the estimated noise variance
 
     error <- seg$MonthVar - noise_stdev ** 2
-    error / noise_stdev
-    #>  [1]  0.008875807 -0.033963344  0.234134349  0.110731841  0.377754728
-    #>  [6]  0.340466809  0.366850887  0.402480519 -0.199188336  0.612194385
-    #> [11]  0.071274954  0.010628167
+    error / (noise_stdev ** 2)
+    #>  [1]  0.08875807 -0.11321115  0.33447764  0.09227653  0.20986374  0.17023340
+    #>  [7]  0.18342544  0.22360029 -0.16599028  0.87456341  0.23758318  0.10628167
 
 The relative error on some months is quite large.
 
