@@ -77,6 +77,12 @@ values, in each segment.
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 

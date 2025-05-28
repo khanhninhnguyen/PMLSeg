@@ -73,6 +73,12 @@ Run the segmentation with default parameters and no functional:
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -130,6 +136,12 @@ Plot the time series with the updated segmentation and RemoveData
 information
 
     PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 

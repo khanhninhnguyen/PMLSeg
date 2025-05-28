@@ -80,6 +80,12 @@ of valid (non-NA) data points `np` in the signal:
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
