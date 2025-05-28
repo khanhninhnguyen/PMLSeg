@@ -117,8 +117,8 @@ The segmentation captures the periodic signal.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-The segmentation now captures the CPs but the periodic signal is not
-well estimated by the functional part.
+The segmentation now captures the CPs, at the right position, but the
+periodic signal is not well estimated by the functional part.
 
 #### c. Run segmentation with functional and selection of statistically significant coefficients
 
@@ -150,4 +150,4 @@ well estimated by the functional part.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
-The functional part now correctly captures the periodic signal.
+Both the CPs and functional part now correctly captured.

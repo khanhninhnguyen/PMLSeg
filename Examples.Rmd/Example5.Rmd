@@ -107,4 +107,4 @@ sum(seg$CoeffF^2)
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
 ```
 
-The functional part now correctly captures the periodic signal.
+Both the CPs and functional part now correctly captured.
