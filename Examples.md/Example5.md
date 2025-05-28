@@ -74,6 +74,12 @@
     #> 9    795  848  2.01251370 0.14661834  54
     #> 10   849 1000  1.28919902 0.08452552 152
     PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = FALSE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
@@ -100,6 +106,14 @@ The segmentation captures the periodic signal.
     sum(seg$CoeffF^2)
     #> [1] 1.005895
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -125,6 +139,14 @@ well estimated by the functional part.
     sum(seg$CoeffF^2)
     #> [1] 1.013704
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
+    #> Warning: No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
+    #> No shared levels found between `names(values)` of the manual scale and the
+    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
