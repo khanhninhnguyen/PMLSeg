@@ -155,7 +155,7 @@ valid <- Validation(OneSeries = df, Tmu = seg_updated$Tmu, MaxDist = valid_max_d
 PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = TRUE, Metadata = true_cp_df, Validated_CP_Meta = valid, RemoveData = screening$RemoveData)
 ```
 
-The ```UpdatedParametersForFixedCP``` has an option to statistically significant Fourier coefficients:
+The ```UpdatedParametersForFixedCP``` has an option to select the statistically significant Fourier coefficients ```selectionF = TRUE```:
 
 ```{r}
 # update the segmentation dataframe with seletection

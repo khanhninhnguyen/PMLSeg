@@ -205,8 +205,8 @@ time series.
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
-The `UpdatedParametersForFixedCP` has an option to statistically
-significant Fourier coefficients:
+The `UpdatedParametersForFixedCP` has an option to select the
+statistically significant Fourier coefficients `selectionF = TRUE`:
 
     # update the segmentation dataframe with seletection
     if (screening$ChangeCP == "Yes") {
