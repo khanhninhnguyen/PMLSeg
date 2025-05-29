@@ -168,9 +168,12 @@ PlotSeg <- function(OneSeries,
     }
   }
 
+first_date <- as.Date(paste0(format(min(OneSeries$date), "%Y"), "-01-01"))
+last_date <- as.Date(paste0(format(max(OneSeries$date), "%Y"), "-12-31"))
+
   # Add labels
   p <- p + 
-      scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+      scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
       scale_color_manual(values = colors) +
       scale_shape_manual(values = shapes) +
       labs(x = labelx, y = labely, color = "", fill = "") +
