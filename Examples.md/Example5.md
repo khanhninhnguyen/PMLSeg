@@ -6,7 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -38,6 +37,7 @@
     # create a time series df with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+    CP_date <- mydate[cp_ind]
 
     # create a periodic function (Fourier series)
     T <- 365.25                             # reference period (unit days)
@@ -51,14 +51,14 @@
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-#### a. Run the segmentation without the functional part to see what happens…
+#### a. Run the segmentation without the functional part to see what happens
 
     seg_nofunc <- Segmentation(OneSeries = df, FunctPart = FALSE)
     seg_nofunc$Tmu
@@ -79,7 +79,7 @@
 
 The segmentation captures the periodic signal.
 
-#### b. Run the segmentation with the functional part.
+#### b. Run the segmentation with the functional part
 
     seg <- Segmentation(OneSeries = df, FunctPart = TRUE)
     seg$Tmu
@@ -103,8 +103,8 @@ The segmentation captures the periodic signal.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-The segmentation now captures the CPs but the periodic signal is not
-well estimated by the functional part.
+The segmentation now captures the CPs, at the right position, but the
+periodic signal is not well estimated by the functional part.
 
 #### c. Run segmentation with functional and selection of statistically significant coefficients
 
@@ -128,4 +128,4 @@ well estimated by the functional part.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
-The functional part now correctly captures the periodic signal.
+Both the CPs and functional part now correctly captured.

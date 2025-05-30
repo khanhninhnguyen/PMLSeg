@@ -1,24 +1,24 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
-#' Method: estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variances are chaning on monthly intervals.
+#' A method to estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variance is changing on monthly intervals.
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
-#'   Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.
+#'   Note: gaps in the time series (i.e. missing dates and signal) are allowed. An alternative is to make the time continous and insert NA values in the signal.
 #' @param lmin is the minimum length of the segments. Default value is 1.
-#' @param Kmax is the maximal number of segments. Default value is 30.
+#' @param Kmax is the maximal number of segments. Default value is 30. 
 #'   Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.
-#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K).
-#'   Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}). Default is \code{"BM_BJ"}.
-#'   If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}.
-#'   If \code{selectionK = "All"}, the results for the four possible criteria are given.
-#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE.
-#'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way.
+#' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K). 
+#'   Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"}, \code{"BM_slope"}, or \code{"All"}). Default is \code{"BM_BJ"}.
+#'   If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. 
+#'   If \code{selectionK = "All"}, the results for all four criteria are given. 
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is \code{TRUE}.
+#'   Note: with \code{FunctPart=TRUE} the algorithm estimates alternatively the functional and the segmentation parameters in an iterative procedure.
 #'         with \code{FunctPart=FALSE}, only one segmentation is performed.
 #'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
-#' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.
-#' @param initf refers how the functional part is initialized in the iterative inference procedure.
+#' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is \code{FALSE}.
+#' @param initf controls how the functional part is initialized in the iterative inference procedure (\code{FunctPart=TRUE}). 
 #'   Options: \code{"each"} means that the functional part is estimated from scratch at each K,
-#'            \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1,
+#'            \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1, 
 #'            \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
 #'            \code{"both"} means that \code{"ascendent"} is used first for K = 1 to Kmax, then \code{"descendent"} is tested for K = Kmax/2 to 1 and if the latter solution is better it replaces \code{"ascendent"} solution.
 #'            Default is \code{"ascendent"}.
@@ -29,7 +29,7 @@
 #'   The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}) in a segment (valid means not NA).
 #' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 #' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
-#'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
+#'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. 
 #'         If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 #' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 #' \item \code{SSR} is the Sum of Squared Residuals of the fit.
@@ -451,7 +451,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
   func <- get(Used.function)  # Used.function est une chaîne de caractères, donc on récupère la fonction
   # Si initf est "each", on applique directement la fonction pour chaque valeur de i
   if (initf == "each") {
-    result <- map(1:Kmax, ~func(Data, var.est.month, .x, myGraph[[.x]], lmin, lyear, threshold, tol, initf))
+    result <- purrr::map(1:Kmax, ~func(Data, var.est.month, .x, myGraph[[.x]], lmin, lyear, threshold, tol, initf))
   } else if (initf=="ascendent") {
     # Premier appel avec initf = "each"
     result[[1]] <- func(Data, var.est.month, 1, myGraph[[1]], lmin, lyear, threshold, tol, initf = "each")
@@ -497,7 +497,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
 Loop.K.seg.procedure = function(Data,var.est.month,lyear,lmin,Kmax,myGraph){
   result <- vector("list", Kmax)
   var.est.t <- var.est.month[as.numeric(Data$month)]
-  result <- map(1:Kmax, ~SegMonthlyVarianceK(Data, .x, myGraph[[.x]], lmin, var.est.t))
+  result <- purrr::map(1:Kmax, ~SegMonthlyVarianceK(Data, .x, myGraph[[.x]], lmin, var.est.t))
   return(result)
 }
 
@@ -796,13 +796,8 @@ FormatOptSegK <- function(breakpointsK,Data,v){
   var.est.k = apply(rupt,1,FUN=function(z) sum(1/(v[z[1]:z[2]]),na.rm=TRUE))
   mean.est.k = mean.est.k/var.est.k
   np.k      = apply(rupt,1,FUN=function(z) sum(!is.na(Data$signal[z[1]:z[2]])))
-  Tmu = data.frame(rupt)
-  colnames(Tmu) = c("begin","end")
-  Tmu$tbegin = Data$date[Tmu$begin]
-  Tmu$tend = Data$date[Tmu$end]
-  Tmu$mean=mean.est.k
-  Tmu$se= 1/sqrt(var.est.k)
-  Tmu$np=np.k
+  Tmu = data.frame(rupt,mean.est.k, 1/sqrt(var.est.k),np.k)
+  colnames(Tmu) = c("begin","end","mean","se","np")
   return(Tmu)
 }
 
