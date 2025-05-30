@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   out.width = "100%",
-  fig.width=8, fig.height=4
+  fig.width=6, fig.height=3
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```

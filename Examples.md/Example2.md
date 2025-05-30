@@ -76,8 +76,8 @@ Run the segmentation without the functional part:
     #> 3   637 1000  1.9698991 0.05627932 364
 
 The first CP is detected at the right date but not the 2nd one because
-of the gap. However the missing data points do not count in . Hence, the
-gap does not hamper the validation (see below).
+of the gap. However the missing data points do not count in `np`. Hence,
+the gap does not hamper the validation (see below).
 
 ### 3. Visualization of the time series with segmentation results and metadata superposed
 
