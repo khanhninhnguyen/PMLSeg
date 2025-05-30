@@ -8,10 +8,10 @@
 #' @return
 #' \itemize{
 #' \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series.
-#'   The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
+#'   The columns are: \code{$begin, $end, $tbegin, $tend, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, their corresponding dates (tbegin and tend), the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}), i.e. non-NA $signal values in the segment.
 #' \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 #' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
-#'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients. 
+#'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
 #'         If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 #' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
 #' \item \code{SSR} is the Sum of Squared Residuals of the fit.
@@ -42,7 +42,7 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   UpdatedSeries$month <-  droplevels(UpdatedSeries$month)
   UpdatedSeries$year   <-  droplevels(UpdatedSeries$year)
   MonthVar <- RobEstiMonthlyVariance(UpdatedSeries)^2
-  
+
   # Compute time series of monthly variance
   var.est.t = MonthVar[as.numeric(UpdatedSeries$month)]
   var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
@@ -60,23 +60,23 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
   UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreening$UpdatedCP])
   UpdatedCP <- c(UpdatedCP, nrow(UpdatedSeries))
   # print(UpdatedCP)
-  
+
   # Re-estimate means of segments and functional part
   if (FunctPart==TRUE){
     lyear <- 365.25
     coeff <- c()
     funct <- c()
     predicted_signal <- c()
-    
+
     UpdatedSignalModel <- periodic_estimation_all(Data = UpdatedSeries, CP = UpdatedCP, var.est.t = var.est.t, lyear = lyear)
 
     predicted_signal <- UpdatedSignalModel$predict
     coeff <- UpdatedSignalModel$coeff
     funct <- UpdatedSignalModel$FitF
-        
+
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
-    
+
     if (selectionF==TRUE){
         auxiliar_data <- UpdatedSeries
         auxiliar_data$signal <- predicted_signal-mean.est.t
@@ -91,7 +91,7 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
     predicted_signal = mean.est.t
   }
-  
+
   # compute SSR
   SSR <- sum(((UpdatedSeries$signal-predicted_signal)^2)/var.est.t,na.rm=TRUE)
 
@@ -133,20 +133,20 @@ periodic_estimation_all = function(Data,CP,var.est.t,lyear){
     return(new_col)
   })
   names(new_columns) <- paste0("mean_", 1:length(CP))
-  
+
   # prep data for regression with lm()
   DataF <- DataF %>%
     select(signal,cos1, sin1, cos2, sin2, cos3, sin3, cos4, sin4)
   DataF <- cbind(DataF, new_columns)
   # print(DataF)
-  
+
   # regression
   reg=stats::lm(signal~-1+.,weights=1/var.est.t,data=DataF)
   coeff_all <- base::summary(reg)$coefficients[,1]
 
   # coeff of functional part
   coeff <- coeff_all[1:(2*p)]
-  
+
   # compute functional part
   f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/lyear) + coeff[2*i]*sin(i*(t-t0+1)*(2*pi)/lyear)))
 
