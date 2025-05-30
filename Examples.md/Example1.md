@@ -7,6 +7,7 @@
     rm(list=ls(all=TRUE))
     library(PMLseg)
     library(purrr)
+    #> Warning: le package 'purrr' a été compilé avec la version R 4.4.3
 
     # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in the segment
 
@@ -80,12 +81,6 @@ valid data points (non-NA values in the signal):
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
