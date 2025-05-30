@@ -6,7 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -66,7 +65,7 @@ Run the segmentation with default parameters:
     #> 2   201  601  0.9995062 0.01246875 401
     #> 3   602 1000  1.9948656 0.01244232 399
 
-### 3. Validate estimated change-point positions:
+### 3. Validate estimated change-point positions
 
     valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
     valid <- Validation(OneSeries = df, 

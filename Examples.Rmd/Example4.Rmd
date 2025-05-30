@@ -8,7 +8,8 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  out.width = "100%"
+  out.width = "100%",
+  fig.width=6, fig.height=3
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
@@ -20,7 +21,6 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 ```{r}
 rm(list=ls(all=TRUE))
 library(PMLseg)
-library(purrr)
 
 # define simulation function
 simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -76,7 +76,7 @@ seg = Segmentation(OneSeries = df,
 seg$Tmu
 ```
 
-### 3. Validate estimated change-point positions:
+### 3. Validate estimated change-point positions
 
 ```{r}
 valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
