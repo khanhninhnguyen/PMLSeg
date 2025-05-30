@@ -64,7 +64,7 @@ PlotSeg <- function(OneSeries,
     validCP = Validated_CP_Meta$CP[which(Validated_CP_Meta$valid == 1)]
     OneSeries <- OneSeries %>%
       mutate(valid = ifelse(date %in% validCP, MinPoint, NA))
-    # shape for validated CP=0 (0=open square)
+    # shape for validated: open square (shapes = 0)
     shapes <- c(shapes, "valid" = 0)
   }
 
@@ -109,11 +109,10 @@ PlotSeg <- function(OneSeries,
       spec_date = Metadata$date[Metadata$type == type] %>% unlist()
       OneSeries[[type]][OneSeries$date %in% spec_date] <- MaxPoint
     }
-
   } else{
     OneSeries <- OneSeries %>%
-      dplyr::mutate( Meta = ifelse(date %in% Metadata, MaxPoint, NA))
-    shapes <- c(shapes, "Meta" = 1)
+      mutate( Meta = ifelse(date %in% Metadata, MaxPoint, NA))
+    # shapes <- c(shapes, "Meta" = 1)
   }
   
   # make data for plot
@@ -131,9 +130,9 @@ PlotSeg <- function(OneSeries,
   p <- ggplot2::ggplot(long_data, aes(x = date, y = value, colour = variable, shape = variable)) +
     theme_bw() +
     geom_line(data = subset(long_data, variable %in% c("signal")),
-              aes(color = variable), size = 0.5, na.rm = TRUE) +
+              aes(color = variable), linewidth = 0.5, na.rm = TRUE) +
     geom_line(data = subset(long_data, variable %in% c("Mean", "MonthStd")),
-              aes(color = variable), size = 0.5, na.rm = TRUE) +
+              aes(color = variable), linewidth = 0.5, na.rm = TRUE) +
     geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE) +
     geom_hline(yintercept = MinPoint, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
 
@@ -168,15 +167,22 @@ PlotSeg <- function(OneSeries,
                    size = 2, na.rm = TRUE)
     }
   }
+  
+  # Add title
+  p <- p + ggplot2::ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
 
-first_date <- as.Date(paste0(format(min(OneSeries$date), "%Y"), "-01-01"))
-last_date <- as.Date(paste0(format(max(OneSeries$date), "%Y"), "-12-31"))
+  first_date <- as.Date(paste0(format(min(OneSeries$date), "%Y"), "-01-01"))
+  last_date <- as.Date(paste0(format(max(OneSeries$date), "%Y"), "-12-31"))
 
+  if (!is.null(Validated_CP_Meta) | !is.null(Metadata$type)) {
+    p <- p + 
+      scale_shape_manual(values = shapes)  
+  }
+  
   # Add labels
   p <- p + 
       scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
       scale_color_manual(values = colors) +
-      scale_shape_manual(values = shapes) +
       labs(x = labelx, y = labely, color = "", fill = "") +
       theme(
         legend.title = element_blank(),
