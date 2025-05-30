@@ -6,7 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -37,17 +36,18 @@
     }
 
     # specify the simulation parameters
-    date_begin <- as.Date("2010-03-01")             # date of first data point
+    date_begin <- as.Date("2010-03-01")              # date of first data point
     n <- 1000                                        # length of time series
-    cp_ind <- c(200, 600, 990)                      # position of CPs (index in time series)
+    cp_ind <- c(200, 600, 990)                       # position of CPs (index in time series)
     segmt_mean <- c(-1, 1, 2, -1)                    # mean value of segments
     noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
-    coeff <- c(1, 0, 0, 0)                          # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
-    set.seed(1)                                     # initialise random generator
+    coeff <- c(1, 0, 0, 0)                           # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
+    set.seed(1)                                      # initialise random generator
 
     # create a time series with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+    CP_date <- mydate[cp_ind]
 
     # add NA's in the signal
     NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
@@ -63,14 +63,14 @@
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", main="Simulated time series")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-#### a. Run the segmentation with default parameters:
+#### a. Run the segmentation with default parameters
 
     seg = Segmentation(OneSeries = df)
     seg$Tmu
@@ -238,5 +238,5 @@ statistically significant Fourier coefficients `selectionF = TRUE`:
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
 
 Remember that the data in the clusters are hidden in the plot but are
-still in the time series dataframe. To remove them from the data see
-Example3.md.
+still in the time series dataframe. It is recommended to replace them
+with NA values in `df$signal`.
