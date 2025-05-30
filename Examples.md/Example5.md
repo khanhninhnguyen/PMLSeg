@@ -6,7 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -38,6 +37,7 @@
     # create a time series df with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+    CP_date <- mydate[cp_ind]
 
     # create a periodic function (Fourier series)
     T <- 365.25                             # reference period (unit days)
@@ -51,14 +51,14 @@
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-#### a. Run the segmentation without the functional part to see what happens…
+#### a. Run the segmentation without the functional part to see what happens
 
     seg_nofunc <- Segmentation(OneSeries = df, FunctPart = FALSE)
     seg_nofunc$Tmu
@@ -74,18 +74,12 @@
     #> 9    795  848  2.01251370 0.14661834  54
     #> 10   849 1000  1.28919902 0.08452552 152
     PlotSeg(OneSeries = df, SegRes = seg_nofunc, FunctPart = FALSE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
 The segmentation captures the periodic signal.
 
-#### b. Run the segmentation with the functional part.
+#### b. Run the segmentation with the functional part
 
     seg <- Segmentation(OneSeries = df, FunctPart = TRUE)
     seg$Tmu
@@ -106,14 +100,6 @@ The segmentation captures the periodic signal.
     sum(seg$CoeffF^2)
     #> [1] 1.005895
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -139,14 +125,6 @@ periodic signal is not well estimated by the functional part.
     sum(seg$CoeffF^2)
     #> [1] 1.013704
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = TRUE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
