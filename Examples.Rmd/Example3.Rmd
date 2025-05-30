@@ -108,4 +108,4 @@ PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = sc
 ```
 
 Note that the data in the clusters are only masked in the plot. They are still contained in the time series dataframe. 
-It is recommended to replace tham with NA values or to actually remove them from the data frame.
+It is recommended to replace them with NA values in `df$signal`.

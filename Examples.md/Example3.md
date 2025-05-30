@@ -137,5 +137,4 @@ the data removed by the screening (`RemoveData` option).
 
 Note that the data in the clusters are only masked in the plot. They are
 still contained in the time series dataframe. It is recommended to
-replace tham with NA values or to actually remove them from the data
-frame.
+replace them with NA values in `df$signal`.
