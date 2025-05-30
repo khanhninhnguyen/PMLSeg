@@ -1,22 +1,22 @@
 #' Segmentation of time series by Penalized Maximum Likelihood
 #'
-#' Method: estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variances are chaning on monthly intervals.
+#' A method to estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variance is changing on monthly intervals.
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
-#'   Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.
+#'   Note: gaps in the time series (i.e. missing dates and signal) are allowed. An alternative is to make the time continous and insert NA values in the signal.
 #' @param lmin is the minimum length of the segments. Default value is 1.
 #' @param Kmax is the maximal number of segments. Default value is 30. 
 #'   Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.
 #' @param selectionK specifies the penalty criterion used for the model selection (selection of the number of segments K). 
-#'   Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}). Default is \code{"BM_BJ"}.
+#'   Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"}, \code{"BM_slope"}, or \code{"All"}). Default is \code{"BM_BJ"}.
 #'   If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. 
-#'   If \code{selectionK = "All"}, the results for the four possible criteria are given. 
-#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE.
-#'   Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way.
+#'   If \code{selectionK = "All"}, the results for all four criteria are given. 
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is \code{"TRUE"}.
+#'   Note: with \code{FunctPart=TRUE} the algorithm estimates alternatively the functional and the segmentation parameters in an iterative procedure.
 #'         with \code{FunctPart=FALSE}, only one segmentation is performed.
 #'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
-#' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.
-#' @param initf refers how the functional part is initialized in the iterative inference procedure. 
+#' @param selectionF is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is \code{FALSE}.
+#' @param initf controls how the functional part is initialized in the iterative inference procedure (\code{FunctPart=TRUE}). 
 #'   Options: \code{"each"} means that the functional part is estimated from scratch at each K,
 #'            \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1, 
 #'            \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
