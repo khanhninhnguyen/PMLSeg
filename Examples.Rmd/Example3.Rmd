@@ -108,12 +108,4 @@ PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = sc
 ```
 
 Note that the data in the clusters are only masked in the plot. They are still contained in the time series dataframe. 
-To actually remove them from data frame, do the following:
-
-```{r}
-# Cleanup the time series dataframe
-df_screened <- df
-for (i in 1:(nrow(screening$RemoveData))) {
-    df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
-}
-```
+It is recommended to replace tham with NA values or to actually remove them from the data frame.

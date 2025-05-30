@@ -136,11 +136,6 @@ the data removed by the screening (`RemoveData` option).
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 Note that the data in the clusters are only masked in the plot. They are
-still contained in the time series dataframe. To actually remove them
-from data frame, do the following:
-
-    # Cleanup the time series dataframe
-    df_screened <- df
-    for (i in 1:(nrow(screening$RemoveData))) {
-        df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
-    }
+still contained in the time series dataframe. It is recommended to
+replace tham with NA values or to actually remove them from the data
+frame.
