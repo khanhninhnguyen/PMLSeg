@@ -5,9 +5,9 @@
 In real data, clusters of CPs can occur in a short period of time or can
 be due to noise spikes. In many applications, we don’t want to keep such
 clusters with short segments. We have included a screening function
-which removes or reduces clusters to single CP based on a significance
-test comparing the mean before vs. after each cluster. If the change in
-mean is significant the cluster is replaced by one single CP, otherwise
+which removes clusters or reduces them to single CPs, depending on the
+significance of the change in mean before/after each cluster. If the
+change is significant the cluster is replaced by a single CP, otherwise
 all the CPs in that cluster are removed.
 
 ### 1. Simulate a time series with 2 clusters
@@ -34,7 +34,7 @@ all the CPs in that cluster are removed.
 
     # specify the simulation parameters
     n <- 1000                                       # length of time series
-    cp_ind <- c(10, 200, 210, 580, 590, 600, 990)   # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
+    cp_ind <- c(10, 200, 210, 580, 590, 600, 990)   # 2 clusters of CPs + one short segment at the begining and one at the end
     segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)       # mean of segments
     noise_stdev <- 1                                # noise std dev (identical for all months)
     set.seed(1)                                     # initialise random generator
@@ -44,11 +44,7 @@ all the CPs in that cluster are removed.
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
     df <- data.frame(date = mydate, signal = mysignal)
 
-    # true CP date
-    CP_date <- mydate[cp_ind]                             # date of CP
-    CP_date
-    #> [1] "2010-01-10" "2010-07-19" "2010-07-29" "2011-08-03" "2011-08-13"
-    #> [6] "2011-08-23" "2012-09-16"
+    CP_date <- mydate[cp_ind]                       # dates of CP
 
     # plot signal and position of change-points
     plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
@@ -132,18 +128,16 @@ Now, update the segmentation parameters
     #> $SSR
     #> [1] 860.383
 
-Plot the time series with the updated segmentation and RemoveData
-information
+Plot the time series with the updated segmentation information and mask
+the data removed by the screening (`RemoveData` option).
 
     PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
-Note that the data in the clusters are hidden by the Plot function with
-the RemoveData option, but they are still in the time series dataframe.
-
-To actually remove the data in the time series data frame, do the
-following:
+Note that the data in the clusters are only masked in the plot. They are
+still contained in the time series dataframe. To actually remove them
+from data frame, do the following:
 
     # Cleanup the time series dataframe
     df_screened <- df
