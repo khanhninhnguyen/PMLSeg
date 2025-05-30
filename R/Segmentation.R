@@ -11,7 +11,7 @@
 #'   Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"}, \code{"BM_slope"}, or \code{"All"}). Default is \code{"BM_BJ"}.
 #'   If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}. 
 #'   If \code{selectionK = "All"}, the results for all four criteria are given. 
-#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is \code{"TRUE"}.
+#' @param FunctPart specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is \code{TRUE}.
 #'   Note: with \code{FunctPart=TRUE} the algorithm estimates alternatively the functional and the segmentation parameters in an iterative procedure.
 #'         with \code{FunctPart=FALSE}, only one segmentation is performed.
 #'   If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.
