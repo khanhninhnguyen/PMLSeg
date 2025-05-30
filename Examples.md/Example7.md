@@ -9,7 +9,6 @@ bias, monthly variance, and gaps.
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -51,6 +50,11 @@ bias, monthly variance, and gaps.
     # create a time series with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+    CP_date <- mydate[cp_ind]                       # dates of CP
+
+    # add a periodic function (Fourier series)
+    f <- fourier_series(mydate, coeff)
+    mysignal <- mysignal + f
 
     # add NA's in the signal
     NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
@@ -58,16 +62,12 @@ bias, monthly variance, and gaps.
     NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
 
-    # add a periodic function (Fourier series)
-    f <- fourier_series(mydate, coeff)
-    mysignal <- mysignal + f
-
     # create df with full signal
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", main="Simulated time series")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example7_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
@@ -146,16 +146,16 @@ bias, monthly variance, and gaps.
     #> $BM_slope
     #> [1] 835.1317
 
-We see that and , on the one hand, and and , on the other hand, select
-the same number of segments . The former two criteria appear slighlty
-more parsimonious and find the correct number of CPs, while and have one
-extra CPs. Note that the maximum likelihood solutions for a fixed are
-identical, i.e.  and give exactly the same solution in terms of and ,
-while is unique and does not depend on the criterion.
+We see that `mBIC` and `Lav`, on the one hand, and `BM_MJ` and
+`BM_slope`, on the other hand, select the same number of segments `K`.
+The former two criteria appear slighlty more parsimonious and find the
+correct number of CPs, while `BM_MJ` and `BM_slope` have one extra CP.
 
-The spurious CP detected by and is removed when we apply the selection
-of functional coefficients (see Example 6).
+Note that the maximum likelihood solutions for a fixed `K` are
+identical, i.e. `mBIC` and `Lav` give exactly the same solution in terms
+of `seg$Tmu` and `seg$CoeffF`, while `seg$MonthVar` is unique and does
+not depend on the criterion.
 
-Remember that the data in the clusters are hidden in the plot but are
-still in the time series dataframe. To remove them from the data see
-Example3.md.
+The spurious CP detected by `BM_MJ` and `BM_slope` is removed when we
+apply the selection of functional coefficients `selectionF = TRUE` (see
+Example 6).

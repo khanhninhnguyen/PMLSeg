@@ -64,15 +64,15 @@ mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 CP_date <- mydate[cp_ind]
 
+# add a periodic function (Fourier series)
+f <- fourier_series(mydate, coeff)
+mysignal <- mysignal + f
+
 # add NA's in the signal
 NA_ind = seq(from = 100, to = 150, by = 1)  # 1st gap
 mysignal[NA_ind] <- NA
 NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
 mysignal[NA_ind] <- NA
-
-# add a periodic function (Fourier series)
-f <- fourier_series(mydate, coeff)
-mysignal <- mysignal + f
 
 # create df with full signal
 df <- data.frame(date = mydate, signal = mysignal)
