@@ -8,7 +8,7 @@
     library(PMLseg)
     library(purrr)
 
-    # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in a the segment
+    # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in the segment
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -28,10 +28,10 @@
     }
 
     # specify the simulation parameters
-    n <- 1000                    # length of time series
+    n <- 1000                   # length of time series
     cp_ind <- c(200, 600)       # position of CPs (index in time series)
     segmt_mean <- c(-1, 1, 2)   # mean value of segments
-    noise_stdev <- 1             # noise std dev (identical for all months)
+    noise_stdev <- 1            # noise std dev (identical for all months)
     set.seed(1)                 # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
@@ -40,14 +40,14 @@
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", xlab = "Date", ylab = "signal")
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-Run the segmentation with default parameters and no functional:
+Run the segmentation with without functional:
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
@@ -66,8 +66,8 @@ Run the segmentation with default parameters and no functional:
     #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
 
 The `Tmu` dataframe contains, for each segment: the index of beginning
-and end, the esitmated mean and its standard erreor `se`, and the number
-of valid (non-NA) data points `np` in the signal:
+and end, the estimated mean and its standard erreor, and the number of
+valid data points (non-NA values in the signal):
 
     seg$Tmu
     #>   begin  end       mean         se  np
