@@ -6,8 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
-    #> Warning: le package 'purrr' a été compilé avec la version R 4.4.3
 
     # Note 1: Note: by convention the date/time of a change-point is the date/time of the last point in the segment
 
