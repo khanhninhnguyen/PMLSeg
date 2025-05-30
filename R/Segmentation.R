@@ -451,7 +451,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
   func <- get(Used.function)  # Used.function est une chaîne de caractères, donc on récupère la fonction
   # Si initf est "each", on applique directement la fonction pour chaque valeur de i
   if (initf == "each") {
-    result <- map(1:Kmax, ~func(Data, var.est.month, .x, myGraph[[.x]], lmin, lyear, threshold, tol, initf))
+    result <- purrr::map(1:Kmax, ~func(Data, var.est.month, .x, myGraph[[.x]], lmin, lyear, threshold, tol, initf))
   } else if (initf=="ascendent") {
     # Premier appel avec initf = "each"
     result[[1]] <- func(Data, var.est.month, 1, myGraph[[1]], lmin, lyear, threshold, tol, initf = "each")
@@ -497,7 +497,7 @@ Loop.K.procedure <- function(Data, var.est.month, lyear, lmin, Kmax, myGraph, Us
 Loop.K.seg.procedure = function(Data,var.est.month,lyear,lmin,Kmax,myGraph){
   result <- vector("list", Kmax)
   var.est.t <- var.est.month[as.numeric(Data$month)]
-  result <- map(1:Kmax, ~SegMonthlyVarianceK(Data, .x, myGraph[[.x]], lmin, var.est.t))
+  result <- purrr::map(1:Kmax, ~SegMonthlyVarianceK(Data, .x, myGraph[[.x]], lmin, var.est.t))
   return(result)
 }
 
