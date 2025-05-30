@@ -23,10 +23,11 @@ PlotSeg <- function(OneSeries,
                     RemoveData = NULL,
                     Metadata = NULL,
                     Validated_CP_Meta = NULL,
-                    labelx = "Date",
-                    labely = "signal") {
-
-
+                    labelx = "date",
+                    labely = "signal",
+                    title = "Segmented time series"
+                    )
+{
   MaxPoint = max(OneSeries$signal, na.rm = TRUE) + 0.5
   MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE)) - 0.5
 
