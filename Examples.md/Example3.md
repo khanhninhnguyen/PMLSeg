@@ -5,15 +5,15 @@
 In real data, clusters of CPs can occur in a short period of time or can
 be due to noise spikes. In many applications, we don’t want to keep such
 clusters with short segments. We have included a screening function
-which replaces a clusters by one single CP if the change in mean before
-vs. after is significant, or removes all the CPs if it is not
-significant.
+which removes or reduces clusters to single CP based on a significance
+test comparing the mean before vs. after each cluster. If the change in
+mean is significant the cluster is replaced by one single CP, otherwise
+all the CPs in that cluster are removed.
 
 ### 1. Simulate a time series with 2 clusters
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -34,25 +34,31 @@ significant.
 
     # specify the simulation parameters
     n <- 1000                                       # length of time series
-    cp_ind <- c(10, 200, 210, 580, 590, 600, 990)  # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
-    segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)      # mean of segments
+    cp_ind <- c(10, 200, 210, 580, 590, 600, 990)   # 2 clusters of CPs + one short segment at the begining and one at the end => 7 CPs
+    segmt_mean <- c(0, -1, 5, 1, -5, 5, 2, 0)       # mean of segments
     noise_stdev <- 1                                # noise std dev (identical for all months)
-    set.seed(1)                                    # initialise random generator
+    set.seed(1)                                     # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
     df <- data.frame(date = mydate, signal = mysignal)
 
-    # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "grey", lty = 2)
+    # true CP date
+    CP_date <- mydate[cp_ind]                             # date of CP
+    CP_date
+    #> [1] "2010-01-10" "2010-07-19" "2010-07-29" "2011-08-03" "2011-08-13"
+    #> [6] "2011-08-23" "2012-09-16"
+
+    # plot signal and position of change-points
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 ### 2. Segmentation
 
-Run the segmentation with default parameters and no functional:
+Run the segmentation without the functional part:
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
@@ -73,12 +79,6 @@ Run the segmentation with default parameters and no functional:
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -136,19 +136,14 @@ Plot the time series with the updated segmentation and RemoveData
 information
 
     PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 Note that the data in the clusters are hidden by the Plot function with
 the RemoveData option, but they are still in the time series dataframe.
 
-To actually remove the data, do the following:
+To actually remove the data in the time series data frame, do the
+following:
 
     # Cleanup the time series dataframe
     df_screened <- df

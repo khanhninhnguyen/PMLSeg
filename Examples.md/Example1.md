@@ -64,7 +64,7 @@ Run the segmentation with without functional:
     #>  $ SSR     : num 926
     #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
 
-The `Tmu` dataframe contains, for each segment: the index of beginning
+`Tmu` is a list which contains, for each segment: the index of beginning
 and end, the estimated mean and its standard erreor, and the number of
 valid data points (non-NA values in the signal):
 
@@ -92,16 +92,15 @@ change-points.
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
 For the example, we create a fake metadata data frame with the true
-position of change-points:
+dates of CPs and invented types of change
 
-    meta_ind = cp_ind               # index in time series of metadata information
-    meta_date <- df$date[meta_ind]  # corresponding date 
-    meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+    meta_date <- df$date[cp_ind]                          # date of metadata event = date of CP
+    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
     metadata = data.frame(date = meta_date, type = meta_type)
     metadata
-    #>         date type
-    #> 1 2010-07-19    R
-    #> 2 2011-08-23  RAD
+    #>         date            type
+    #> 1 2010-07-19 receiver_change
+    #> 2 2011-08-23  antenna_change
 
 Plot with metadata:
 
@@ -121,10 +120,10 @@ Validate estimated change-point positions wrt metadata:
                Metadata = metadata)
     valid
     #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type  valid
-    #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-19 2010-07-19             0 R         1
-    #> 2 2011-08-23 2011-08-23             0 RAD       1
+    #>   CP         closestMetadata Distance type            valid
+    #>   <date>     <date>             <dbl> <chr>           <dbl>
+    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
+    #> 2 2011-08-23 2011-08-23             0 antenna_change      1
 
 Note: valid$Distance gives the distance between estimated CP and
 metadata

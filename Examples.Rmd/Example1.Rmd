@@ -68,7 +68,7 @@ seg = Segmentation(OneSeries = df,
 str(seg)
 ```
 
-The `Tmu` dataframe contains, for each segment: the index of beginning and end, the estimated mean and its standard erreor, and the number of valid data points (non-NA values in the signal):
+`Tmu` is a list which contains, for each segment: the index of beginning and end, the estimated mean and its standard erreor, and the number of valid data points (non-NA values in the signal):
 
 ```{r}
 seg$Tmu
@@ -89,12 +89,11 @@ The y-intercept of the noise is the lower black line. Dashed vertical lines show
 
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
-For the example, we create a fake metadata data frame with the true position of change-points:
+For the example, we create a fake metadata data frame with the true dates of CPs and invented types of change
 
 ```{r}
-meta_ind = cp_ind               # index in time series of metadata information
-meta_date <- df$date[meta_ind]  # corresponding date 
-meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
+meta_date <- df$date[cp_ind]                          # date of metadata event = date of CP
+meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
 metadata = data.frame(date = meta_date, type = meta_type)
 metadata
 ```

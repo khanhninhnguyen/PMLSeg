@@ -6,9 +6,6 @@
 
     rm(list=ls(all=TRUE))
     library(PMLseg)
-    library(purrr)
-
-    # Note 2: the time series must have continue time, missing data are included as NA values
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -29,34 +26,46 @@
 
     # specify the simulation parameters
     n <- 1000                    # length of time series
-    cp_ind <- c(200, 600)       # position of change points (index in time series)
-    segmt_mean <- c(-1, 1, 2)   # mean value of segments
+    cp_ind <- c(200, 600)        # position of change points (index in time series)
+    segmt_mean <- c(-1, 1, 2)    # mean value of segments
     noise_stdev <- 1             # noise std dev (identical for all months)
-    set.seed(1)                 # initialise random generator
+    set.seed(1)                  # initialise random generator
 
-    # create a time series df
+    # simulate data
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
+
+    # true CP date
+    CP_date <- mydate[cp_ind]                             # date of CP
+    CP_date
+    #> [1] "2010-07-19" "2011-08-23"
+
+    # define fake metadata from true CP dates
+    meta_date <- CP_date                                  # date of metadata event = date of CP
+    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+    metadata = data.frame(date = meta_date, type = meta_type)
 
     # add NA's in the signal
     NA_ind <- seq(from = 100, to = 150, by = 1)  # 1st gap
     mysignal[NA_ind] <- NA
     NA_ind <- seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
+
+    # create a time series df
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 Note that the 1st gap lies within the 1st segment, while the 2nd gap is
-overlapping the 2nd and 3rd segments.
+overlapping the 2nd change-point.
 
 ### 2. Segmentation
 
-Run the segmentation with default parameters and no functional:
+Run the segmentation without the functional part:
 
     seg = Segmentation(OneSeries = df, 
                        FunctPart = FALSE)
@@ -66,39 +75,11 @@ Run the segmentation with default parameters and no functional:
     #> 2   201  636  1.0046283 0.05436229 385
     #> 3   637 1000  1.9698991 0.05627932 364
 
-The first CP is detected at the right position (index=200) but not the
-2nd (index=636) because of the gap.
+The first CP is detected at the right date but not the 2nd one because
+of the gap. However the missing data points do not count in . Hence, the
+gap does not hamper the validation (see below).
 
-Note that `np` is the number of valid points, i.e. excluding the NA
-values, in each segment.
-
-### 3. Visualization of the time series with segmentation results superposed
-
-    PlotSeg(OneSeries = df, 
-            SegRes = seg, 
-            FunctPart = FALSE)
-    #> Warning: No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-    #> No shared levels found between `names(values)` of the manual scale and the
-    #> data's shape values.
-
-<img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
-
-### 4. Validation of detected change-points with metadata
-
-For the example, we create a fake metadata data frame with the true
-position of change-points:
-
-    meta_ind = cp_ind               # index in time series of metadata information
-    meta_date <- df$date[meta_ind]  # corresponding date 
-    meta_type <- c("R", "RAD")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
-    metadata = data.frame(date = meta_date, type = meta_type)
-    metadata
-    #>         date type
-    #> 1 2010-07-19    R
-    #> 2 2011-08-23  RAD
+### 3. Visualization of the time series with segmentation results and metadata superposed
 
 Plot with metadata:
 
@@ -107,9 +88,9 @@ Plot with metadata:
             FunctPart = FALSE, 
             Metadata = metadata) 
 
-<img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
+<img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
-Validate estimated change-point positions wrt metadata:
+### 4. Validation of detected change-points with metadata
 
     valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
     valid = Validation(OneSeries = df, 
@@ -118,18 +99,16 @@ Validate estimated change-point positions wrt metadata:
                Metadata = metadata)
     valid
     #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type  valid
-    #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-19 2010-07-19             0 R         1
-    #> 2 2011-09-28 2011-08-23             5 RAD       1
+    #>   CP         closestMetadata Distance type            valid
+    #>   <date>     <date>             <dbl> <chr>           <dbl>
+    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
+    #> 2 2011-09-28 2011-08-23             5 antenna_change      1
 
 Note that the distance between the 2nd CP (index=636) and the nearest
 metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
 
 Hence both CPs are validated.
 
-Plot with metadata and validation results:
-
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+<img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
