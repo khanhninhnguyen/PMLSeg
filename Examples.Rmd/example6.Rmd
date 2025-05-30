@@ -77,7 +77,7 @@ mysignal <- mysignal + f
 df <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(df$date, df$signal, type = "l")
+plot(df$date, df$signal, type = "l", main="Simulated time series")
 abline(v = mydate[cp_ind], col = "red", lty = 2)
 ```
 
@@ -86,7 +86,7 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 #### a. Run the segmentation with default parameters:
 
 ```{r}
-seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+seg = Segmentation(OneSeries = df)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
@@ -110,7 +110,7 @@ Therefore, try the segmentation with ```selectionF = TRUE```.
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
 ```{r}
-seg_selectF = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
+seg_selectF = Segmentation(OneSeries = df, selectionF = TRUE)
 seg_selectF$Tmu
 seg_selectF$CoeffF
 seg_selectF$MonthVar

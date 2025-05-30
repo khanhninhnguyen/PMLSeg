@@ -63,7 +63,7 @@
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l")
+    plot(df$date, df$signal, type = "l", main="Simulated time series")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -72,7 +72,7 @@
 
 #### a. Run the segmentation with default parameters:
 
-    seg = Segmentation(OneSeries = df, FunctPart = TRUE)
+    seg = Segmentation(OneSeries = df)
     seg$Tmu
     #>   begin  end       mean         se  np
     #> 1     1  199 -0.8967092 0.09561914 148
@@ -119,7 +119,7 @@ number of CPs may be wanted. Therefore, try the segmentation with
 
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
-    seg_selectF = Segmentation(OneSeries = df, FunctPart = TRUE, selectionF = TRUE)
+    seg_selectF = Segmentation(OneSeries = df, selectionF = TRUE)
     seg_selectF$Tmu
     #>   begin  end       mean         se  np
     #> 1     1  199 -0.8965279 0.09561914 148
