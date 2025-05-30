@@ -86,7 +86,7 @@ abline(v = CP_date, col = "red", lty = 2)
 
 ### 2. Segmentation
 
-#### a. Run the segmentation with \code{selectionK = "All"}:
+#### a. Run the segmentation with `selectionK = "All"`
 
 ```{r}
 seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionK = "All")

@@ -73,7 +73,7 @@ bias, monthly variance, and gaps.
 
 ### 2. Segmentation
 
-#### a. Run the segmentation with :
+#### a. Run the segmentation with `selectionK = "All"`
 
     seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionK = "All")
     seg$Tmu
