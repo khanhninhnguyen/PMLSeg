@@ -27,22 +27,31 @@
     }
 
     # specify the simulation parameters
-    n <- 1000                            # length of time series
+    date_begin <- as.Date("2010-01-01") # date of first data point
+    n <- 1000                           # length of time series
     cp_ind <- c(200, 600)               # position of change points (index in time series)
     segmt_mean <- c(-1, 1, 2)           # mean value of segments
     noise_stdev <- c(0.1, 0.3, 0.7, 1.2, 1.8, 2, 2, 1.8, 1.2, 0.7, 0.3, 0.1) # 12 values, one per month (Jan to Dec)
     set.seed(1)                         # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
-    mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
+    date_end <- date_begin + n - 1
+    mydate <- seq.Date(from = date_begin, to = date_end, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
     df <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l",xlab ="Date",ylab="signal")
-    abline(v = mydate[cp_ind], col = "red", lty = 2)
+    CP_date <- mydate[cp_ind]
+    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example4_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
+
+
+    # define fake metadata from true CP dates
+    meta_date <- CP_date                                  # date of metadata event = date of CP
+    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+    metadata = data.frame(date = meta_date, type = meta_type)
 
 ### 2. Segmentation
 
@@ -57,16 +66,7 @@ Run the segmentation with default parameters:
     #> 2   201  601  0.9995062 0.01246875 401
     #> 3   602 1000  1.9948656 0.01244232 399
 
-### 3. Validate estimated change-point positions wrt metadata:
-
-    meta_ind <- cp_ind               # index in time series of metadata information
-    meta_date <- df$date[meta_ind]  # corresponding date 
-    meta_type <- c("true", "true")      # type of information, e.g. R = receiver change, A = antenna change, D = radome change
-    metadata <- data.frame(date = meta_date, type = meta_type)
-    metadata
-    #>         date type
-    #> 1 2010-07-19 true
-    #> 2 2011-08-23 true
+### 3. Validate estimated change-point positions:
 
     valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
     valid <- Validation(OneSeries = df, 
@@ -75,10 +75,10 @@ Run the segmentation with default parameters:
                Metadata = metadata)
     valid
     #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type  valid
-    #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-19 2010-07-19             0 true      1
-    #> 2 2011-08-24 2011-08-23             1 true      1
+    #>   CP         closestMetadata Distance type            valid
+    #>   <date>     <date>             <dbl> <chr>           <dbl>
+    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
+    #> 2 2011-08-24 2011-08-23             1 antenna_change      1
 
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
