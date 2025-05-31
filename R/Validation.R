@@ -19,21 +19,24 @@
 #' @export
 
 Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
-  cond1=TRUE
-  cond2=TRUE
+  
+  ### check metadata exist and is properly defined
+  if ((nrow(Metadata) > 0) & inherits( Metadata$date, "Date")) {
+    cond1 = TRUE
+  } else { 
+    cond1 = FALSE
+  } 
 
-  if (!inherits( Metadata$date, "Date")) {
-    cond1=FALSE
-    cat("Metadata$date must be a Date object\n")
+  ### check there is at least one CP to validate
+  if (nrow(Tmu) > 1){
+    cond2 = TRUE
+  } else {
+    cond2 = FALSE
   }
 
-  if (nrow(Tmu)==1){
-    cond2=FALSE
-    cat("no change-point to validate")
-  }
-
-  ### validate if metadata exist for the station
-  if ((nrow(Metadata) > 0) & (cond1==TRUE) & (cond2==TRUE)){
+  ### validate if metadata exist and there is at least one CP 
+  if ((cond1==TRUE) & (cond2==TRUE))
+  {
     distance <- c()
     Distance <- c()
     CP <- c()
@@ -68,20 +71,29 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
      dplyr:: mutate(
         CP = OneSeries$date[CP],
         valid = ifelse(Distance < MaxDist, 1, 0))
-  } 
+  }
   else 
   {
-    valid = seg$Tmu %>% 
-      mutate(CP = DataRaw$date[seg$Tmu$end],
-             closestMetadata = NA, 
-             type = "U",
-             Distance = NA, 
-             valid = 0)
-    valid <- valid[-nrow(valid),]
-    valid = valid %>% 
-      mutate(name = station_name) %>% 
-      select(name, CP, closestMetadata, type, Distance, valid)
-    Out <- valid
+    if(cond2==TRUE){
+      print("no metadata")
+      ### set all valid to 0 if no metadata exist
+      valid = Tmu %>% 
+        mutate(CP = OneSeries$date[Tmu$end],
+               closestMetadata = NA, 
+               type = "U",
+               Distance = NA, 
+               valid = 0)
+      valid <- valid[-nrow(valid),]
+      valid = valid %>% 
+        select(CP, closestMetadata, type, Distance, valid)
+      Out <- valid
+    }
+    ### return NULL if there is no CP in the data
+    else
+    {
+      print("no CP to validate")
+      Out <- NULL
+    }
   }
   return(Out)
 }
