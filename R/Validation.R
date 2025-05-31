@@ -24,7 +24,6 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
 
   if (!inherits( Metadata$date, "Date")) {
     cond1=FALSE
-    cat("date must be in Date formate")
     cat("Metadata$date must be a Date object\n")
   }
 
@@ -33,48 +32,57 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     cat("no change-point to validate")
   }
 
-  if ((cond1==TRUE) & (cond2==TRUE)){
+  ### validate if metadata exist for the station
+  if ((nrow(station_metadata) > 0) & (cond1==TRUE) & (cond2==TRUE)){
+    distance <- c()
+    Distance <- c()
+    CP <- c()
+    MetadataIndex <- c()
 
-  distance <- c()
-  Distance <- c()
-  CP <- c()
-  MetadataIndex <- c()
+    OneSeriesFull <- OneSeries %>%
+      tidyr::complete(date = seq(min(date), max(date), by = "day"))
 
+    CP <-  Tmu$end[-nrow(Tmu)]
+    CP_m <- which(OneSeriesFull$date %in% OneSeries$date[CP])
 
+    MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
 
-  OneSeriesFull <- OneSeries %>%
-    tidyr::complete(date = seq(min(date), max(date), by = "day"))
+    positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
+      dplyr::mutate(
+        distance = mapply(function(x, y) sum(!is.na(OneSeriesFull$signal[x:y])),
+                          CP_m,
+                          MetadataIndex),
+        distance = distance -1
+      )
 
-  CP <-  Tmu$end[-nrow(Tmu)]
-  CP_m <- which(OneSeriesFull$date %in% OneSeries$date[CP])
+    closest_results <- positions_df %>%
+      dplyr::group_by(CP) %>%
+      dplyr::summarise(
+        closestMetadata = Metadata$date[which.min(distance)],
+        Distance = min(distance)
+      ) %>%
+      dplyr::ungroup()
 
-  MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
-
-  positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
-    dplyr::mutate(
-      distance = mapply(function(x, y) sum(!is.na(OneSeriesFull$signal[x:y])),
-                        CP_m,
-                        MetadataIndex),
-      distance = distance -1
-    )
-
-  closest_results <- positions_df %>%
-    dplyr::group_by(CP) %>%
-    dplyr::summarise(
-      closestMetadata = Metadata$date[which.min(distance)],
-      Distance = min(distance)
-    ) %>%
-    dplyr::ungroup()
-
-  Out <- left_join(closest_results,Metadata,by=c("closestMetadata"="date"))
-  Out <- Out %>%
-   dplyr:: mutate(
-      CP = OneSeries$date[CP],
-      valid = ifelse(Distance < MaxDist, 1, 0))
-
-
-
-  return(Out)
+    Out <- left_join(closest_results,Metadata,by=c("closestMetadata"="date"))
+    Out <- Out %>%
+     dplyr:: mutate(
+        CP = OneSeries$date[CP],
+        valid = ifelse(Distance < MaxDist, 1, 0))
+  } 
+  else 
+  {
+    valid = seg$Tmu %>% 
+      mutate(CP = DataRaw$date[seg$Tmu$end],
+             closestMetadata = NA, 
+             type = "U",
+             Distance = NA, 
+             valid = 0)
+    valid <- valid[-nrow(valid),]
+    valid = valid %>% 
+      mutate(name = station_name) %>% 
+      select(name, CP, closestMetadata, type, Distance, valid)
+    Out <- valid
   }
+  return(Out)
 }
 
