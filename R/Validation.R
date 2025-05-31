@@ -33,7 +33,7 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
   }
 
   ### validate if metadata exist for the station
-  if ((nrow(station_metadata) > 0) & (cond1==TRUE) & (cond2==TRUE)){
+  if ((nrow(Metadata) > 0) & (cond1==TRUE) & (cond2==TRUE)){
     distance <- c()
     Distance <- c()
     CP <- c()
