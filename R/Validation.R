@@ -4,7 +4,7 @@
 #' @param Tmu is a data frame containing segmentation results (see segmentation.R)
 #' @param MaxDist is the maximum distance (number of valid days) between a change-point and the nearest metadata to be valid
 #' @param Metadata is a data frame with two columns, $date and $type, they represent changes at the station which observed the OneSeries time series
-#' 
+#'
 #' @return
 #' \itemize{
 #' \item \code{CP} are the dates of the change-points contained in \code{Tmu}
@@ -19,13 +19,13 @@
 #' @export
 
 Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
-  
+
   ### check metadata exist and is properly defined
   if ((nrow(Metadata) > 0) & inherits( Metadata$date, "Date")) {
     cond1 = TRUE
-  } else { 
+  } else {
     cond1 = FALSE
-  } 
+  }
 
   ### check there is at least one CP to validate
   if (nrow(Tmu) > 1){
@@ -34,7 +34,7 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     cond2 = FALSE
   }
 
-  ### validate if metadata exist and there is at least one CP 
+  ### validate if metadata exist and there is at least one CP
   if ((cond1==TRUE) & (cond2==TRUE))
   {
     distance <- c()
@@ -49,6 +49,21 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     CP_m <- which(OneSeriesFull$date %in% OneSeries$date[CP])
 
     MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
+
+    if (length(MetadataIndex)==0) {
+      print("no metadata available in the time period")
+      ### set all valid to 0 if no metadata exist
+      valid = Tmu %>%
+        mutate(CP = OneSeries$date[Tmu$end],
+               closestMetadata = NA,
+               type = "U",
+               Distance = NA,
+               valid = 0)
+      valid <- valid[-nrow(valid),]
+      valid = valid %>%
+        select(CP, closestMetadata, type, Distance, valid)
+      Out <- valid
+    } else {
 
     positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
       dplyr::mutate(
@@ -71,20 +86,20 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
      dplyr:: mutate(
         CP = OneSeries$date[CP],
         valid = ifelse(Distance < MaxDist, 1, 0))
-  }
-  else 
+  }}
+  else
   {
     if(cond2==TRUE){
       print("no metadata")
       ### set all valid to 0 if no metadata exist
-      valid = Tmu %>% 
+      valid = Tmu %>%
         mutate(CP = OneSeries$date[Tmu$end],
-               closestMetadata = NA, 
+               closestMetadata = NA,
                type = "U",
-               Distance = NA, 
+               Distance = NA,
                valid = 0)
       valid <- valid[-nrow(valid),]
-      valid = valid %>% 
+      valid = valid %>%
         select(CP, closestMetadata, type, Distance, valid)
       Out <- valid
     }
