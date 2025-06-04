@@ -51,19 +51,8 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
 
     if (length(MetadataIndex)==0) {
-      print("no metadata available in the time period")
-      ### set all valid to 0 if no metadata exist
-      valid = Tmu %>%
-        mutate(CP = OneSeries$date[Tmu$end],
-               closestMetadata = NA,
-               type = "U",
-               Distance = NA,
-               valid = 0)
-      valid <- valid[-nrow(valid),]
-      valid = valid %>%
-        select(CP, closestMetadata, type, Distance, valid)
-      Out <- valid
-    } else {
+      MetadataIndex <- ifelse(max(Metadata$date) < min(OneSeriesFull$date), 1, length(OneSeriesFull$date))
+    }
 
     positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
       dplyr::mutate(
@@ -86,7 +75,7 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
      dplyr:: mutate(
         CP = OneSeries$date[CP],
         valid = ifelse(Distance < MaxDist, 1, 0))
-  }}
+  }
   else
   {
     if(cond2==TRUE){
