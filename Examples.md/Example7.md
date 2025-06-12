@@ -78,34 +78,34 @@ bias, monthly variance, and gaps.
     seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionK = "All")
     seg$Tmu
     #> $mBIC
-    #>   begin  end       mean         se  np
-    #> 1     1  199 -0.9320301 0.09561914 148
-    #> 2   200  571  0.8812958 0.01369619 372
-    #> 3   572  989  1.8504464 0.01382573 367
-    #> 4   990 1000 -1.1943639 0.07603715  11
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  199 2010-03-01 2010-09-15 -0.9320301 0.09561914 148
+    #> 2   200  571 2010-09-16 2011-09-22  0.8812958 0.01369619 372
+    #> 3   572  989 2011-09-23 2012-11-13  1.8504464 0.01382573 367
+    #> 4   990 1000 2012-11-14 2012-11-24 -1.1943639 0.07603715  11
     #> 
     #> $Lav
-    #>   begin  end       mean         se  np
-    #> 1     1  199 -0.9320301 0.09561914 148
-    #> 2   200  571  0.8812958 0.01369619 372
-    #> 3   572  989  1.8504464 0.01382573 367
-    #> 4   990 1000 -1.1943639 0.07603715  11
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  199 2010-03-01 2010-09-15 -0.9320301 0.09561914 148
+    #> 2   200  571 2010-09-16 2011-09-22  0.8812958 0.01369619 372
+    #> 3   572  989 2011-09-23 2012-11-13  1.8504464 0.01382573 367
+    #> 4   990 1000 2012-11-14 2012-11-24 -1.1943639 0.07603715  11
     #> 
     #> $BM_BJ
-    #>   begin  end       mean         se  np
-    #> 1     1  199 -0.8967092 0.09561914 148
-    #> 2   200  571  0.9128602 0.01369619 372
-    #> 3   572  701  1.8608640 0.01494423  79
-    #> 4   702  989  2.0044065 0.03642282 288
-    #> 5   990 1000 -1.1441469 0.07603715  11
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  199 2010-03-01 2010-09-15 -0.8967092 0.09561914 148
+    #> 2   200  571 2010-09-16 2011-09-22  0.9128602 0.01369619 372
+    #> 3   572  701 2011-09-23 2012-01-30  1.8608640 0.01494423  79
+    #> 4   702  989 2012-01-31 2012-11-13  2.0044065 0.03642282 288
+    #> 5   990 1000 2012-11-14 2012-11-24 -1.1441469 0.07603715  11
     #> 
     #> $BM_slope
-    #>   begin  end       mean         se  np
-    #> 1     1  199 -0.8967092 0.09561914 148
-    #> 2   200  571  0.9128602 0.01369619 372
-    #> 3   572  701  1.8608640 0.01494423  79
-    #> 4   702  989  2.0044065 0.03642282 288
-    #> 5   990 1000 -1.1441469 0.07603715  11
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  199 2010-03-01 2010-09-15 -0.8967092 0.09561914 148
+    #> 2   200  571 2010-09-16 2011-09-22  0.9128602 0.01369619 372
+    #> 3   572  701 2011-09-23 2012-01-30  1.8608640 0.01494423  79
+    #> 4   702  989 2012-01-31 2012-11-13  2.0044065 0.03642282 288
+    #> 5   990 1000 2012-11-14 2012-11-24 -1.1441469 0.07603715  11
     seg$CoeffF
     #> $mBIC
     #>         cos1         sin1         cos2         sin2         cos3         sin3 
@@ -146,16 +146,18 @@ bias, monthly variance, and gaps.
     #> $BM_slope
     #> [1] 835.1317
 
-We see that `mBIC` and `Lav`, on the one hand, and `BM_MJ` and
-`BM_slope`, on the other hand, select the same number of segments `K`.
-The former two criteria appear slighlty more parsimonious and find the
-correct number of CPs, while `BM_MJ` and `BM_slope` have one extra CP.
+It must be remembered that the model selection operates once the Maximum
+Likelihood (ML) solutions for all values of `K = 1..K_max` are computed.
+Hence, two criteria selecting the same `K` provide exactly the same ML
+solutions (same `seg$Tmu` and `seg$CoeffF`). Note also that the
+`seg$MonthVar` parameter is estimated before the ML solutions are
+computed and thus does not depend on the selected `K`.
 
-Note that the maximum likelihood solutions for a fixed `K` are
-identical, i.e. `mBIC` and `Lav` give exactly the same solution in terms
-of `seg$Tmu` and `seg$CoeffF`, while `seg$MonthVar` is unique and does
-not depend on the criterion.
+The model selection on this simulated case gives: `K=4` for `mBIC` and
+`Lav` and `K=5` for `BM_MJ` and `BM_slope`. The latter two criteria
+include a spurious CP in this case which is actually avoided when we set
+`selectionF = TRUE` (see Example 6) or `initf = "descendent"`.
 
-The spurious CP detected by `BM_MJ` and `BM_slope` is removed when we
-apply the selection of functional coefficients `selectionF = TRUE` (see
-Example 6).
+Based on a large set of simulations, we checked that all four criteria
+find the correct number of CPs with the recommended (default) strategy
+`selectionF = FALSE` and `initf = "both"`.

@@ -96,11 +96,10 @@ seg$MonthVar
 seg$SSR
 ```
 
-We see that `mBIC` and `Lav`, on the one hand, and `BM_MJ` and `BM_slope`, on the other hand, select the same number of segments `K`.
-The former two criteria appear slighlty more parsimonious and find the correct number of CPs, while `BM_MJ` and `BM_slope` have one extra CP.
+It must be remembered that the model selection operates once the Maximum Likelihood (ML) solutions for all values of `K = 1..K_max` are computed. Hence, two criteria selecting the same `K` provide exactly the same ML solutions (same `seg$Tmu` and `seg$CoeffF`). Note also that the `seg$MonthVar` parameter is estimated before the ML solutions are computed and thus does not depend on the selected `K`.
 
-Note that the maximum likelihood solutions for a fixed `K` are identical, i.e. `mBIC` and `Lav` give exactly the same solution in terms of `seg$Tmu` and `seg$CoeffF`, while `seg$MonthVar` is unique and does not depend on the criterion.
+The model selection on this simulated case gives: `K=4` for `mBIC` and `Lav` and `K=5` for `BM_MJ` and `BM_slope`. The latter two criteria include a spurious CP in this case which is actually avoided when we set `selectionF = TRUE` (see Example 6) or `initf = "descendent"`.
 
-The spurious CP detected by `BM_MJ` and `BM_slope` is removed when we apply the selection of functional coefficients `selectionF = TRUE` (see Example 6).
+Based on a large set of simulations, we checked that all four criteria find the correct number of CPs with the recommended (default) strategy `selectionF = FALSE` and `initf = "both"`.
 
 
