@@ -16,7 +16,7 @@ Segmentation(
 }
 \arguments{
 \item{OneSeries}{is a time series data frame with 2 columns, $signal and $date, each of size n x 1, n is the number of days of the time series.
-Note: the $date variable should be continous. If the original data has gaps, NAs should be added at the corresponding dates.}
+Note: gaps in the time series (i.e. missing dates and signal) are allowed. An alternative is to make the time continous and insert NA values in the signal.}
 
 \item{lmin}{is the minimum length of the segments. Default value is 1.}
 
@@ -24,18 +24,18 @@ Note: the $date variable should be continous. If the original data has gaps, NAs
 Note: with \code{BM_slope}, \code{Kmax} must be larger than or equal to 10.}
 
 \item{selectionK}{specifies the penalty criterion used for the model selection (selection of the number of segments K).
-Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"} or \code{"BM_slope"}). Default is \code{"BM_BJ"}.
+Options are: \code{"none"}, \code{"mBIC"}, \code{"Lav"}, \code{"BM_BJ"}, \code{"BM_slope"}, or \code{"All"}). Default is \code{"BM_BJ"}.
 If \code{selectionK = "none"}, the model is estimated with \code{K = Kmax}.
-If \code{selectionK = "All"}, the results for the four possible criteria are given.}
+If \code{selectionK = "All"}, the results for all four criteria are given.}
 
-\item{FunctPart}{specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is TRUE.
-Note: with \code{FunctPart=TRUE} the algorithm estimates the functional and the segmentation parameters in an iterative way.
+\item{FunctPart}{specifies if the functional part (Fourier series of order 4) should be included in the model (\code{FunctPart=TRUE}) or not (\code{FunctPart=FALSE}). Default is \code{TRUE}.
+Note: with \code{FunctPart=TRUE} the algorithm estimates alternatively the functional and the segmentation parameters in an iterative procedure.
 with \code{FunctPart=FALSE}, only one segmentation is performed.
 If the functional part is unnecessary, \code{FunctPart=FALSE} can be much faster.}
 
-\item{selectionF}{is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is FALSE.}
+\item{selectionF}{is used to select only significant coefficients of the Fourier series when \code{FunctPart=TRUE}. Default is \code{FALSE}.}
 
-\item{initf}{refers how the functional part is initialized in the iterative inference procedure.
+\item{initf}{controls how the functional part is initialized in the iterative inference procedure (\code{FunctPart=TRUE}).
 Options: \code{"each"} means that the functional part is estimated from scratch at each K,
 \code{"ascendent"} means that the initial functional part for K is the solution obtained for K-1,
 \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
@@ -45,7 +45,7 @@ Default is \code{"ascendent"}.}
 \value{
 \itemize{
 \item \code{Tmu} is a data frame containing the segmentation results, with 5 columns and a number of lines equal to the number of segments of the time series.
-The columns are: \code{$begin, $end, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}) in a segment (valid means not NA).
+The columns are: \code{$begin, $end, $tbegin, $tend, $mean, $se, $np}. They represent the date index (integer) of begin and end of each segment, their corresponding dates (tbegin and tend), the estimated mean of the segment (\code{mean}) and its standard error (\code{se}), and the number of "valid" points (\code{np}) in a segment (valid means not NA).
 \item \code{FitF} is the functional part predicted from the estimated Fourier coefficients, a numeric vector of size n x 1. Note: if \code{FunctPart=FALSE}, \code{FitF} is FALSE.
 \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
 Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
@@ -57,7 +57,7 @@ If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
 If \code{selectionK="All"}, the outputs \code{Tmu}, \code{FitF}, \code{CoeffF}, and \code{SSR} are lists, containing the corresponding results obtained for each of the model selection criteria.
 }
 \description{
-Method: estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variances are chaning on monthly intervals.
+A method to estimate the position of change-points (CPs) in the mean superposed with a global periodic function (Fourier series of order 4) and IID noise with variance changing over fixed intervals. The current version assumes that: i) the time series is given with a daily time resolution, ii) the functional has a fundamental period of 1 year, and iii) the variance is changing on monthly intervals.
 }
 \details{
 The theoretical basis of the segmentation method developped by Quarello (2020) and published in Quarello et al., (2022).

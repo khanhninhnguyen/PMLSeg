@@ -34,7 +34,7 @@ Method:
 (1) detection of cluster of CPs, i.e. consecutive CPs closer than MaxDist days
 (2) test of the change in mean before and after the cluster with significance level alpha
 (3) removal of all the CPs in the cluster if the change in mean is unsignificant
-(4) add a new change-point in the middle of the cluster if the change in mean is significant.
+(4) add a new change-point at the beginning of the segment if the change in mean is significant.
 }
 \details{
 Note: it is recommended to replace the data inside the cluster(s) by NA in the general homogenization process

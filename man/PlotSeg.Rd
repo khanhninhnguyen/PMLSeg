@@ -11,8 +11,9 @@ PlotSeg(
   RemoveData = NULL,
   Metadata = NULL,
   Validated_CP_Meta = NULL,
-  labelx = "Date",
-  labely = "signal"
+  labelx = "date",
+  labely = "signal",
+  title = "Segmented time series"
 )
 }
 \arguments{

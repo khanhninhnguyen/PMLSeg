@@ -3,6 +3,7 @@
 export(Cluster_screening)
 export(PlotSeg)
 export(Segmentation)
+export(Test_CP)
 export(UpdatedParametersForFixedCP)
 export(Validation)
 import(dplyr)
