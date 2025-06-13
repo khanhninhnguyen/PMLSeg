@@ -16,7 +16,7 @@ Test_CP(Tmu, alpha = 0.05, detail = FALSE)
 \value{
 \itemize{
 \item \code{UpdatedCP}: The change-points remaining after testing.
-\item \code{RemoveData}: A data frame containing NA to be consistent with the screening's results.
+\item \code{RemoveData}: A data frame containing NA to be consistent with the results of the screening.
 \item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after the test.
 \item \code{detail}: A data frame containing the results of the test of the mean difference before and after the cluster, including the following columns:
 \itemize{
