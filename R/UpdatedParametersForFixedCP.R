@@ -28,13 +28,15 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
     return(NULL)
   }
 
-  # Remove data in cluster
-  segments <- sapply(1:nrow(ResScreening$RemoveData), function(i) {
+  if (!any(is.na(ResScreening$RemoveData))) {
+    # Remove data in cluster
+    segments <- sapply(1:nrow(ResScreening$RemoveData), function(i) {
     ResScreening$RemoveData$begin[i]:ResScreening$RemoveData$end[i]
-  })
-  for (seg in segments) {
-    UpdatedSeries$signal[seg] <- NA
-  }
+      })
+    for (seg in segments) {
+      UpdatedSeries$signal[seg] <- NA
+    }
+    }
 
   # Estimate monthly variance parameters
   UpdatedSeries$year <- as.factor(format(UpdatedSeries$date,format='%Y'))
