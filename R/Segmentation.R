@@ -22,6 +22,7 @@
 #'            \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
 #'            \code{"both"} means that \code{"ascendent"} is used first for K = 1 to Kmax, then \code{"descendent"} is tested for K = Kmax/2 to 1 and if the latter solution is better it replaces \code{"ascendent"} solution.
 #'            Default is \code{"ascendent"}.
+#' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
 #'
 #' @return
 #' \itemize{
@@ -70,7 +71,7 @@
 #'
 #' @export
 #'
-Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=TRUE,selectionF=FALSE,initf="ascendent"){
+Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=TRUE,selectionF=FALSE,initf="ascendent",VarMonthly=TRUE){
   result  <-  list()
   OneSeries.X  <-  c()
   cond1 <- TRUE
@@ -141,10 +142,14 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
       return(res.with.NA)
     }
 
-
-    #Estimation of the Montly variances
-    sigma.est.month <- RobEstiMonthlyVariance(OneSeries.X)
-    var.est.month   <- sigma.est.month^2
+    if (VarMonthly==TRUE){
+      #Estimation of the Montly variances
+      sigma.est.month <- RobEstiMonthlyVariance(OneSeries.X)
+    } else {
+      Y_diff <- diff(OneSeries.X$signal)
+      sigma.est.month <- rep(robustbase::Qn(Y_diff)/sqrt(2),12)
+    }
+    var.est.month <- sigma.est.month^2
 
     #Creation of graphs
     myGraph <- GraphBuilding(lmin,Kmax)
