@@ -1,6 +1,6 @@
 Package: PMLseg
 Title: Segmentation of time series by Penalized Maximum Likelihood 
-Version: 0.0.0.9009
+Version: 0.0.0.9010
 Authors@R: c(person("Annarosa", "Quarello", role = c("aut")),
     person("Emilie", "Lebarbier", email = "emilie.lebarbier@parisnanterre.fr", role = c("aut", "cre")),
     person("Ninh", "Nguyen", email = "ninh.nguyen.cva@gmail.com", role = c("aut")),
