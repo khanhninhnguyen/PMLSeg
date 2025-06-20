@@ -1,7 +1,7 @@
 #' update the segmentation parameters based on the screening result
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1
-#' @param ResScreening the output of the Cluster_screening() function
+#' @param ResScreeningTest the output of the Cluster_screening() function or the Test_CP() function.
 #' @param FunctPart a boolean indicating if the functional part should be modelled. Default is TRUE.
 #' @param selectionF a boolean indicating if the statistically significant parameters of the functional part should be selected. The level of the test is by default 0.001. Default is FALSE.
 #' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
@@ -20,20 +20,24 @@
 #'
 #' @export
 
-UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE, selectionF=FALSE,VarMonthly=TRUE){
+UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=TRUE, selectionF=FALSE,VarMonthly=TRUE){
+
+  UpdatedSeries <- c()
+  UpdatedPara <- c()
 
   UpdatedSeries <- OneSeries
+
   n <- dim(UpdatedSeries)[1]
 
-  if (ResScreening$ChangeCP=="No") {
+  if (ResScreeningTest$ChangeCP=="No") {
     warning("Screening did not change segmentation results")
     return(NULL)
   }
 
-  if (!any(is.na(ResScreening$RemoveData))) {
+  if (!any(is.na(ResScreeningTest$RemoveData))) {
     # Remove data in cluster
-    segments <- sapply(1:nrow(ResScreening$RemoveData), function(i) {
-    ResScreening$RemoveData$begin[i]:ResScreening$RemoveData$end[i]
+    segments <- sapply(1:nrow(ResScreeningTest$RemoveData), function(i) {
+    ResScreeningTest$RemoveData$begin[i]:ResScreeningTest$RemoveData$end[i]
       })
     for (seg in segments) {
       UpdatedSeries$signal[seg] <- NA
@@ -64,16 +68,16 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreening, FunctPart=TRUE,
 
 
   # Update begin and end of segments
-  if(length(ResScreening$UpdatedCP)>0){
-    begin = c(1, ResScreening$UpdatedCP + 1)
-    end =  c(ResScreening$UpdatedCP, nrow(OneSeries))
+  if(length(ResScreeningTest$UpdatedCP)>0){
+    begin = c(1, ResScreeningTest$UpdatedCP + 1)
+    end =  c(ResScreeningTest$UpdatedCP, nrow(OneSeries))
   } else{
     begin = 1
     end = nrow(OneSeries)
   }
 
   # Update CPs
-  UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreening$UpdatedCP])
+  UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreeningTest$UpdatedCP])
   UpdatedCP <- c(UpdatedCP, nrow(UpdatedSeries))
   # print(UpdatedCP)
 
