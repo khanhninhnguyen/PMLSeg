@@ -96,7 +96,7 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
 
         ### Update the CPs which have a significant change in mean
         ind_signif = which(PValues < alpha)
-        ReplacedCP = Tmu$begin[SegmentsTest$begin[ind_signif]]#ceiling((Tmu$end[SegmentsTest$begin[ind_signif]] + Tmu$begin[SegmentsTest$end[ind_signif]]) / 2)
+        ReplacedCP = Tmu$end[SegmentsTest$begin[ind_signif]]#ceiling((Tmu$end[SegmentsTest$begin[ind_signif]] + Tmu$begin[SegmentsTest$end[ind_signif]]) / 2)
 
         # Update of list of CPs
         UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
