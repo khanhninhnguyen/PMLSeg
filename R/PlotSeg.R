@@ -3,6 +3,7 @@
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param SegRes result from the segmentation funtion.
 #' @param FunctPart a boolean, specifies if the functional part should be plotted. Default is FALSE.
+#' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
 #' @param RemoveData a data frame including the beginning and the end positions (time index) of the segments to be removed.
 #' @param Validated_CP_Meta the results from the Validation function. Default is NULL.
 #' @param Metadata a data frame with two columns: $date (in date format) and $type (label in string format)
@@ -20,6 +21,7 @@
 PlotSeg <- function(OneSeries,
                     SegRes,
                     FunctPart = TRUE,
+                    VarMonthly=TRUE,
                     RemoveData = NULL,
                     Metadata = NULL,
                     Validated_CP_Meta = NULL,
@@ -42,13 +44,27 @@ PlotSeg <- function(OneSeries,
 
   colors <- c("signal" = "gray", "Mean" = "red", "FitF" = "purple", "MonthStd" = "cyan")
   metadata_colors <- c("A" = "green", "R" = "magenta")
-  
+
   # mutate OneSeries
+
+
   OneSeries <- OneSeries %>%
     mutate(Mean = rep(SegRes$Tmu$mean, times = (SegRes$Tmu$end - SegRes$Tmu$begin + 1)),
-           Month = as.numeric(format(date, "%m")),
-           MonthStd = sqrt(SegRes$MonthVar[as.numeric(Month)]) - abs(MinPoint)) %>%  
-    select(-Month)
+           Month = as.numeric(format(date, "%m")))
+
+  if (VarMonthly==TRUE){
+    #Estimation of the Montly variances
+    var.est.t <-  SegRes$MonthVar[as.numeric(OneSeries$Month)]
+  } else {
+    n <- dim(OneSeries)[1]
+    var.est.t <- rep(SegRes$MonthVar,n)
+  }
+
+  OneSeries <- OneSeries %>%
+    mutate(MonthStd = sqrt(var.est.t) - abs(MinPoint)) %>%
+    dplyr::select(-Month)
+
+
   if (FunctPart==TRUE){
     OneSeries <- OneSeries %>%
       mutate( FitF = SegRes$FitF - abs(MinPoint))
@@ -56,7 +72,7 @@ PlotSeg <- function(OneSeries,
 
   # dates of CPs
   SegRes$Tmu <- SegRes$Tmu %>%
-    mutate(tbegin = OneSeries$date[SegRes$Tmu$begin], 
+    mutate(tbegin = OneSeries$date[SegRes$Tmu$begin],
            tend = OneSeries$date[SegRes$Tmu$end])
 
   # validated CPs
@@ -68,7 +84,7 @@ PlotSeg <- function(OneSeries,
     shapes <- c(shapes, "valid" = 0)
   }
 
-  # Replace data in clusters by NA 
+  # Replace data in clusters by NA
   # in signal
   if (!is.null(RemoveData)) {
     index <- unlist(lapply(1:nrow(RemoveData), function(x) {
@@ -114,7 +130,7 @@ PlotSeg <- function(OneSeries,
       mutate( Meta = ifelse(date %in% Metadata, MaxPoint, NA))
     # shapes <- c(shapes, "Meta" = 1)
   }
-  
+
   # make data for plot
   variable_names <- names(OneSeries)[-1]  # Exclude the first column which is 'date'
   long_data <- OneSeries %>%
@@ -159,7 +175,7 @@ PlotSeg <- function(OneSeries,
   if (!is.null(Metadata)) {
     if (!is.null(Metadata$type)) {
       p <- p +
-        geom_point(data = subset(long_data, variable %in% types), color = "gray", aes(shape = variable), 
+        geom_point(data = subset(long_data, variable %in% types), color = "gray", aes(shape = variable),
                    size = 2, na.rm = TRUE)
     } else {
       p <- p +
@@ -167,7 +183,7 @@ PlotSeg <- function(OneSeries,
                    size = 2, na.rm = TRUE)
     }
   }
-  
+
   # Add title
   p <- p + ggplot2::ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
 
@@ -175,12 +191,12 @@ PlotSeg <- function(OneSeries,
   last_date <- as.Date(paste0(format(max(OneSeries$date), "%Y"), "-12-31"))
 
   if (!is.null(Validated_CP_Meta) | !is.null(Metadata$type)) {
-    p <- p + 
-      scale_shape_manual(values = shapes)  
+    p <- p +
+      scale_shape_manual(values = shapes)
   }
-  
+
   # Add labels
-  p <- p + 
+  p <- p +
       scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
       scale_color_manual(values = colors) +
       labs(x = labelx, y = labely, color = "", fill = "") +
