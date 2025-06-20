@@ -2,6 +2,7 @@
 #'
 #' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1
 #' @param ResScreeningTest the output of the Cluster_screening() function or the Test_CP() function.
+#' @param RemoveData A data frame containing the beginning and end positions (time index) of the segments to be deleted in the data.
 #' @param FunctPart a boolean indicating if the functional part should be modelled. Default is TRUE.
 #' @param selectionF a boolean indicating if the statistically significant parameters of the functional part should be selected. The level of the test is by default 0.001. Default is FALSE.
 #' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
@@ -20,7 +21,7 @@
 #'
 #' @export
 
-UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=TRUE, selectionF=FALSE,VarMonthly=TRUE){
+UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, RemoveData,FunctPart=TRUE, selectionF=FALSE,VarMonthly=TRUE){
 
   UpdatedSeries <- c()
   UpdatedPara <- c()
@@ -34,10 +35,10 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=T
     return(NULL)
   }
 
-  if (!any(is.na(ResScreeningTest$RemoveData))) {
+  if (!any(is.na(RemoveData))) {
     # Remove data in cluster
-    segments <- sapply(1:nrow(ResScreeningTest$RemoveData), function(i) {
-    ResScreeningTest$RemoveData$begin[i]:ResScreeningTest$RemoveData$end[i]
+    segments <- sapply(1:nrow(RemoveData), function(i) {
+      RemoveData$begin[i]:RemoveData$end[i]
       })
     for (seg in segments) {
       UpdatedSeries$signal[seg] <- NA

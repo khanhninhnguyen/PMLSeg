@@ -1,3 +1,4 @@
+
 #' Test of each change-point (CP)
 #'
 #' Method:
@@ -49,15 +50,15 @@ Test_CP <- function(Tmu, alpha = 0.05,RemoveDataFromScreening=NULL, detail = FAL
     ### Test difference in mean before and after each cluster
     if(nrow(SegmentsTest) > 0) {
       TValues <- sapply(1:nrow(SegmentsTest), function(x) {
-      D = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
-      SD = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
-                        Tmu$se[SegmentsTest$end[x]]^2)
-      D / SD
+        D = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
+        SD = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
+                    Tmu$se[SegmentsTest$end[x]]^2)
+        D / SD
       })
       PValues <- sapply(TValues, function(x) {
         (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
-        })
-        ### save test details in ClusterTestOut df
+      })
+      ### save test details in ClusterTestOut df
       ClusterTestOut <- data.frame(
         mu_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$mean[SegmentsTest$begin]),
         mu_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$mean[SegmentsTest$end]),
@@ -68,19 +69,19 @@ Test_CP <- function(Tmu, alpha = 0.05,RemoveDataFromScreening=NULL, detail = FAL
         tstat = TValues,
         pval = PValues,
         signif = ifelse(PValues > alpha, 0, 1)
-        )
+      )
 
-        ### Update the CPs which have a significant change in mean
-        ind_signif = which(PValues < alpha)
-        ReplacedCP = Tmu$end[SegmentsTest$begin[ind_signif]]
+      ### Update the CPs which have a significant change in mean
+      ind_signif = which(PValues < alpha)
+      ReplacedCP = Tmu$end[SegmentsTest$begin[ind_signif]]
 
-        # Update of list of CPs
-        UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
-        if (length(UpdatedCP)>0){
-          if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
-            UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
-          }
+      # Update of list of CPs
+      UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
+      if (length(UpdatedCP)>0){
+        if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
+          UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
         }
+      }
     }
 
     if (length(ind_signif)<(nrow(Tmu)-1)){
@@ -103,4 +104,3 @@ Test_CP <- function(Tmu, alpha = 0.05,RemoveDataFromScreening=NULL, detail = FAL
 
   return(Out)
 }
-
