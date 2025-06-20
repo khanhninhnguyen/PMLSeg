@@ -32,8 +32,7 @@
 #' \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
 #'   Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
 #'         If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
-#' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
-#' \item \code{SSR} is the Sum of Squared Residuals of the fit.
+#' \item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12 if \code{VarMonthly=TRUE}, one value otherwise.#' \item \code{SSR} is the Sum of Squared Residuals of the fit.
 #' \item \code{SSR_All} is the Sum of Squared Residuals for the fit for all K=1,...,Kmax
 #' }
 #' If \code{selectionK="All"}, the outputs \code{Tmu}, \code{FitF}, \code{CoeffF}, and \code{SSR} are lists, containing the corresponding results obtained for each of the model selection criteria.
@@ -427,7 +426,12 @@ Segmentation <- function(OneSeries,lmin=1,Kmax=30,selectionK="BM_BJ",FunctPart=T
     result$FitF <- funct
     result$CoeffF <- coeff
     #Global results
-    result$MonthVar <- var.est.month
+    if (VarMonthly==TRUE){
+      #Estimation of the Montly variances
+      result$MonthVar <- var.est.month
+    } else {
+      result$MonthVar <- var.est.month[1]
+    }
     result$SSR <- SSwg
     result$SSR_All <- SSwg_All
 
