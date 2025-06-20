@@ -5,13 +5,13 @@
 #' (2) removal of all the CPs in the cluster if the change in mean is unsignificant
 #'
 #' @param Tmu the segmentation results obtained from the Segmentation function
-#' @param detail: if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
 #' @param alpha: significance level of the test (value between 0 and 1). Default is 0.05.
-#'
+#' @param RemoveDataFromScreening the removed data from the Cluster_screening() function. If no screening has been performed before, \code{RemoveDataFromScreening=NULL}.
+#' @param detail: if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
 #' @return
 #' \itemize{
 #' \item \code{UpdatedCP}: The change-points remaining after testing.
-#' \item \code{RemoveData}: A data frame containing NA to be consistent with the results of the screening.
+#' \item \code{RemoveData}: The removed data obtained from the screening, NA if no screening is performed before (\code{RemoveDataFromScreening=NULL}).
 #' \item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after the test.
 #' \item \code{detail}: A data frame containing the results of the test of the mean difference before and after the cluster, including the following columns:
 #'   \itemize{
@@ -24,19 +24,24 @@
 #' @export
 
 
-Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
+Test_CP <- function(Tmu, alpha = 0.05,RemoveDataFromScreening=NULL, detail = FALSE) {
 
   RemoveData <-  c()
   UpdatedCP <-  c()
   ChangeCP <- c()
   ClusterTestOut <- c()
 
+  #RemoveData = data.frame(begin = NA,end = NA)
+  if (is.null(RemoveDataFromScreening)){
+    RemoveData = data.frame(begin = NA,end = NA)
+  } else (RemoveData <- RemoveDataFromScreening)
+
+
   if(nrow(Tmu) > 1) {
     # index of segment before and after each cluster (NA if first or last segment)
     SegBefInd = 1:(nrow(Tmu)-1)
     SegAftInd = SegBefInd+1
 
-    RemoveData = data.frame(begin = NA,end = NA)
 
     SegmentsTest = data.frame(begin = SegBefInd, end = SegAftInd)
     UpdatedCP = Tmu$end[nrow(Tmu)]
@@ -83,7 +88,7 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
     } else {ChangeCP <- "No"}
 
   } else {
-    RemoveData = data.frame(begin = NA,end = NA)
+    #RemoveData = data.frame(begin = NA,end = NA)
     ChangeCP <- "No"
     ClusterTestOut <- NA
   }
