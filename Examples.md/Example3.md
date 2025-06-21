@@ -136,10 +136,9 @@ the data removed by the screening (`RemoveData` option).
 
 Note that the data in the clusters are only masked in the plot. They are
 still contained in the time series dataframe. So it is necessary to
-update also `df`. Two options are possible: either replace the data
-removed by the screening with NA values in `df$signal` or simply remove
-the data from `df`. This step is mandatory before running again the
-Validation.
+update also `df`: replace the data removed by the screening with NA
+values in `df$signal`. This step is mandatory before running again the
+Validation or using PlotSeg.
 
     df_screened <- df
     for (i in 1:(nrow(screening$RemoveData))) {

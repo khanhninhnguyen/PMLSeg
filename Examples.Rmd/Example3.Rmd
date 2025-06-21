@@ -108,7 +108,7 @@ PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = sc
 ```
 
 Note that the data in the clusters are only masked in the plot. They are still contained in the time series dataframe. 
-So it is necessary to update also `df`. Two options are possible: either replace the data removed by the screening with NA values in `df$signal` or simply remove the data from `df`. This step is mandatory before running again the Validation.
+So it is necessary to update also `df`: replace the data removed by the screening with NA values in `df$signal`. This step is mandatory before running again the Validation or using PlotSeg.
 
 ```{r}
 df_screened <- df
