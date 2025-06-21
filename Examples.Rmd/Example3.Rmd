@@ -115,7 +115,6 @@ df_screened <- df
 for (i in 1:(nrow(screening$RemoveData))) {
     df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
 }
-PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE)
 ```
 
 ### 5. Validation of change-points after screening
@@ -128,6 +127,9 @@ metadata = data.frame(date = meta_date, type = meta_type)
 valid_max_dist = 10               # max distance between CP and metadata for the validation
 valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
 valid
+
+p <- PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+print(p)
 
 ```
 

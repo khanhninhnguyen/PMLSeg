@@ -145,9 +145,6 @@ Validation.
     for (i in 1:(nrow(screening$RemoveData))) {
         df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
     }
-    PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE)
-
-<img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
 
 ### 5. Validation of change-points after screening
 
@@ -163,3 +160,8 @@ Validation.
     #>   <date>     <date>             <dbl> <chr>           <dbl>
     #> 1 2010-07-25 2010-07-19             0 receiver_change     1
     #> 2 2011-08-14 2011-08-23            -1 antenna_change      1
+
+    p <- PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+    print(p)
+
+<img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
