@@ -60,15 +60,15 @@ Run the segmentation without the functional part:
                        FunctPart = FALSE)
 
     seg$Tmu
-    #>   begin  end       mean         se  np
-    #> 1     1   11  0.1667099 0.31114798  11
-    #> 2    12  200 -0.9713045 0.07737888 189
-    #> 3   201  210  5.5271484 0.35944691  10
-    #> 4   211  580  0.9858219 0.05634461 370
-    #> 5   581  590 -4.6640059 0.38365696  10
-    #> 6   591  600  4.7472015 0.38365696  10
-    #> 7   601  990  1.9793571 0.05450709 390
-    #> 8   991 1000 -0.3262317 0.29314546  10
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1   11 2010-01-01 2010-01-11  0.1667099 0.31114798  11
+    #> 2    12  200 2010-01-12 2010-07-19 -0.9713045 0.07737888 189
+    #> 3   201  210 2010-07-20 2010-07-29  5.5271484 0.35944691  10
+    #> 4   211  580 2010-07-30 2011-08-03  0.9858219 0.05634461 370
+    #> 5   581  590 2011-08-04 2011-08-13 -4.6640059 0.38365696  10
+    #> 6   591  600 2011-08-14 2011-08-23  4.7472015 0.38365696  10
+    #> 7   601  990 2011-08-24 2012-09-16  1.9793571 0.05450709 390
+    #> 8   991 1000 2012-09-17 2012-09-26 -0.3262317 0.29314546  10
 
 ### 3. Visualization of the time series with segmentation results superposed
 
@@ -105,19 +105,18 @@ in clusters.
 The Cluster\_screening function returns information to update the
 segmentation dataframe.
 
-Now, update the segmentation parameters
+Now, update the segmentation parameters and the time serie
 
     seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
     seg_updated
     #> $MonthVar
-    #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480
-    #>  [8] 1.4346685 0.9308744 1.8745634 1.2375832 1.1062817
+    #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480 1.4346685 0.9308744 1.8745634 1.2375832 1.1062817
     #> 
     #> $Tmu
-    #>   begin  end       mean         se  np
-    #> 1     1  206 -0.9723087 0.07737455 189
-    #> 2   207  591  0.9855249 0.05651114 370
-    #> 3   592 1000  1.9801639 0.05477701 390
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  206 2010-01-01 2010-07-25 -0.9723087 0.07737455 189
+    #> 2   207  591 2010-07-26 2011-08-14  0.9855249 0.05651114 370
+    #> 3   592 1000 2011-08-15 2012-09-26  1.9801639 0.05477701 390
     #> 
     #> $FitF
     #> [1] FALSE
@@ -136,5 +135,31 @@ the data removed by the screening (`RemoveData` option).
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 Note that the data in the clusters are only masked in the plot. They are
-still contained in the time series dataframe. It is recommended to
-replace them with NA values in `df$signal`.
+still contained in the time series dataframe. So it is necessary to
+update also `df`. Two options are possible: either replace the data
+removed by the screening with NA values in `df$signal` or simply remove
+the data from `df`. This step is mandoroty before running again the
+Validation.
+
+    df_screened <- df
+    for (i in 1:(nrow(screening$RemoveData))) {
+        df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
+    }
+    PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE)
+
+<img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+
+### 5. Validation of change-points after screening
+
+    # define fake metadata from true CP dates
+    meta_date <- CP_date[c(2, 6)]                                  # date of metadata event = date of CP
+    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+    metadata = data.frame(date = meta_date, type = meta_type)
+    valid_max_dist = 10               # max distance between CP and metadata for the validation
+    valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
+    valid
+    #> # A tibble: 2 × 5
+    #>   CP         closestMetadata Distance type            valid
+    #>   <date>     <date>             <dbl> <chr>           <dbl>
+    #> 1 2010-07-25 2010-07-19             0 receiver_change     1
+    #> 2 2011-08-14 2011-08-23            -1 antenna_change      1

@@ -94,7 +94,7 @@ screening
 ```
 The Cluster_screening function returns information to update the segmentation dataframe.
 
-Now, update the segmentation parameters
+Now, update the segmentation parameters and the time serie
 
 ```{r}
 seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
@@ -108,4 +108,26 @@ PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = sc
 ```
 
 Note that the data in the clusters are only masked in the plot. They are still contained in the time series dataframe. 
-It is recommended to replace them with NA values in `df$signal`.
+So it is necessary to update also `df`. Two options are possible: either replace the data removed by the screening with NA values in `df$signal` or simply remove the data from `df`. This step is mandoroty before running again the Validation.
+
+```{r}
+df_screened <- df
+for (i in 1:(nrow(screening$RemoveData))) {
+    df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
+}
+PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE)
+```
+
+### 5. Validation of change-points after screening
+
+```{r}
+# define fake metadata from true CP dates
+meta_date <- CP_date[c(2, 6)]                                  # date of metadata event = date of CP
+meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+metadata = data.frame(date = meta_date, type = meta_type)
+valid_max_dist = 10               # max distance between CP and metadata for the validation
+valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
+valid
+
+```
+
