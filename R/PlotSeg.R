@@ -3,7 +3,6 @@
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param SegRes result from the segmentation funtion.
 #' @param FunctPart a boolean, specifies if the functional part should be plotted. Default is FALSE.
-#' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
 #' @param RemoveData a data frame including the beginning and the end positions (time index) of the segments to be removed.
 #' @param Validated_CP_Meta the results from the Validation function. Default is NULL.
 #' @param Metadata a data frame with two columns: $date (in date format) and $type (label in string format)
@@ -21,7 +20,6 @@
 PlotSeg <- function(OneSeries,
                     SegRes,
                     FunctPart = TRUE,
-                    VarMonthly=TRUE,
                     RemoveData = NULL,
                     Metadata = NULL,
                     Validated_CP_Meta = NULL,
@@ -52,12 +50,11 @@ PlotSeg <- function(OneSeries,
     mutate(Mean = rep(SegRes$Tmu$mean, times = (SegRes$Tmu$end - SegRes$Tmu$begin + 1)),
            Month = as.numeric(format(date, "%m")))
 
-  if (VarMonthly==TRUE){
-    #Estimation of the Montly variances
-    var.est.t <-  SegRes$MonthVar[as.numeric(OneSeries$Month)]
+  # construct var.est.t
+  if (length(SegRes$MonthVar)==1){
+    var.est.t <- rep(SegRes$MonthVar, length(OneSeries$date))
   } else {
-    n <- dim(OneSeries)[1]
-    var.est.t <- rep(SegRes$MonthVar,n)
+    var.est.t <-  SegRes$MonthVar[as.numeric(OneSeries$Month)]
   }
 
   OneSeries <- OneSeries %>%
