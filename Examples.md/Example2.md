@@ -105,7 +105,7 @@ Plot with Metadata:
 
 Note that the distance between the estimated date of the 2nd CP
 (2011-09-28) and nearest Metadata (2011-08-23) excludes the NA values,
-hence `np = 5` and the CP is validated.
+hence `np = 6` and the CP is validated.
 
     PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 
