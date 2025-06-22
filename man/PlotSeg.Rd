@@ -8,7 +8,6 @@ PlotSeg(
   OneSeries,
   SegRes,
   FunctPart = TRUE,
-  RemoveData = NULL,
   Metadata = NULL,
   Validated_CP_Meta = NULL,
   labelx = "date",
@@ -22,8 +21,6 @@ PlotSeg(
 \item{SegRes}{result from the segmentation funtion.}
 
 \item{FunctPart}{a boolean, specifies if the functional part should be plotted. Default is FALSE.}
-
-\item{RemoveData}{a data frame including the beginning and the end positions (time index) of the segments to be removed.}
 
 \item{Metadata}{a data frame with two columns: $date (in date format) and $type (label in string format)}
 

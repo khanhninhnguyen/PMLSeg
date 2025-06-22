@@ -53,12 +53,12 @@ set.seed(1)                                     # initialise random generator
 # create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-df <- data.frame(date = mydate, signal = mysignal)
+OneSeries <- data.frame(date = mydate, signal = mysignal)
 
 CP_date <- mydate[cp_ind]                       # dates of CP
 
 # plot signal and position of change-points
-plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -67,16 +67,17 @@ abline(v = CP_date, col = "red", lty = 2)
 Run the segmentation without the functional part:
 
 ```{r}
-seg = Segmentation(OneSeries = df, 
-                   FunctPart = FALSE)
+seg = Segmentation(OneSeries = OneSeries, 
+                   FunctPart = FALSE,
+                   VarMonthly = FALSE)
 
-seg$Tmu
+print(seg$Tmu)
 ```
 
 ### 3. Visualization of the time series with segmentation results superposed
 
 ```{r}
-PlotSeg(OneSeries = df, 
+PlotSeg(OneSeries = OneSeries, 
         SegRes = seg, 
         FunctPart = FALSE)
 ```
@@ -88,8 +89,7 @@ Note that the segmentation is able to detect all CPs, even those close to the be
 We want to remove the segments smaller than 80 days, either isolated or in clusters.
 
 ```{r}
-cluster_max_dist <- 80             # max distance between CPs in a cluster
-screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = cluster_max_dist)
+screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = 80)
 screening
 ```
 The Cluster_screening function returns information to update the segmentation dataframe.
@@ -97,38 +97,27 @@ The Cluster_screening function returns information to update the segmentation da
 Now, update the segmentation parameters and the time serie
 
 ```{r}
-seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
-seg_updated
+seg_updated <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=FALSE, VarMonthly=FALSE)
+print(seg_updated)
+
+OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
 ```
 
-Plot the time series with the updated segmentation information and mask the data removed by the screening (`RemoveData` option).
+Plot the updated time series with the updated segmentation information.
 
 ```{r}
-PlotSeg(OneSeries = df, SegRes = seg_updated, FunctPart = FALSE, RemoveData = screening$RemoveData)
+PlotSeg(OneSeries = OneSeriesUpd, SegRes = seg_updated, FunctPart = FALSE)
 ```
 
-Note that the data in the clusters are only masked in the plot. They are still contained in the time series dataframe. 
-So it is necessary to update also `df`: replace the data removed by the screening with NA values in `df$signal`. This step is mandatory before running again the Validation or using PlotSeg.
-
-```{r}
-df_screened <- df
-for (i in 1:(nrow(screening$RemoveData))) {
-    df_screened$signal[screening$RemoveData$begin[i]:screening$RemoveData$end[i]] = NA
-}
-```
 
 ### 5. Validation of change-points after screening
 
 ```{r}
-# define fake metadata from true CP dates
-meta_date <- CP_date[c(2, 6)]                                  # date of metadata event = date of CP
-meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
-metadata = data.frame(date = meta_date, type = meta_type)
-valid_max_dist = 10               # max distance between CP and metadata for the validation
-valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = valid_max_dist, Metadata = metadata)
-valid
+Metadata = data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
+valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = Metadata)
+print(valid)
 
-p <- PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+p <- PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 print(p)
 
 ```

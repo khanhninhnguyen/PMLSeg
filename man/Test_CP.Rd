@@ -2,33 +2,34 @@
 % Please edit documentation in R/Test_CP.R
 \name{Test_CP}
 \alias{Test_CP}
-\title{Test of each change-point (CP)}
+\title{Test the significance of each change-point (CP)}
 \usage{
 Test_CP(Tmu, alpha = 0.05, detail = FALSE)
 }
 \arguments{
 \item{Tmu}{the segmentation results obtained from the Segmentation function}
 
-\item{detail:}{if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.}
-
 \item{alpha:}{significance level of the test (value between 0 and 1). Default is 0.05.}
+
+\item{RemoveDataFromScreening}{the removed data from the Cluster_screening() function. If no screening has been performed before, \code{RemoveDataFromScreening=NULL}.}
+
+\item{detail:}{if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.}
 }
 \value{
 \itemize{
 \item \code{UpdatedCP}: The change-points remaining after testing.
-\item \code{RemoveData}: A data frame containing NA to be consistent with the results of the screening.
+\item \code{RemoveData}: The removed data obtained from the screening, NA if no screening is performed before (\code{RemoveDataFromScreening=NULL}).
 \item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after the test.
-\item \code{detail}: A data frame containing the results of the test of the mean difference before and after the cluster, including the following columns:
+\item \code{detail}: A data frame containing the results of the test of the mean difference before and after each CP, including the following columns:
 \itemize{
 \item \code{mu_L}, \code{mu_R}: Means of the segments before and after the change-point.
 \item \code{se_L}, \code{se_R}: Standard errors of the means of the segments before and after the change-point.
 \item \code{np_L}, \code{np_R}: Number of points before and after the change-point.
-\item \code{tstat}, \code{pval}, \code{signif}: t-values, p-values, and significance codes of the test.
+\item \code{tstat}, \code{pval}, \code{signif}: t-value, p-value, and significance (0 or 1) of the test.
 }
 }
 }
 \description{
 Method:
-(1) test of the change in mean before and after the cluster with significance level alpha
-(2) removal of all the CPs in the cluster if the change in mean is unsignificant
+(1) test of the change in mean before and after each change-point (CP) with significance level alpha
 }

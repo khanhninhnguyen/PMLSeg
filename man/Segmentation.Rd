@@ -11,7 +11,8 @@ Segmentation(
   selectionK = "BM_BJ",
   FunctPart = TRUE,
   selectionF = FALSE,
-  initf = "ascendent"
+  initf = "ascendent",
+  VarMonthly = TRUE
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ Options: \code{"each"} means that the functional part is estimated from scratch 
 \code{"descendent"} means that the initial functional part for K is the solution obtained for K+1,
 \code{"both"} means that \code{"ascendent"} is used first for K = 1 to Kmax, then \code{"descendent"} is tested for K = Kmax/2 to 1 and if the latter solution is better it replaces \code{"ascendent"} solution.
 Default is \code{"ascendent"}.}
+
+\item{VarMonthly}{indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.}
 }
 \value{
 \itemize{
@@ -50,8 +53,7 @@ The columns are: \code{$begin, $end, $tbegin, $tend, $mean, $se, $np}. They repr
 \item \code{CoeffF} is the vector of coefficients of the Fourier series, a numeric vector of size 1 x 8 if \code{selectionF=FALSE}.
 Note: If \code{selectionF=TRUE} the size of \code{CoeffF} correspods to the number of selected coefficients.
 If \code{FunctPart=FALSE}, \code{CoeffF} is FALSE.
-\item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12.
-\item \code{SSR} is the Sum of Squared Residuals of the fit.
+\item \code{MonthVar} contains the estimated monthly variances, a numeric vector of size 1 x 12 if \code{VarMonthly=TRUE}, one value otherwise.#' \item \code{SSR} is the Sum of Squared Residuals of the fit.
 \item \code{SSR_All} is the Sum of Squared Residuals for the fit for all K=1,...,Kmax
 }
 If \code{selectionK="All"}, the outputs \code{Tmu}, \code{FitF}, \code{CoeffF}, and \code{SSR} are lists, containing the corresponding results obtained for each of the model selection criteria.
