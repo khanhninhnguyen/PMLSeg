@@ -21,61 +21,61 @@
 #'
 #' @export
 
-UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, RemoveData,FunctPart=TRUE, selectionF=FALSE,VarMonthly=TRUE){
+UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=TRUE, selectionF=FALSE, VarMonthly=TRUE){
 
   UpdatedSeries <- c()
   UpdatedPara <- c()
 
   UpdatedSeries <- OneSeries
 
-  n <- dim(UpdatedSeries)[1]
-
   if (ResScreeningTest$ChangeCP=="No") {
-    warning("Screening did not change segmentation results")
+    warning("Nothing to update...")
     return(NULL)
   }
 
+  RemoveData = ResScreeningTest$RemoveData
+  
+  # Remove data in cluster
   if (!any(is.na(RemoveData))) {
-    # Remove data in cluster
     segments <- sapply(1:nrow(RemoveData), function(i) {
       RemoveData$begin[i]:RemoveData$end[i]
       })
     for (seg in segments) {
       UpdatedSeries$signal[seg] <- NA
     }
-    }
+  }
 
   # Estimate monthly variance parameters
-  UpdatedSeries$year <- as.factor(format(UpdatedSeries$date,format='%Y'))
+  UpdatedSeries$year  <- as.factor(format(UpdatedSeries$date,format='%Y'))
   UpdatedSeries$month <- as.factor(format(UpdatedSeries$date,format='%m'))
   UpdatedSeries$month <-  droplevels(UpdatedSeries$month)
-  UpdatedSeries$year   <-  droplevels(UpdatedSeries$year)
+  UpdatedSeries$year  <-  droplevels(UpdatedSeries$year)
 
+  # Estimate the variance parameters and compute the variance time series
   if (VarMonthly==TRUE){
-    #Estimation of the Montly variances
+    # Estimate all Montly variances
     sigma.est.month <- RobEstiMonthlyVariance(UpdatedSeries)
     MonthVar <- sigma.est.month^2
-    # Compute time series of monthly variance
+    # Compute the variance time series
     var.est.t <-  MonthVar[as.numeric(UpdatedSeries$month)]
-    var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
   } else {
-    Y_diff <- diff(UpdatedSeries$signal)
+    # Estimate one single variance
+    Y_diff <- diff(UpdatedSeries$signal[which(!is.na(UpdatedSeries$signal))])
     sigma.est.month <- robustbase::Qn(Y_diff)/sqrt(2)
     MonthVar <- sigma.est.month^2
-    var.est.t <- rep(MonthVar,n)
-    var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
+    # Compute the variance time series
+    var.est.t <- rep(MonthVar,length(UpdatedSeries$date))
   }
-
-
+  var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
 
   # Update begin and end of segments
-  if(length(ResScreeningTest$UpdatedCP)>0){
-    begin = c(1, ResScreeningTest$UpdatedCP + 1)
-    end =  c(ResScreeningTest$UpdatedCP, nrow(OneSeries))
-  } else{
-    begin = 1
-    end = nrow(OneSeries)
-  }
+  # if(length(ResScreeningTest$UpdatedCP)>0){
+    # begin = c(1, ResScreeningTest$UpdatedCP + 1)
+    # end =  c(ResScreeningTest$UpdatedCP, nrow(OneSeries))
+  # } else{
+    # begin = 1
+    # end = nrow(OneSeries)
+  # }
 
   # Update CPs
   UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreeningTest$UpdatedCP])
@@ -85,15 +85,15 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, RemoveData,
   # Re-estimate means of segments and functional part
   if (FunctPart==TRUE){
     lyear <- 365.25
-    coeff <- c()
-    funct <- c()
+    CoeffF <- c()
+    FitF <- c()
     predicted_signal <- c()
 
     UpdatedSignalModel <- periodic_estimation_all(Data = UpdatedSeries, CP = UpdatedCP, var.est.t = var.est.t, lyear = lyear)
 
     predicted_signal <- UpdatedSignalModel$predict
-    coeff <- UpdatedSignalModel$coeff
-    funct <- UpdatedSignalModel$FitF
+    CoeffF <- UpdatedSignalModel$CoeffF
+    FitF <- UpdatedSignalModel$FitF
 
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
@@ -102,12 +102,12 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, RemoveData,
         auxiliar_data <- UpdatedSeries
         auxiliar_data$signal <- predicted_signal-mean.est.t
         period <- periodic_estimation_selb_init(auxiliar_data,var.est.t,lyear)
-        funct <- period$predict
-        coeff <- period$coeff
+        FitF <- period$predict
+        CoeffF <- period$CoeffF
     }
   } else {
-    funct <- FALSE
-    coeff <- FALSE
+    FitF <- FALSE
+    CoeffF <- FALSE
     Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
     predicted_signal = mean.est.t
@@ -116,9 +116,9 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, RemoveData,
   # compute SSR
   SSR <- sum(((UpdatedSeries$signal-predicted_signal)^2)/var.est.t,na.rm=TRUE)
   UpdatedPara$MonthVar <- MonthVar
-  UpdatedPara$Tmu   <-  Tmu
-  UpdatedPara$FitF  <-  funct
-  UpdatedPara$CoeffF <-  coeff
+  UpdatedPara$Tmu   <- Tmu
+  UpdatedPara$FitF  <- FitF
+  UpdatedPara$CoeffF <- CoeffF
   UpdatedPara$SSR <- SSR
   return(UpdatedPara)
 
@@ -171,8 +171,8 @@ periodic_estimation_all = function(Data,CP,var.est.t,lyear){
 
   result=list()
   result$predict=stats::predict(reg,DataF)
-  result$coeff_all=coeff_all
-  result$coeff=coeff
+  #result$coeff_all=coeff_all
+  result$CoeffF=coeff
   result$FitF=f
   return(result)
 }

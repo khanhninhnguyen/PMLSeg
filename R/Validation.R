@@ -37,52 +37,55 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
   ### validate if metadata exist and there is at least one CP
   if ((cond1==TRUE) & (cond2==TRUE))
   {
-    distance <- c()
-    Distance <- c()
-    CP <- c()
-    MetadataIndex <- c()
-
-    OneSeriesFull <- OneSeries %>%
-      tidyr::complete(date = seq(min(date), max(date), by = "day"))
-
-    CP <-  Tmu$end[-nrow(Tmu)]
-    CP_m <- which(OneSeriesFull$date %in% OneSeries$date[CP])
-
-    MetadataIndex <- which(OneSeriesFull$date %in% Metadata$date)
-
-    if (length(MetadataIndex)==0) {
-      MetadataIndex <- ifelse(max(Metadata$date) < min(OneSeriesFull$date), 1, length(OneSeriesFull$date))
+    # select metadata in the period of data or nearest to the left and right
+    ind = which(Metadata$date < min(OneSeries$date))
+    if(length(ind)>0) {
+      Metadata = Metadata[max(ind):length(Metadata),]
+    } 
+    ind = which(Metadata$date > max(OneSeries$date))
+    if(length(ind)>0) {
+      Metadata = Metadata[1:min(ind),]
     }
-
-    positions_df <- expand.grid(CP = CP, MetadataIndex = MetadataIndex) %>%
-      dplyr::mutate(
-        distance = mapply(function(x, y) sum(!is.na(OneSeriesFull$signal[x:y])),
-                          CP_m,
-                          MetadataIndex),
-        distance = distance -1
-      )
-
-    closest_results <- positions_df %>%
-      dplyr::group_by(CP) %>%
-      dplyr::summarise(
-        closestMetadata = Metadata$date[which.min(distance)],
-        Distance = min(distance)
-      ) %>%
-      dplyr::ungroup()
-
-    Out <- left_join(closest_results,Metadata,by=c("closestMetadata"="date"))
-    Out <- Out %>%
-     dplyr:: mutate(
-        CP = OneSeries$date[CP],
-        valid = ifelse(Distance < MaxDist, 1, 0))
+    # K = number of segments, M = number of metadata
+    K = nrow(Tmu);
+    M = nrow(Metadata);
+    CP = Tmu$tend[1:(K-1)]
+    Distance <- vector("numeric", K-1)
+    Meta <- vector("numeric", K-1)
+    
+    # squeeze OneSeries (remove dates when signal == NA)
+    OneSeriesRed = OneSeries[which(!is.na(OneSeries$signal)),]
+    
+    # search nearest metadata date for each CP
+    d <- matrix(nrow = K-1, ncol = M)
+    for(k in 1:K-1) {
+      dd = abs(OneSeriesRed$date - CP[k])
+      i_k = which.min(dd)
+      for(j in 1:M) {
+        dd = abs(OneSeriesRed$date - Metadata$date[j])
+        i_j = which.min(dd)
+        d[k, j] = abs(i_k - i_j)
+      }
+      j_k = which.min(d[k,])
+      Meta[k] = j_k
+      Distance[k] = d[k, j_k]
+    }
+    
+    # create output data frame
+    Out <- data.frame(CP = CP, 
+      closestMetadata = Metadata$date[Meta], 
+      type = Metadata$type[Meta], 
+      Distance = Distance, 
+      valid = ifelse(Distance < MaxDist, 1, 0))
   }
   else
   {
     if(cond2==TRUE){
-      print("no metadata")
+      print("the station has no metadata")
       ### set all valid to 0 if no metadata exist
+      CP = Tmu$tend
       valid = Tmu %>%
-        mutate(CP = OneSeries$date[Tmu$end],
+        mutate(CP = CP,
                closestMetadata = NA,
                type = "U",
                Distance = NA,

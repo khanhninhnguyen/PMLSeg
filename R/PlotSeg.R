@@ -3,7 +3,6 @@
 #' @param OneSeries a data frame, with size n x 2, containing the signal with n points and the dates in Date format. The names of the 2 columns are thus signal and date
 #' @param SegRes result from the segmentation funtion.
 #' @param FunctPart a boolean, specifies if the functional part should be plotted. Default is FALSE.
-#' @param RemoveData a data frame including the beginning and the end positions (time index) of the segments to be removed.
 #' @param Validated_CP_Meta the results from the Validation function. Default is NULL.
 #' @param Metadata a data frame with two columns: $date (in date format) and $type (label in string format)
 #' @param labelx a string for the label of the x-axis
@@ -20,7 +19,6 @@
 PlotSeg <- function(OneSeries,
                     SegRes,
                     FunctPart = TRUE,
-                    RemoveData = NULL,
                     Metadata = NULL,
                     Validated_CP_Meta = NULL,
                     labelx = "date",
@@ -31,9 +29,6 @@ PlotSeg <- function(OneSeries,
   MaxPoint = max(OneSeries$signal, na.rm = TRUE) + 0.5
   MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE)) - 0.5
 
-  if (!is.null(RemoveData) && is.na(RemoveData$begin[1])) {
-    RemoveData = NULL
-  }
   Month <- c()
   type <- c()
   value <- c()
@@ -81,15 +76,7 @@ PlotSeg <- function(OneSeries,
     shapes <- c(shapes, "valid" = 0)
   }
 
-  # Replace data in clusters by NA
-  # in signal
-  if (!is.null(RemoveData)) {
-    index <- unlist(lapply(1:nrow(RemoveData), function(x) {
-      RemoveData$begin[x]:RemoveData$end[x]
-    }))
-    OneSeries[index, c("signal")] <- NA
-  }
-  # in other variables
+  # If signal contains NA, do the same for other time series variables
   is_na_signal <- is.na(OneSeries$signal)
   if(sum(is_na_signal) > 0){
     if (FunctPart) {
