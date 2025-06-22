@@ -30,16 +30,16 @@
     n <- 1000                   # length of time series
     cp_ind <- c(200, 600)       # position of CPs (index in time series)
     segmt_mean <- c(-1, 1, 2)   # mean value of segments
-    noise_stdev <- 1            # noise std dev (identical for all months)
+    noise_stdev <- 1            # noise std dev
     set.seed(1)                 # initialise random generator
 
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df <- data.frame(date = mydate, signal = mysignal)
+    OneSeries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -48,35 +48,37 @@
 
 Run the segmentation with without functional:
 
-    seg = Segmentation(OneSeries = df, 
+    seg = Segmentation(OneSeries = OneSeries, 
                        FunctPart = FALSE)
     str(seg)
     #> List of 6
-    #>  $ Tmu     :'data.frame':    3 obs. of  5 variables:
-    #>   ..$ begin: int [1:3] 1 201 601
-    #>   ..$ end  : int [1:3] 200 600 1000
-    #>   ..$ mean : num [1:3] -0.959 0.999 1.97
-    #>   ..$ se   : num [1:3] 0.075 0.0538 0.053
-    #>   ..$ np   : int [1:3] 200 400 400
+    #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
+    #>   ..$ begin : int [1:3] 1 201 601
+    #>   ..$ end   : int [1:3] 200 600 1000
+    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" ...
+    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" ...
+    #>   ..$ mean  : num [1:3] -0.959 0.999 1.97
+    #>   ..$ se    : num [1:3] 0.075 0.0538 0.053
+    #>   ..$ np    : int [1:3] 200 400 400
     #>  $ FitF    : logi FALSE
     #>  $ CoeffF  : logi FALSE
     #>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
     #>  $ SSR     : num 926
     #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
 
-`Tmu` is a list which contains, for each segment: the index of beginning
-and end, the estimated mean and its standard erreor, and the number of
-valid data points (non-NA values in the signal):
+`Tmu` is a list which contains, for each segment: the index and date of
+beginning and end, the estimated mean and its standard erreor, and the
+number of valid data points (non-NA values in the signal):
 
-    seg$Tmu
-    #>   begin  end       mean         se  np
-    #> 1     1  200 -0.9590041 0.07503988 200
-    #> 2   201  600  0.9986774 0.05381478 400
-    #> 3   601 1000  1.9700134 0.05301899 400
+    print(seg$Tmu)
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  200 2010-01-01 2010-07-19 -0.9590041 0.07503988 200
+    #> 2   201  600 2010-07-20 2011-08-23  0.9986774 0.05381478 400
+    #> 3   601 1000 2011-08-24 2012-09-26  1.9700134 0.05301899 400
 
 ### 3. Visualization of the time series with segmentation results superposed
 
-    PlotSeg(OneSeries = df, 
+    PlotSeg(OneSeries = OneSeries, 
             SegRes = seg, 
             FunctPart = FALSE)
 
@@ -92,49 +94,47 @@ change-points.
 Metadata is represented by a data frame with 2 columns: `date`, `type`.
 
 For the example, we create a fake metadata data frame with the true
-dates of CPs and invented types of change
+dates of CPs
 
-    meta_date <- df$date[cp_ind]                          # date of metadata event = date of CP
-    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
-    metadata = data.frame(date = meta_date, type = meta_type)
-    metadata
-    #>         date            type
-    #> 1 2010-07-19 receiver_change
-    #> 2 2011-08-23  antenna_change
+    Metadata = data.frame(date = OneSeries$date[cp_ind], type = c("1", "2"))
+    print(Metadata)
+    #>         date type
+    #> 1 2010-07-19    1
+    #> 2 2011-08-23    2
 
 Plot with metadata:
 
-    PlotSeg(OneSeries = df, 
+    PlotSeg(OneSeries = OneSeries, 
             SegRes = seg, 
             FunctPart = FALSE, 
-            Metadata = metadata) 
+            Metadata = Metadata) 
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
-Validate estimated change-point positions wrt metadata:
+Validate estimated change-point positions wrt metadata with a maximum
+distance of 10 days:
 
-    valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-    valid = Validation(OneSeries = df, 
+    valid = Validation(OneSeries = OneSeries, 
                Tmu = seg$Tmu,
-               MaxDist =  valid_max_dist,
-               Metadata = metadata)
+               MaxDist =  10,
+               Metadata = Metadata)
     valid
     #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type            valid
-    #>   <date>     <date>             <dbl> <chr>           <dbl>
-    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
-    #> 2 2011-08-23 2011-08-23             0 antenna_change      1
+    #>   CP         closestMetadata Distance type  valid
+    #>   <date>     <date>             <dbl> <chr> <dbl>
+    #> 1 2010-07-19 2010-07-19             0 1         1
+    #> 2 2011-08-23 2011-08-23             0 2         1
 
-Note: valid$Distance gives the distance between estimated CP and
+Note: `valid$Distance` gives the distance between estimated CP and
 metadata
 
 Plot with metadata and validation results:
 
-    PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
 
-Validated change-points are indicated by a filled triangle at the bottom
+Validated change-points are indicated by the red squares at the bottom
 line.
 
 ### 5. Further explore the sensitivity of segmentation results to signal and noise parameters

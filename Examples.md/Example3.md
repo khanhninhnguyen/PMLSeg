@@ -110,7 +110,8 @@ Now, update the segmentation parameters and the time serie
     seg_updated <- UpdatedParametersForFixedCP(OneSeries = df, ResScreening = screening, FunctPart=FALSE)
     seg_updated
     #> $MonthVar
-    #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480 1.4346685 0.9308744 1.8745634 1.2375832 1.1062817
+    #>  [1] 1.1281267 0.8867889 1.3344776 1.0922765 1.2098637 1.1702334 1.2043480
+    #>  [8] 1.4346685 0.9308744 1.8745634 1.2375832 1.1062817
     #> 
     #> $Tmu
     #>   begin  end     tbegin       tend       mean         se  np
