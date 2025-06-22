@@ -103,10 +103,9 @@ Plot with Metadata:
     #> 1 2010-07-19      2010-07-19    1        0     1
     #> 2 2011-09-28      2011-08-23    2        6     1
 
-Note that the distance between the 2nd CP (index=636) and the nearest
-Metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
-
-Hence both CPs are validated.
+Note that the distance between the estimated date of the 2nd CP
+(2011-09-28) and nearest Metadata (2011-08-23) excludes the NA values,
+hence `np = 5` and the CP is validated.
 
     PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 
