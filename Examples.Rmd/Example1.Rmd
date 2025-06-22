@@ -60,12 +60,12 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 ### 2. Segmentation
 
-Run the segmentation with without functional and `VarMonthly=TRUE`:
+Run the segmentation with without functional and `VarMonthly=FALSE`:
 
 ```{r}
 seg = Segmentation(OneSeries = OneSeries, 
                    FunctPart = FALSE,
-                   VarMonthly = TRUE)
+                   VarMonthly = FALSE)
 str(seg)
 ```
 

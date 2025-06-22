@@ -46,11 +46,11 @@
 
 ### 2. Segmentation
 
-Run the segmentation with without functional and `VarMonthly=TRUE`:
+Run the segmentation with without functional and `VarMonthly=FALSE`:
 
     seg = Segmentation(OneSeries = OneSeries, 
                        FunctPart = FALSE,
-                       VarMonthly = TRUE)
+                       VarMonthly = FALSE)
     str(seg)
     #> List of 6
     #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
@@ -58,14 +58,14 @@ Run the segmentation with without functional and `VarMonthly=TRUE`:
     #>   ..$ end   : int [1:3] 200 600 1000
     #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" ...
     #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" ...
-    #>   ..$ mean  : num [1:3] -0.959 0.999 1.97
-    #>   ..$ se    : num [1:3] 0.075 0.0538 0.053
+    #>   ..$ mean  : num [1:3] -0.964 0.999 1.954
+    #>   ..$ se    : num [1:3] 0.0753 0.0533 0.0533
     #>   ..$ np    : int [1:3] 200 400 400
     #>  $ FitF    : logi FALSE
     #>  $ CoeffF  : logi FALSE
-    #>  $ MonthVar: num [1:12] 1.089 0.887 1.334 1.092 1.21 ...
-    #>  $ SSR     : num 926
-    #>  $ SSR_All : num [1:30] 1943 1092 926 923 914 ...
+    #>  $ MonthVar: num 1.14
+    #>  $ SSR     : num 941
+    #>  $ SSR_All : num [1:30] 1941 1102 941 937 928 ...
 
 `Tmu` is a list which contains, for each segment: the index and date of
 beginning and end, the estimated mean and its standard erreor, and the
@@ -73,9 +73,9 @@ number of valid data points (non-NA values in the signal):
 
     print(seg$Tmu)
     #>   begin  end     tbegin       tend       mean         se  np
-    #> 1     1  200 2010-01-01 2010-07-19 -0.9590041 0.07503988 200
-    #> 2   201  600 2010-07-20 2011-08-23  0.9986774 0.05381478 400
-    #> 3   601 1000 2011-08-24 2012-09-26  1.9700134 0.05301899 400
+    #> 1     1  200 2010-01-01 2010-07-19 -0.9644604 0.07534822 200
+    #> 2   201  600 2010-07-20 2011-08-23  0.9994054 0.05327923 400
+    #> 3   601 1000 2011-08-24 2012-09-26  1.9537044 0.05327923 400
 
 ### 3. Visualization of the time series with segmentation results superposed
 
