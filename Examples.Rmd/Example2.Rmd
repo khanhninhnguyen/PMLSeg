@@ -51,13 +51,13 @@ mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
 # true CP date
-CP_date <- mydate[cp_ind]                             # date of CP
+CP_date <- mydate[cp_ind]    # date of CP
 CP_date
 
 # define fake metadata from true CP dates
-meta_date <- CP_date                                  # date of metadata event = date of CP
-meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
-metadata = data.frame(date = meta_date, type = meta_type)
+meta_date <- CP_date        # date of metadata event = date of CP
+meta_type <- c("1", "2")    # type of metadata event
+Metadata = data.frame(date = meta_date, type = meta_type)
 
 # add NA's in the signal
 NA_ind <- seq(from = 100, to = 150, by = 1)  # 1st gap
@@ -65,11 +65,11 @@ mysignal[NA_ind] <- NA
 NA_ind <- seq(from = 580, to = 630, by = 1)  # 2nd gap 
 mysignal[NA_ind] <- NA
 
-# create a time series df
-df <- data.frame(date = mydate, signal = mysignal)
+# create a time series OneSeries
+OneSeries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -80,8 +80,9 @@ Note that the 1st gap lies within the 1st segment, while the 2nd gap is overlapp
 Run the segmentation without the functional part:
 
 ```{r}
-seg = Segmentation(OneSeries = df, 
-                   FunctPart = FALSE)
+seg = Segmentation(OneSeries = OneSeries, 
+                   FunctPart = FALSE,
+                   VarMonthly = FALSE)
 seg$Tmu
 ```
 
@@ -90,32 +91,32 @@ Hence, the gap does not hamper the validation (see below).
 
 ### 3. Visualization of the time series with segmentation results and metadata superposed
 
-Plot with metadata:
+Plot with Metadata:
 
 ```{r}
-PlotSeg(OneSeries = df, 
+PlotSeg(OneSeries = OneSeries, 
         SegRes = seg, 
         FunctPart = FALSE, 
-        Metadata = metadata) 
+        Metadata = Metadata) 
 ```
 
 ### 4. Validation of detected change-points with metadata
 
 ```{r}
 valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-valid = Validation(OneSeries = df, 
+valid = Validation(OneSeries = OneSeries, 
            Tmu = seg$Tmu,
            MaxDist =  valid_max_dist,
-           Metadata = metadata)
+           Metadata = Metadata)
 valid
 ```
 
-Note that the distance between the 2nd CP (index=636) and the nearest metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
+Note that the distance between the 2nd CP (index=636) and the nearest Metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
 
 Hence both CPs are validated.
 
 ```{r}
-PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 ```
 
 

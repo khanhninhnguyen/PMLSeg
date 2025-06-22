@@ -36,14 +36,14 @@
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 
     # true CP date
-    CP_date <- mydate[cp_ind]                             # date of CP
+    CP_date <- mydate[cp_ind]    # date of CP
     CP_date
     #> [1] "2010-07-19" "2011-08-23"
 
     # define fake metadata from true CP dates
-    meta_date <- CP_date                                  # date of metadata event = date of CP
-    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
-    metadata = data.frame(date = meta_date, type = meta_type)
+    meta_date <- CP_date        # date of metadata event = date of CP
+    meta_type <- c("1", "2")    # type of metadata event
+    Metadata = data.frame(date = meta_date, type = meta_type)
 
     # add NA's in the signal
     NA_ind <- seq(from = 100, to = 150, by = 1)  # 1st gap
@@ -51,11 +51,11 @@
     NA_ind <- seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
 
-    # create a time series df
-    df <- data.frame(date = mydate, signal = mysignal)
+    # create a time series OneSeries
+    OneSeries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -67,13 +67,14 @@ overlapping the 2nd change-point.
 
 Run the segmentation without the functional part:
 
-    seg = Segmentation(OneSeries = df, 
-                       FunctPart = FALSE)
+    seg = Segmentation(OneSeries = OneSeries, 
+                       FunctPart = FALSE,
+                       VarMonthly = FALSE)
     seg$Tmu
-    #>   begin  end       mean         se  np
-    #> 1     1  200 -0.8974084 0.08695923 149
-    #> 2   201  636  1.0046283 0.05436229 385
-    #> 3   637 1000  1.9698991 0.05627932 364
+    #>   begin  end     tbegin       tend      mean         se  np
+    #> 1     1  200 2010-01-01 2010-07-19 -0.897949 0.08778476 149
+    #> 2   201  636 2010-07-20 2011-09-28  1.003554 0.05461122 385
+    #> 3   637 1000 2011-09-29 2012-09-26  1.955391 0.05616446 364
 
 The first CP is detected at the right date but not the 2nd one because
 of the gap. However the missing data points do not count in `np`. Hence,
@@ -81,34 +82,32 @@ the gap does not hamper the validation (see below).
 
 ### 3. Visualization of the time series with segmentation results and metadata superposed
 
-Plot with metadata:
+Plot with Metadata:
 
-    PlotSeg(OneSeries = df, 
+    PlotSeg(OneSeries = OneSeries, 
             SegRes = seg, 
             FunctPart = FALSE, 
-            Metadata = metadata) 
+            Metadata = Metadata) 
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
 ### 4. Validation of detected change-points with metadata
 
     valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-    valid = Validation(OneSeries = df, 
+    valid = Validation(OneSeries = OneSeries, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,
-               Metadata = metadata)
+               Metadata = Metadata)
     valid
-    #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type            valid
-    #>   <date>     <date>             <dbl> <chr>           <dbl>
-    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
-    #> 2 2011-09-28 2011-08-23             5 antenna_change      1
+    #>           CP closestMetadata type Distance valid
+    #> 1 2010-07-19      2010-07-19    1        0     1
+    #> 2 2011-09-28      2011-08-23    2        6     1
 
 Note that the distance between the 2nd CP (index=636) and the nearest
-metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
+Metadata (index=600) excludes the NA values (up to 630): 636 - 631 = 5.
 
 Hence both CPs are validated.
 
-    PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
