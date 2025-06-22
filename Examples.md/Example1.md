@@ -46,10 +46,11 @@
 
 ### 2. Segmentation
 
-Run the segmentation with without functional:
+Run the segmentation with without functional and `VarMonthly=TRUE`:
 
     seg = Segmentation(OneSeries = OneSeries, 
-                       FunctPart = FALSE)
+                       FunctPart = FALSE,
+                       VarMonthly = TRUE)
     str(seg)
     #> List of 6
     #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
@@ -119,11 +120,9 @@ distance of 10 days:
                MaxDist =  10,
                Metadata = Metadata)
     valid
-    #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type  valid
-    #>   <date>     <date>             <dbl> <chr> <dbl>
-    #> 1 2010-07-19 2010-07-19             0 1         1
-    #> 2 2011-08-23 2011-08-23             0 2         1
+    #>           CP closestMetadata type Distance valid
+    #> 1 2010-07-19      2010-07-19    1        0     1
+    #> 2 2011-08-23      2011-08-23    2        0     1
 
 Note: `valid$Distance` gives the distance between estimated CP and
 metadata
