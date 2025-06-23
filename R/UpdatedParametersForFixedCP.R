@@ -1,8 +1,7 @@
-#' update the segmentation parameters based on the screening result
+#' update the segmentation parameters after the screening or the test
 #'
-#' @param OneSeries is a time series data frame with 2 columns, $signal and $date, each of size n x 1
-#' @param ResScreeningTest the output of the Cluster_screening() function or the Test_CP() function.
-#' @param RemoveData A data frame containing the beginning and end positions (time index) of the segments to be deleted in the data.
+#' @param OneSeriesUpd is a time series data frame with 2 columns, $signal and $date, each of size n x 1, updated from the screening
+#' @param UpdatedCP a vector of change-points remaining after screening or test.
 #' @param FunctPart a boolean indicating if the functional part should be modelled. Default is TRUE.
 #' @param selectionF a boolean indicating if the statistically significant parameters of the functional part should be selected. The level of the test is by default 0.001. Default is FALSE.
 #' @param VarMonthly indicates if the variance is assumed to be monthly (\code{VarMonthly=TRUE}) or homogeneous (\code{VarMonthly=FALSE}). Default is \code{TRUE}.
@@ -21,65 +20,37 @@
 #'
 #' @export
 
-UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=TRUE, selectionF=FALSE, VarMonthly=TRUE){
+UpdatedParametersForFixedCP <- function(OneSeriesUpd, UpdatedCP, FunctPart=TRUE, selectionF=FALSE, VarMonthly=TRUE){
 
-  UpdatedSeries <- c()
   UpdatedPara <- c()
 
-  UpdatedSeries <- OneSeries
-
-  if (ResScreeningTest$ChangeCP=="No") {
-    warning("Nothing to update...")
-    return(NULL)
-  }
-
-  RemoveData = ResScreeningTest$RemoveData
-  
-  # Remove data in cluster
-  if (!any(is.na(RemoveData))) {
-    segments <- sapply(1:nrow(RemoveData), function(i) {
-      RemoveData$begin[i]:RemoveData$end[i]
-      })
-    for (seg in segments) {
-      UpdatedSeries$signal[seg] <- NA
-    }
-  }
-
   # Estimate monthly variance parameters
-  UpdatedSeries$year  <- as.factor(format(UpdatedSeries$date,format='%Y'))
-  UpdatedSeries$month <- as.factor(format(UpdatedSeries$date,format='%m'))
-  UpdatedSeries$month <-  droplevels(UpdatedSeries$month)
-  UpdatedSeries$year  <-  droplevels(UpdatedSeries$year)
+   OneSeriesUpd$year  <- as.factor(format(OneSeriesUpd$date,format='%Y'))
+   OneSeriesUpd$month <- as.factor(format(OneSeriesUpd$date,format='%m'))
+   OneSeriesUpd$month <-  droplevels(OneSeriesUpd$month)
+   OneSeriesUpd$year  <-  droplevels(OneSeriesUpd$year)
 
   # Estimate the variance parameters and compute the variance time series
   if (VarMonthly==TRUE){
     # Estimate all Montly variances
-    sigma.est.month <- RobEstiMonthlyVariance(UpdatedSeries)
+    sigma.est.month <- RobEstiMonthlyVariance(OneSeriesUpd)
     MonthVar <- sigma.est.month^2
     # Compute the variance time series
-    var.est.t <-  MonthVar[as.numeric(UpdatedSeries$month)]
+    var.est.t <-  MonthVar[as.numeric(OneSeriesUpd$month)]
   } else {
     # Estimate one single variance
-    Y_diff <- diff(UpdatedSeries$signal[which(!is.na(UpdatedSeries$signal))])
+    Y_diff <- diff(OneSeriesUpd$signal[which(!is.na(OneSeriesUpd$signal))])
     sigma.est.month <- robustbase::Qn(Y_diff)/sqrt(2)
     MonthVar <- sigma.est.month^2
     # Compute the variance time series
-    var.est.t <- rep(MonthVar,length(UpdatedSeries$date))
+    var.est.t <- rep(MonthVar,length(OneSeriesUpd$date))
   }
-  var.est.t[which(is.na(UpdatedSeries$signal))] <- NA
+  var.est.t[which(is.na(OneSeriesUpd$signal))] <- NA
 
-  # Update begin and end of segments
-  # if(length(ResScreeningTest$UpdatedCP)>0){
-    # begin = c(1, ResScreeningTest$UpdatedCP + 1)
-    # end =  c(ResScreeningTest$UpdatedCP, nrow(OneSeries))
-  # } else{
-    # begin = 1
-    # end = nrow(OneSeries)
-  # }
 
   # Update CPs
-  UpdatedCP = which(UpdatedSeries$date %in% OneSeries$date[ResScreeningTest$UpdatedCP])
-  UpdatedCP <- c(UpdatedCP, nrow(UpdatedSeries))
+  UpdatedCP = which(OneSeriesUpd$date %in% OneSeriesUpd$date[UpdatedCP])
+  UpdatedCP <- c(UpdatedCP, nrow(OneSeriesUpd))
   # print(UpdatedCP)
 
   # Re-estimate means of segments and functional part
@@ -89,17 +60,17 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=T
     FitF <- c()
     predicted_signal <- c()
 
-    UpdatedSignalModel <- periodic_estimation_all(Data = UpdatedSeries, CP = UpdatedCP, var.est.t = var.est.t, lyear = lyear)
+    UpdatedSignalModel <- periodic_estimation_all(Data = OneSeriesUpd, CP = UpdatedCP, var.est.t = var.est.t, lyear = lyear)
 
     predicted_signal <- UpdatedSignalModel$predict
     CoeffF <- UpdatedSignalModel$CoeffF
     FitF <- UpdatedSignalModel$FitF
 
-    Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
+    Tmu <- FormatOptSegK(UpdatedCP,OneSeriesUpd,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
 
     if (selectionF==TRUE){
-        auxiliar_data <- UpdatedSeries
+        auxiliar_data <- OneSeriesUpd
         auxiliar_data$signal <- predicted_signal-mean.est.t
         period <- periodic_estimation_selb_init(auxiliar_data,var.est.t,lyear)
         FitF <- period$predict
@@ -108,13 +79,13 @@ UpdatedParametersForFixedCP <- function(OneSeries, ResScreeningTest, FunctPart=T
   } else {
     FitF <- FALSE
     CoeffF <- FALSE
-    Tmu <- FormatOptSegK(UpdatedCP,UpdatedSeries,var.est.t)
+    Tmu <- FormatOptSegK(UpdatedCP,OneSeriesUpd,var.est.t)
     mean.est.t  = rep(Tmu$mean,diff(c(0,Tmu$end)))
     predicted_signal = mean.est.t
   }
 
   # compute SSR
-  SSR <- sum(((UpdatedSeries$signal-predicted_signal)^2)/var.est.t,na.rm=TRUE)
+  SSR <- sum(((OneSeriesUpd$signal-predicted_signal)^2)/var.est.t,na.rm=TRUE)
   UpdatedPara$MonthVar <- MonthVar
   UpdatedPara$Tmu   <- Tmu
   UpdatedPara$FitF  <- FitF

@@ -40,8 +40,8 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     # select metadata in the period of data or nearest to the left and right
     ind = which(Metadata$date < min(OneSeries$date))
     if(length(ind)>0) {
-      Metadata = Metadata[max(ind):length(Metadata),]
-    } 
+      Metadata = Metadata[max(ind):nrow(Metadata),]
+    }
     ind = which(Metadata$date > max(OneSeries$date))
     if(length(ind)>0) {
       Metadata = Metadata[1:min(ind),]
@@ -52,30 +52,31 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     CP = Tmu$tend[1:(K-1)]
     Distance <- vector("numeric", K-1)
     Meta <- vector("numeric", K-1)
-    
+
     # squeeze OneSeries (remove dates when signal == NA)
     OneSeriesRed = OneSeries[which(!is.na(OneSeries$signal)),]
-    
+
     # search nearest metadata date for each CP
     d <- matrix(nrow = K-1, ncol = M)
-    for(k in 1:K-1) {
-      dd = abs(OneSeriesRed$date - CP[k])
-      i_k = which.min(dd)
+    for(k in 1:(K-1)) {
+      ddk = abs(OneSeriesRed$date - CP[k])
+      i_k = which.min(ddk)
       for(j in 1:M) {
-        dd = abs(OneSeriesRed$date - Metadata$date[j])
-        i_j = which.min(dd)
-        d[k, j] = abs(i_k - i_j)
-      }
+        ddj = abs(OneSeriesRed$date - Metadata$date[j])
+        i_j = which.min(ddj)
+       d[k, j] = abs(i_k - i_j)
+        }
       j_k = which.min(d[k,])
       Meta[k] = j_k
       Distance[k] = d[k, j_k]
+      Distance
     }
-    
+
     # create output data frame
-    Out <- data.frame(CP = CP, 
-      closestMetadata = Metadata$date[Meta], 
-      type = Metadata$type[Meta], 
-      Distance = Distance, 
+    Out <- data.frame(CP = CP,
+      closestMetadata = Metadata$date[Meta],
+      type = Metadata$type[Meta],
+      Distance = Distance,
       valid = ifelse(Distance < MaxDist, 1, 0))
   }
   else

@@ -9,9 +9,9 @@
 #' Note: it is recommended to replace the data inside the cluster(s) by NA in the general homogenization process
 #
 #' @param Tmu the segmentation results obtained from the Segmentation function
+#' @param alpha is the significance level of the test (value between 0 and 1). Default is 0.05.
 #' @param MaxDist the maximal number of days between change-points within a cluster. Default is 80.
-#' @param detail: if TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
-#' @param alpha: significance level of the test (value between 0 and 1). Default is 0.05.
+#' @param detail is a boolean. If TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
 #'
 #' @return
 #' \itemize{
