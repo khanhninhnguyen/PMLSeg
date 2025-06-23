@@ -52,16 +52,16 @@ set.seed(1)                         # initialise random generator
 date_end <- date_begin + n - 1
 mydate <- seq.Date(from = date_begin, to = date_end, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-df <- data.frame(date = mydate, signal = mysignal)
+OneSeries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
 CP_date <- mydate[cp_ind]
-plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 
 # define fake metadata from true CP dates
-meta_date <- CP_date                                  # date of metadata event = date of CP
-meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+meta_date <- CP_date              # date of metadata event = date of CP
+meta_type <- c("1", "2")          # type of metadata event
 metadata = data.frame(date = meta_date, type = meta_type)
 ```
 
@@ -70,19 +70,18 @@ metadata = data.frame(date = meta_date, type = meta_type)
 Run the segmentation with default parameters:
 
 ```{r}
-seg = Segmentation(OneSeries = df, 
-                   FunctPart = FALSE)
+SegRes = Segmentation(OneSeries = OneSeries, 
+                      FunctPart = FALSE)
 
-seg$Tmu
+SegRes$Tmu
 ```
 
 ### 3. Validate estimated change-point positions
 
 ```{r}
-valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
-valid <- Validation(OneSeries = df, 
-           Tmu = seg$Tmu,
-           MaxDist =  valid_max_dist,
+valid <- Validation(OneSeries = OneSeries, 
+           Tmu = SegRes$Tmu,
+           MaxDist =  10,
            Metadata = metadata)
 valid
 ```
@@ -90,8 +89,8 @@ valid
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
 ```{r}
-PlotSeg(OneSeries = df, 
-        SegRes = seg, 
+PlotSeg(OneSeries = OneSeries, 
+        SegRes = SegRes, 
         FunctPart = FALSE,
         Metadata = metadata, 
         Validated_CP_Meta = valid)
@@ -101,7 +100,7 @@ Note: the segmentation detects well the position of change points despite the st
 
 ### 5. Evaluate the error of the estimated noise variance
 ```{r}
-error <- seg$MonthVar - noise_stdev ** 2
+error <- SegRes$MonthVar - noise_stdev ** 2
 error / (noise_stdev ** 2)
 ```
 

@@ -37,52 +37,49 @@
     date_end <- date_begin + n - 1
     mydate <- seq.Date(from = date_begin, to = date_end, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    df <- data.frame(date = mydate, signal = mysignal)
+    OneSeries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
     CP_date <- mydate[cp_ind]
-    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example4_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
 
 
     # define fake metadata from true CP dates
-    meta_date <- CP_date                                  # date of metadata event = date of CP
-    meta_type <- c("receiver_change", "antenna_change")   # type of metadata event
+    meta_date <- CP_date              # date of metadata event = date of CP
+    meta_type <- c("1", "2")          # type of metadata event
     metadata = data.frame(date = meta_date, type = meta_type)
 
 ### 2. Segmentation
 
 Run the segmentation with default parameters:
 
-    seg = Segmentation(OneSeries = df, 
-                       FunctPart = FALSE)
+    SegRes = Segmentation(OneSeries = OneSeries, 
+                          FunctPart = FALSE)
 
-    seg$Tmu
-    #>   begin  end       mean         se  np
-    #> 1     1  200 -0.9851706 0.01745298 200
-    #> 2   201  601  0.9995062 0.01246875 401
-    #> 3   602 1000  1.9948656 0.01244232 399
+    SegRes$Tmu
+    #>   begin  end     tbegin       tend       mean         se  np
+    #> 1     1  200 2010-01-01 2010-07-19 -0.9851706 0.01745298 200
+    #> 2   201  601 2010-07-20 2011-08-24  0.9995062 0.01246875 401
+    #> 3   602 1000 2011-08-25 2012-09-26  1.9948656 0.01244232 399
 
 ### 3. Validate estimated change-point positions
 
-    valid_max_dist <- 10             # maximum distance wrt metadata for a CP to be validated
-    valid <- Validation(OneSeries = df, 
-               Tmu = seg$Tmu,
-               MaxDist =  valid_max_dist,
+    valid <- Validation(OneSeries = OneSeries, 
+               Tmu = SegRes$Tmu,
+               MaxDist =  10,
                Metadata = metadata)
     valid
-    #> # A tibble: 2 × 5
-    #>   CP         closestMetadata Distance type            valid
-    #>   <date>     <date>             <dbl> <chr>           <dbl>
-    #> 1 2010-07-19 2010-07-19             0 receiver_change     1
-    #> 2 2011-08-24 2011-08-23             1 antenna_change      1
+    #>           CP closestMetadata type Distance valid
+    #> 1 2010-07-19      2010-07-19    1        0     1
+    #> 2 2011-08-24      2011-08-23    2        1     1
 
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
-    PlotSeg(OneSeries = df, 
-            SegRes = seg, 
+    PlotSeg(OneSeries = OneSeries, 
+            SegRes = SegRes, 
             FunctPart = FALSE,
             Metadata = metadata, 
             Validated_CP_Meta = valid)
@@ -94,7 +91,7 @@ despite the steep variations in the noise
 
 ### 5. Evaluate the error of the estimated noise variance
 
-    error <- seg$MonthVar - noise_stdev ** 2
+    error <- SegRes$MonthVar - noise_stdev ** 2
     error / (noise_stdev ** 2)
     #>  [1]  0.08875807 -0.11321115  0.33447764  0.09227653  0.20986374  0.17023340
     #>  [7]  0.18342544  0.22360029 -0.16599028  0.87456341  0.23758318  0.10628167
