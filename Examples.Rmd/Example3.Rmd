@@ -67,18 +67,18 @@ abline(v = CP_date, col = "red", lty = 2)
 Run the segmentation without the functional part:
 
 ```{r}
-seg = Segmentation(OneSeries = OneSeries, 
+SegRes = Segmentation(OneSeries = OneSeries, 
                    FunctPart = FALSE,
                    VarMonthly = FALSE)
 
-print(seg$Tmu)
+print(SegRes$Tmu)
 ```
 
 ### 3. Visualization of the time series with segmentation results superposed
 
 ```{r}
 PlotSeg(OneSeries = OneSeries, 
-        SegRes = seg, 
+        SegRes = SegRes, 
         FunctPart = FALSE)
 ```
 
@@ -89,7 +89,7 @@ Note that the segmentation is able to detect all CPs, even those close to the be
 We want to remove the segments smaller than 80 days, either isolated or in clusters.
 
 ```{r}
-screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = 80)
+screening <- Cluster_screening(Tmu = SegRes$Tmu, MaxDist = 80)
 screening
 ```
 The Cluster_screening function returns information to update the segmentation dataframe.
@@ -97,8 +97,8 @@ The Cluster_screening function returns information to update the segmentation da
 Now, update the segmentation parameters and the time serie
 
 ```{r}
-seg_updated <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=FALSE, VarMonthly=FALSE)
-print(seg_updated)
+SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=FALSE, VarMonthly=FALSE)
+print(SegResUpd)
 
 OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
 ```
@@ -106,7 +106,7 @@ OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
 Plot the updated time series with the updated segmentation information.
 
 ```{r}
-PlotSeg(OneSeries = OneSeriesUpd, SegRes = seg_updated, FunctPart = FALSE)
+PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE)
 ```
 
 
@@ -114,10 +114,10 @@ PlotSeg(OneSeries = OneSeriesUpd, SegRes = seg_updated, FunctPart = FALSE)
 
 ```{r}
 Metadata = data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
-valid = Validation(OneSeries = df_screened, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = Metadata)
+valid = Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
 print(valid)
 
-p <- PlotSeg(OneSeries = df_screened, SegRes = seg_updated, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+p <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
 print(p)
 
 ```
