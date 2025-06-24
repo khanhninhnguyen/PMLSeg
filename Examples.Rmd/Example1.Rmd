@@ -51,10 +51,10 @@ set.seed(1)                 # initialise random generator
 # create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-OneSeries <- data.frame(date = mydate, signal = mysignal)
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = mydate[cp_ind], col = "red", lty = 2)
 ```
 
@@ -63,7 +63,7 @@ abline(v = mydate[cp_ind], col = "red", lty = 2)
 Run the segmentation with without functional and `VarMonthly=FALSE`:
 
 ```{r}
-seg = Segmentation(OneSeries = OneSeries, 
+seg = Segmentation(OneSeries = myseries, 
                    FunctPart = FALSE,
                    VarMonthly = FALSE)
 str(seg)
@@ -78,7 +78,7 @@ print(seg$Tmu)
 ### 3. Visualization of the time series with segmentation results superposed
 
 ```{r}
-PlotSeg(OneSeries = OneSeries, 
+PlotSeg(OneSeries = myseries, 
         SegRes = seg, 
         FunctPart = FALSE)
 ```
@@ -93,26 +93,26 @@ Metadata is represented by a data frame with 2 columns: `date`, `type`.
 For the example, we create a fake metadata data frame with the true dates of CPs
 
 ```{r}
-Metadata = data.frame(date = OneSeries$date[cp_ind], type = c("1", "2"))
-print(Metadata)
+metadata = data.frame(date = myseries$date[cp_ind], type = c("1", "2"))
+print(metadata)
 ```
 
 Plot with metadata:
 
 ```{r}
-PlotSeg(OneSeries = OneSeries, 
+PlotSeg(OneSeries = myseries, 
         SegRes = seg, 
         FunctPart = FALSE, 
-        Metadata = Metadata) 
+        Metadata = metadata) 
 ```
 
 Validate estimated change-point positions wrt metadata with a maximum distance of 10 days:
 
 ```{r}
-valid = Validation(OneSeries = OneSeries, 
+valid = Validation(OneSeries = myseries, 
            Tmu = seg$Tmu,
            MaxDist =  10,
-           Metadata = Metadata)
+           Metadata = metadata)
 valid
 ```
 Note: `valid$Distance` gives the distance between estimated CP and metadata
@@ -120,7 +120,7 @@ Note: `valid$Distance` gives the distance between estimated CP and metadata
 Plot with metadata and validation results:
 
 ```{r}
-PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
 Validated change-points are indicated by the red squares at the bottom line.

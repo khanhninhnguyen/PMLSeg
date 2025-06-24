@@ -36,10 +36,10 @@
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = mydate[cp_ind], col = "red", lty = 2)
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -48,7 +48,7 @@
 
 Run the segmentation with without functional and `VarMonthly=FALSE`:
 
-    seg = Segmentation(OneSeries = OneSeries, 
+    seg = Segmentation(OneSeries = myseries, 
                        FunctPart = FALSE,
                        VarMonthly = FALSE)
     str(seg)
@@ -56,8 +56,8 @@ Run the segmentation with without functional and `VarMonthly=FALSE`:
     #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
     #>   ..$ begin : int [1:3] 1 201 601
     #>   ..$ end   : int [1:3] 200 600 1000
-    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" ...
-    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" ...
+    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" "2011-08-24"
+    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" "2012-09-26"
     #>   ..$ mean  : num [1:3] -0.964 0.999 1.954
     #>   ..$ se    : num [1:3] 0.0753 0.0533 0.0533
     #>   ..$ np    : int [1:3] 200 400 400
@@ -79,7 +79,7 @@ number of valid data points (non-NA values in the signal):
 
 ### 3. Visualization of the time series with segmentation results superposed
 
-    PlotSeg(OneSeries = OneSeries, 
+    PlotSeg(OneSeries = myseries, 
             SegRes = seg, 
             FunctPart = FALSE)
 
@@ -97,28 +97,28 @@ Metadata is represented by a data frame with 2 columns: `date`, `type`.
 For the example, we create a fake metadata data frame with the true
 dates of CPs
 
-    Metadata = data.frame(date = OneSeries$date[cp_ind], type = c("1", "2"))
-    print(Metadata)
+    metadata = data.frame(date = myseries$date[cp_ind], type = c("1", "2"))
+    print(metadata)
     #>         date type
     #> 1 2010-07-19    1
     #> 2 2011-08-23    2
 
 Plot with metadata:
 
-    PlotSeg(OneSeries = OneSeries, 
+    PlotSeg(OneSeries = myseries, 
             SegRes = seg, 
             FunctPart = FALSE, 
-            Metadata = Metadata) 
+            Metadata = metadata) 
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 Validate estimated change-point positions wrt metadata with a maximum
 distance of 10 days:
 
-    valid = Validation(OneSeries = OneSeries, 
+    valid = Validation(OneSeries = myseries, 
                Tmu = seg$Tmu,
                MaxDist =  10,
-               Metadata = Metadata)
+               Metadata = metadata)
     valid
     #>           CP closestMetadata type Distance valid
     #> 1 2010-07-19      2010-07-19    1        0     1
@@ -129,7 +129,7 @@ metadata
 
 Plot with metadata and validation results:
 
-    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example1_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
 
