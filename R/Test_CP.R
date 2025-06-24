@@ -3,19 +3,19 @@
 #' Method:
 #' (1) test of the change in mean before and after each change-point (CP) with significance level alpha
 #'
-#' @param Tmu the segmentation results
+#' @param Tmu is a data frame containing the segmentation result (see the Segmentation function).
 #' @param detail is a boolean. If TRUE the output contains a $detail field with additional information on the test. Default is FALSE.
 #' @param alpha is the significance level of the test (value between 0 and 1). Default is 0.05.
 #'
 #' @return
 #' \itemize{
-#' \item \code{UpdatedCP}: The change-points remaining after testing.
-#' \item \code{ChangeCP}: "Yes" or "No", indicating whether the list of change-points changed after the test.
-#' \item \code{detail}: A data frame containing the results of the test of the mean difference before and after each CP, including the following columns:
+#' \item \code{UpdatedCP} is a list containing the position of CPs remaining after testing.
+#' \item \code{ChangeCP} is a string, "Yes" or "No", indicating whether the test changed the list of CPs.
+#' \item \code{detail} is a data frame containing the details of the test including the following columns:
 #'   \itemize{
-#'     \item \code{mu_L}, \code{mu_R}: Means of the segments before and after the change-point.
-#'     \item \code{se_L}, \code{se_R}: Standard errors of the means of the segments before and after the change-point.
-#'     \item \code{np_L}, \code{np_R}: Number of points before and after the change-point.
+#'     \item \code{mu_L}, \code{mu_R}: Means of the segments to the left and right of the CP.
+#'     \item \code{se_L}, \code{se_R}: Standard errors of the means of the segments to the left and right of the CP.
+#'     \item \code{np_L}, \code{np_R}: Number of points of the segments to the left and right of the CP.
 #'     \item \code{tstat}, \code{pval}, \code{signif}: t-value, p-value, and significance (0 or 1) of the test.
 #'   }
 #' }
@@ -24,62 +24,52 @@
 
 Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
-  UpdatedCP <-  c()
-  ChangeCP <- c()
-  Test_detail <- c()
+  UpdatedCP <- c()
+  ChangeCP <- "No"
+  Test_detail <- NULL
 
-  if(nrow(Tmu) > 1) {
-    # index of segment before and after each CP
-    SegBefInd = 1:(nrow(Tmu)-1)
-    SegAftInd = SegBefInd+1
-    SegmentsTest = data.frame(begin = SegBefInd, end = SegAftInd)
-
-    ### Test difference in mean before and after each cluster and update the list of CPs
-    UpdatedCP = Tmu$end[nrow(Tmu)]
-    # if(nrow(SegmentsTest) > 0) {
-      TValues <- sapply(1:nrow(SegmentsTest), function(x) {
-        D = Tmu$mean[SegmentsTest$begin[x]] - Tmu$mean[SegmentsTest$end[x]]
-        SD = sqrt(Tmu$se[SegmentsTest$begin[x]]^2 +
-                    Tmu$se[SegmentsTest$end[x]]^2)
-        D / SD
-      })
-      PValues <- sapply(TValues, function(x) {
-        (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
-      })
-      ### save test details in detail df
-      Test_detail <- data.frame(
-        mu_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$mean[SegmentsTest$begin]),
-        mu_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$mean[SegmentsTest$end]),
-        se_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$se[SegmentsTest$begin]),
-        se_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$se[SegmentsTest$end]),
-        np_L = ifelse (is.na(SegmentsTest$begin), NA, Tmu$np[SegmentsTest$begin]),
-        np_R = ifelse(is.na(SegmentsTest$end), NA, Tmu$np[SegmentsTest$end]),
-        tstat = TValues,
-        pval = PValues,
-        signif = ifelse(PValues > alpha, 0, 1)
-      )
-
-      ### replace the CPs whith those having a significant change in mean
-      ind_signif = which(PValues < alpha)
-      ReplacedCP = Tmu$end[SegmentsTest$begin[ind_signif]]
-
-      # Update the final list of CPs
-      UpdatedCP = sort(c(UpdatedCP, unlist(ReplacedCP)), decreasing = FALSE)
-      if (length(UpdatedCP)>0){
-        if(UpdatedCP[length(UpdatedCP)] == Tmu$end[nrow(Tmu)]) {
-          UpdatedCP <- UpdatedCP[-length(UpdatedCP)]
-        }
-      }
-    # }
-    if (length(ind_signif)<(nrow(Tmu)-1)){
-      ChangeCP <- "Yes"
-    } else {ChangeCP <- "No"}
-
+  if(nrow(Tmu) <= 1) {
+    warning("Nothing to test...")
+    return(NULL)
   } else {
-    ChangeCP <- "No"
-    Test_detail <- NULL
+    ### List of indices of segments to the left and right of each CP.
+    ind_left = 1:(nrow(Tmu)-1)
+    ind_right = ind_left+1
+    list_ind = data.frame(left = ind_left, right = ind_right)
+
+    ### Test difference in mean before and after each cluster and update the list of CPs.
+    CP = Tmu$end[1:(nrow(Tmu)-1)]
+    TValues <- sapply(1:nrow(list_ind), function(x) {
+      D = Tmu$mean[list_ind$left[x]] - Tmu$mean[list_ind$right[x]]
+      SD = sqrt(Tmu$se[list_ind$left[x]]^2 + Tmu$se[list_ind$right[x]]^2)
+      D / SD
+    })
+    PValues <- sapply(TValues, function(x) {
+      (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+    })
+    
+    ### save test details
+    Test_detail <- data.frame(
+      mu_L = ifelse(is.na(list_ind$left), NA, Tmu$mean[list_ind$left]),
+      mu_R = ifelse(is.na(list_ind$right), NA, Tmu$mean[list_ind$right]),
+      se_L = ifelse(is.na(list_ind$left), NA, Tmu$se[list_ind$left]),
+      se_R = ifelse(is.na(list_ind$right), NA, Tmu$se[list_ind$right]),
+      np_L = ifelse(is.na(list_ind$left), NA, Tmu$np[list_ind$left]),
+      np_R = ifelse(is.na(list_ind$right), NA, Tmu$np[list_ind$right]),
+      tstat = TValues,
+      pval = PValues,
+      signif = ifelse(PValues > alpha, 0, 1)
+    )
+
+    ### replace the CPs whith those having a significant change in mean
+    ind_signif = which(PValues < alpha)
+    UpdatedCP = CP[list_ind$left[ind_signif]]
+
+    ### set ChangeCP
+    if(length(UpdatedCP) < length(CP)) ChangeCP <- "Yes"
   }
 
+  ### Create outout list
   Out = list(UpdatedCP = UpdatedCP,
              ChangeCP = ChangeCP,
              detail = Test_detail)
