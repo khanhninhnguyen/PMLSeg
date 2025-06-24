@@ -43,7 +43,7 @@
     # define fake metadata from true CP dates
     meta_date <- CP_date        # date of metadata event = date of CP
     meta_type <- c("1", "2")    # type of metadata event
-    Metadata = data.frame(date = meta_date, type = meta_type)
+    metadata = data.frame(date = meta_date, type = meta_type)
 
     # add NA's in the signal
     NA_ind <- seq(from = 100, to = 150, by = 1)  # 1st gap
@@ -51,11 +51,11 @@
     NA_ind <- seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
 
-    # create a time series OneSeries
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    # create a time series myseries
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -67,7 +67,7 @@ overlapping the 2nd change-point.
 
 Run the segmentation without the functional part:
 
-    seg = Segmentation(OneSeries = OneSeries, 
+    seg = Segmentation(OneSeries = myseries, 
                        FunctPart = FALSE,
                        VarMonthly = FALSE)
     seg$Tmu
@@ -84,20 +84,20 @@ the gap does not hamper the validation (see below).
 
 Plot with Metadata:
 
-    PlotSeg(OneSeries = OneSeries, 
+    PlotSeg(OneSeries = myseries, 
             SegRes = seg, 
             FunctPart = FALSE, 
-            Metadata = Metadata) 
+            Metadata = metadata) 
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
 ### 4. Validation of detected change-points with metadata
 
     valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
-    valid = Validation(OneSeries = OneSeries, 
+    valid = Validation(OneSeries = myseries, 
                Tmu = seg$Tmu,
                MaxDist =  valid_max_dist,
-               Metadata = Metadata)
+               Metadata = metadata)
     valid
     #>           CP closestMetadata type Distance valid
     #> 1 2010-07-19      2010-07-19    1        0     1
@@ -107,6 +107,6 @@ Note that the distance between the estimated date of the 2nd CP
 (2011-09-28) and nearest Metadata (2011-08-23) excludes the NA values,
 hence `np = 6` and the CP is validated.
 
-    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example2_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />

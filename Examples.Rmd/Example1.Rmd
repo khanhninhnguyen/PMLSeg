@@ -69,7 +69,7 @@ seg = Segmentation(OneSeries = myseries,
 str(seg)
 ```
 
-`Tmu` is a list which contains, for each segment: the index and date of beginning and end, the estimated mean and its standard erreor, and the number of valid data points (non-NA values in the signal):
+`Tmu` is a data frame which contains, for each segment: the index and date of beginning and end, the estimated mean and its standard erreor, and the number of valid data points (non-NA values in the signal):
 
 ```{r}
 print(seg$Tmu)
