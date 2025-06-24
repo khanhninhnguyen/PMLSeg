@@ -37,11 +37,11 @@
     date_end <- date_begin + n - 1
     mydate <- seq.Date(from = date_begin, to = date_end, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
     CP_date <- mydate[cp_ind]
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example4_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -56,7 +56,7 @@
 
 Run the segmentation with default parameters:
 
-    SegRes = Segmentation(OneSeries = OneSeries, 
+    SegRes = Segmentation(OneSeries = myseries, 
                           FunctPart = FALSE)
 
     SegRes$Tmu
@@ -67,7 +67,7 @@ Run the segmentation with default parameters:
 
 ### 3. Validate estimated change-point positions
 
-    valid <- Validation(OneSeries = OneSeries, 
+    valid <- Validation(OneSeries = myseries, 
                Tmu = SegRes$Tmu,
                MaxDist =  10,
                Metadata = metadata)
@@ -78,7 +78,7 @@ Run the segmentation with default parameters:
 
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
-    PlotSeg(OneSeries = OneSeries, 
+    PlotSeg(OneSeries = myseries, 
             SegRes = SegRes, 
             FunctPart = FALSE,
             Metadata = metadata, 
@@ -93,8 +93,8 @@ despite the steep variations in the noise
 
     error <- SegRes$MonthVar - noise_stdev ** 2
     error / (noise_stdev ** 2)
-    #>  [1]  0.08875807 -0.11321115  0.33447764  0.09227653  0.20986374  0.17023340
-    #>  [7]  0.18342544  0.22360029 -0.16599028  0.87456341  0.23758318  0.10628167
+    #>  [1]  0.08875807 -0.11321115  0.33447764  0.09227653  0.20986374  0.17023340  0.18342544  0.22360029 -0.16599028  0.87456341
+    #> [11]  0.23758318  0.10628167
 
 The relative error on some months is quite large.
 

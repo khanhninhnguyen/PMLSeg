@@ -67,9 +67,9 @@ Run the segmentation with without functional and `VarMonthly=FALSE`:
     #>  $ SSR     : num 941
     #>  $ SSR_All : num [1:30] 1941 1102 941 937 928 ...
 
-`Tmu` is a list which contains, for each segment: the index and date of
-beginning and end, the estimated mean and its standard erreor, and the
-number of valid data points (non-NA values in the signal):
+`Tmu` is a data frame which contains, for each segment: the index and
+date of beginning and end, the estimated mean and its standard erreor,
+and the number of valid data points (non-NA values in the signal):
 
     print(seg$Tmu)
     #>   begin  end     tbegin       tend       mean         se  np

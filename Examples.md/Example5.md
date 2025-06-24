@@ -34,7 +34,7 @@
     coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
     set.seed(1)
 
-    # create a time series OneSeries with jumps and noise
+    # create a time series myseries with jumps and noise
     mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
     CP_date <- mydate[cp_ind]
@@ -48,10 +48,10 @@
 
     # add periodic function to the signal
     mysignal <- mysignal + f
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -60,7 +60,7 @@
 
 #### a. Run the segmentation without the functional part to see what happens
 
-    seg_nofunc <- Segmentation(OneSeries = OneSeries, FunctPart = FALSE)
+    seg_nofunc <- Segmentation(OneSeries = myseries, FunctPart = FALSE)
     seg_nofunc$Tmu
     #>    begin  end     tbegin       tend        mean         se  np
     #> 1      1   96 2010-03-01 2010-06-04 -0.23273344 0.10444403  96
@@ -73,7 +73,7 @@
     #> 8    668  794 2011-12-28 2012-05-02  2.80094194 0.09167862 127
     #> 9    795  848 2012-05-03 2012-06-25  2.01251370 0.14661834  54
     #> 10   849 1000 2012-06-26 2012-11-24  1.28919902 0.08452552 152
-    PlotSeg(OneSeries = OneSeries, SegRes = seg_nofunc, FunctPart = FALSE)
+    PlotSeg(OneSeries = myseries, SegRes = seg_nofunc, FunctPart = FALSE)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
@@ -81,25 +81,22 @@ The segmentation captures the periodic signal.
 
 #### b. Run the segmentation with the functional part
 
-    seg <- Segmentation(OneSeries = OneSeries, FunctPart = TRUE)
+    seg <- Segmentation(OneSeries = myseries, FunctPart = TRUE)
     seg$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  200 2010-03-01 2010-09-16 -0.9811789 0.07365093 200
     #> 2   201  600 2010-09-17 2011-10-21  0.9927344 0.05305705 400
     #> 3   601 1000 2011-10-22 2012-11-24  1.9736524 0.05240993 400
     seg$CoeffF
-    #>         cos1         sin1         cos2         sin2         cos3         sin3 
-    #>  0.999934155 -0.004612869  0.029097601  0.045766870 -0.022228194 -0.011661756 
-    #>         cos4         sin4 
-    #>  0.020905585  0.044686867
+    #>         cos1         sin1         cos2         sin2         cos3         sin3         cos4         sin4 
+    #>  0.999934155 -0.004612869  0.029097601  0.045766870 -0.022228194 -0.011661756  0.020905585  0.044686867
     seg$MonthVar
-    #>  [1] 1.1532654 1.1021487 1.0726657 0.9078918 1.1828747 1.1362753 1.0182985
-    #>  [8] 1.2283415 1.1333834 1.2671579 0.8289470 1.8600646
+    #>  [1] 1.1532654 1.1021487 1.0726657 0.9078918 1.1828747 1.1362753 1.0182985 1.2283415 1.1333834 1.2671579 0.8289470 1.8600646
     seg$SSR
     #> [1] 949.3834
     sum(seg$CoeffF^2)
     #> [1] 1.005895
-    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE)
+    PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -108,7 +105,7 @@ periodic signal is not well estimated by the functional part.
 
 #### c. Run segmentation with functional and selection of statistically significant coefficients
 
-    seg = Segmentation(OneSeries = OneSeries, FunctPart = TRUE, selectionF = TRUE)
+    seg = Segmentation(OneSeries = myseries, FunctPart = TRUE, selectionF = TRUE)
     seg$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  200 2010-03-01 2010-09-16 -0.9766652 0.07365093 200
@@ -118,13 +115,12 @@ periodic signal is not well estimated by the functional part.
     #>     cos1 
     #> 1.006829
     seg$MonthVar
-    #>  [1] 1.1532654 1.1021487 1.0726657 0.9078918 1.1828747 1.1362753 1.0182985
-    #>  [8] 1.2283415 1.1333834 1.2671579 0.8289470 1.8600646
+    #>  [1] 1.1532654 1.1021487 1.0726657 0.9078918 1.1828747 1.1362753 1.0182985 1.2283415 1.1333834 1.2671579 0.8289470 1.8600646
     seg$SSR
     #> [1] 952.2987
     sum(seg$CoeffF^2)
     #> [1] 1.013704
-    PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE)
+    PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE)
 
 <img src="../Examples.md/Example5_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 

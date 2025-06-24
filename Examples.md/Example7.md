@@ -63,10 +63,10 @@ bias, monthly variance, and gaps.
     mysignal[NA_ind] <- NA
 
     # create df with full signal
-    df <- data.frame(date = mydate, signal = mysignal)
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example7_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -75,7 +75,7 @@ bias, monthly variance, and gaps.
 
 #### a. Run the segmentation with `selectionK = "All"`
 
-    seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionK = "All")
+    seg = Segmentation(OneSeries = myseries, FunctPart = TRUE, selectionK = "All")
     seg$Tmu
     #> $mBIC
     #>   begin  end     tbegin       tend       mean         se  np

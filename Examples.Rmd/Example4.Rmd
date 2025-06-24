@@ -52,11 +52,11 @@ set.seed(1)                         # initialise random generator
 date_end <- date_begin + n - 1
 mydate <- seq.Date(from = date_begin, to = date_end, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-OneSeries <- data.frame(date = mydate, signal = mysignal)
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
 CP_date <- mydate[cp_ind]
-plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 
 # define fake metadata from true CP dates
@@ -70,7 +70,7 @@ metadata = data.frame(date = meta_date, type = meta_type)
 Run the segmentation with default parameters:
 
 ```{r}
-SegRes = Segmentation(OneSeries = OneSeries, 
+SegRes = Segmentation(OneSeries = myseries, 
                       FunctPart = FALSE)
 
 SegRes$Tmu
@@ -79,7 +79,7 @@ SegRes$Tmu
 ### 3. Validate estimated change-point positions
 
 ```{r}
-valid <- Validation(OneSeries = OneSeries, 
+valid <- Validation(OneSeries = myseries, 
            Tmu = SegRes$Tmu,
            MaxDist =  10,
            Metadata = metadata)
@@ -89,7 +89,7 @@ valid
 ### 4. Visualization of the time series with segmentation and validation results superposed
 
 ```{r}
-PlotSeg(OneSeries = OneSeries, 
+PlotSeg(OneSeries = myseries, 
         SegRes = SegRes, 
         FunctPart = FALSE,
         Metadata = metadata, 

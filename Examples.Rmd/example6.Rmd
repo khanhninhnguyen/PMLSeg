@@ -74,11 +74,11 @@ mysignal[NA_ind] <- NA
 NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
 mysignal[NA_ind] <- NA
 
-# create OneSeries with full signal
-OneSeries <- data.frame(date = mydate, signal = mysignal)
+# create myseries with full signal
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -87,20 +87,20 @@ abline(v = CP_date, col = "red", lty = 2)
 #### a. Run the segmentation with default parameters
 
 ```{r}
-SegRes = Segmentation(OneSeries = OneSeries)
-SegRes$Tmu
-SegRes$CoeffF
-SegRes$MonthVar
-SegRes$SSR
-sum(SegRes$CoeffF^2)
+seg = Segmentation(OneSeries = myseries)
+seg$Tmu
+seg$CoeffF
+seg$MonthVar
+seg$SSR
+sum(seg$CoeffF^2)
 
 # validate updated CP position wrt metadata
-Metadata <- data.frame(date = OneSeries$date[cp_ind], type = rep("True", (length(cp_ind))))
-valid <- Validation(OneSeries = OneSeries, Tmu = SegRes$Tmu, MaxDist = 10, Metadata = Metadata)
+metadata <- data.frame(date = myseries$date[cp_ind], type = rep("True", (length(cp_ind))))
+valid <- Validation(OneSeries = myseries, Tmu = seg$Tmu, MaxDist = 10, Metadata = metadata)
 valid
 
 # Plot the time series with RemoveData option
-PlotSeg(OneSeries = OneSeries, SegRes = SegRes, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
 A spurious CP is detected, due to confusion between noise, periodic signal and segmentation. 
@@ -110,7 +110,7 @@ Therefore, try the segmentation with ```selectionF = TRUE```.
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
 ```{r}
-seg_selectF = Segmentation(OneSeries = OneSeries, selectionF = TRUE)
+seg_selectF = Segmentation(OneSeries = myseries, selectionF = TRUE)
 seg_selectF$Tmu
 seg_selectF$CoeffF
 seg_selectF$MonthVar
@@ -118,11 +118,11 @@ seg_selectF$SSR
 sum(seg_selectF$CoeffF^2)
 
 # validate updated CP position wrt metadata
-valid = Validation(OneSeries = OneSeries, Tmu = seg_selectF$Tmu, MaxDist = 10, Metadata = Metadata)
+valid = Validation(OneSeries = myseries, Tmu = seg_selectF$Tmu, MaxDist = 10, Metadata = metadata)
 valid
 
 # Plot the time series with RemoveData option
-PlotSeg(OneSeries = OneSeries, SegRes = seg_selectF, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+PlotSeg(OneSeries = myseries, SegRes = seg_selectF, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
 The solution with selection does not have the spurious CP. Selection helps to reduce the confusion between periodic signal and segmentation.
@@ -136,45 +136,47 @@ Now run the cluster screening to remove the small segment at the end of time ser
 screening <- Cluster_screening(Tmu = seg_selectF$Tmu, MaxDist = 80)
 screening
 
-# update the segmentation dataframe if CPs have changed
+# update the segmentation results if CPs have changed
 if (screening$ChangeCP == "Yes") {
-    SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=TRUE)
-    OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
+    myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
+    seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
 } else {
-    SegResUpd <- seg_selectF
-    OneSeriesUpd <- OneSeries
+    myseries_updated <- myseries
+    seg_updated <- seg_selectF
 }
 
-SegResUpd$Tmu
-SegResUpd$CoeffF
-SegResUpd$MonthVar
-SegResUpd$SSR
-sum(SegResUpd$CoeffF^2)
+seg_updated$Tmu
+seg_updated$CoeffF
+seg_updated$MonthVar
+seg_updated$SSR
+sum(seg_updated$CoeffF^2)
 
-# plot the series with updated segmentation dataframe
-valid <- Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
-PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+# plot the series with updated segmentation results
+valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
+PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
 The ```UpdatedParametersForFixedCP``` has an option to select the statistically significant Fourier coefficients ```selectionF = TRUE```:
 
 ```{r}
-# update the segmentation dataframe with seletection
+# update the segmentation results with selectionF = TRUE
 if (screening$ChangeCP == "Yes") {
-    SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=TRUE, selectionF = TRUE)
+    myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
+    seg_updated <- UpdatedParametersForFixedCP(OneSeries = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE, selectionF = TRUE)
 } else {
-    SegResUpd <- seg_selectF
+    myseries_updated <- myseries
+    seg_updated <- seg_selectF
 }
 
-SegResUpd$Tmu
-SegResUpd$CoeffF
-SegResUpd$MonthVar
-SegResUpd$SSR
-sum(SegResUpd$CoeffF^2)
+seg_updated$Tmu
+seg_updated$CoeffF
+seg_updated$MonthVar
+seg_updated$SSR
+sum(seg_updated$CoeffF^2)
 
-# plot the series with updated segmentation dataframe
-valid <- Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
-PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+# plot the series with updated segmentation results
+valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
+PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
 

@@ -77,10 +77,10 @@ NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap
 mysignal[NA_ind] <- NA
 
 # create df with full signal
-df <- data.frame(date = mydate, signal = mysignal)
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(df$date, df$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -89,7 +89,7 @@ abline(v = CP_date, col = "red", lty = 2)
 #### a. Run the segmentation with `selectionK = "All"`
 
 ```{r}
-seg = Segmentation(OneSeries = df, FunctPart = TRUE, selectionK = "All")
+seg = Segmentation(OneSeries = myseries, FunctPart = TRUE, selectionK = "All")
 seg$Tmu
 seg$CoeffF
 seg$MonthVar

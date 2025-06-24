@@ -49,7 +49,7 @@ noise_stdev <- rep(1, 12)         # noise variance (Jan to Dec)
 coeff <- c(1, 0, 0, 0)              # Fourier Series coefficients (cos1, sin1, cos2, sin2...) up to order 4
 set.seed(1)
 
-# create a time series OneSeries with jumps and noise
+# create a time series myseries with jumps and noise
 mydate <- seq.Date(from = date_begin, to = date_begin + n - 1, by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
 CP_date <- mydate[cp_ind]
@@ -63,10 +63,10 @@ f <- rowSums(sapply(1:p, function(i) coeff[2*i-1]*cos(i*(t-t0+1)*(2*pi)/T) + coe
 
 # add periodic function to the signal
 mysignal <- mysignal + f
-OneSeries <- data.frame(date = mydate, signal = mysignal)
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 # plot signal and position of change-points (red dashed line)
-plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -75,9 +75,9 @@ abline(v = CP_date, col = "red", lty = 2)
 #### a. Run the segmentation without the functional part to see what happens
 
 ```{r}
-seg_nofunc <- Segmentation(OneSeries = OneSeries, FunctPart = FALSE)
+seg_nofunc <- Segmentation(OneSeries = myseries, FunctPart = FALSE)
 seg_nofunc$Tmu
-PlotSeg(OneSeries = OneSeries, SegRes = seg_nofunc, FunctPart = FALSE)
+PlotSeg(OneSeries = myseries, SegRes = seg_nofunc, FunctPart = FALSE)
 ```
 
 The segmentation captures the periodic signal.
@@ -85,13 +85,13 @@ The segmentation captures the periodic signal.
 #### b. Run the segmentation with the functional part
 
 ```{r}
-seg <- Segmentation(OneSeries = OneSeries, FunctPart = TRUE)
+seg <- Segmentation(OneSeries = myseries, FunctPart = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
 seg$SSR
 sum(seg$CoeffF^2)
-PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE)
+PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE)
 ```
 
 The segmentation now captures the CPs, at the right position, but the periodic signal is not well estimated by the functional part.
@@ -99,13 +99,13 @@ The segmentation now captures the CPs, at the right position, but the periodic s
 #### c. Run segmentation with functional and selection of statistically significant coefficients
 
 ```{r}
-seg = Segmentation(OneSeries = OneSeries, FunctPart = TRUE, selectionF = TRUE)
+seg = Segmentation(OneSeries = myseries, FunctPart = TRUE, selectionF = TRUE)
 seg$Tmu
 seg$CoeffF
 seg$MonthVar
 seg$SSR
 sum(seg$CoeffF^2)
-PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE)
+PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE)
 ```
 
 Both the CPs and functional part now correctly captured.

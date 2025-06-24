@@ -42,12 +42,12 @@ all the CPs in that cluster are removed.
     # create a data frame of time series with 2 columns: date, signal
     mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
     mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     CP_date <- mydate[cp_ind]                       # dates of CP
 
     # plot signal and position of change-points
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -56,11 +56,11 @@ all the CPs in that cluster are removed.
 
 Run the segmentation without the functional part:
 
-    SegRes = Segmentation(OneSeries = OneSeries, 
-                       FunctPart = FALSE,
-                       VarMonthly = FALSE)
+    seg = Segmentation(OneSeries = myseries, 
+                          FunctPart = FALSE,
+                          VarMonthly = FALSE)
 
-    print(SegRes$Tmu)
+    print(seg$Tmu)
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1   11 2010-01-01 2010-01-11  0.1667099 0.32492519  11
     #> 2    12  200 2010-01-12 2010-07-19 -0.9773856 0.07838786 189
@@ -73,8 +73,8 @@ Run the segmentation without the functional part:
 
 ### 3. Visualization of the time series with segmentation results superposed
 
-    PlotSeg(OneSeries = OneSeries, 
-            SegRes = SegRes, 
+    PlotSeg(OneSeries = myseries, 
+            SegRes = seg, 
             FunctPart = FALSE)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
@@ -87,7 +87,7 @@ to the beginning and end of the time series.
 We want to remove the segments smaller than 80 days, either isolated or
 in clusters.
 
-    screening <- Cluster_screening(Tmu = SegRes$Tmu, MaxDist = 80)
+    screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = 80)
     screening
     #> $UpdatedCP
     #> [1] 200 580
@@ -105,10 +105,13 @@ in clusters.
 The Cluster\_screening function returns information to update the
 segmentation dataframe.
 
-Now, update the segmentation parameters and the time serie
+Now, update the time serie and then the segmentation parameters (in that
+order)
 
-    SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=FALSE, VarMonthly=FALSE)
-    print(SegResUpd)
+    myseries_updated <- UpdateTimeSeries(OneSeries = myseries, RemoveData = screening$RemoveData)
+
+    seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart = FALSE, VarMonthly = FALSE)
+    print(seg_updated)
     #> $MonthVar
     #> [1] 1.155089
     #> 
@@ -127,24 +130,23 @@ Now, update the segmentation parameters and the time serie
     #> $SSR
     #> [1] 881.1525
 
-    OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
-
 Plot the updated time series with the updated segmentation information.
 
-    PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE)
+    PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = FALSE)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
 ### 5. Validation of change-points after screening
 
-    Metadata = data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
-    valid = Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
+    metadata <- data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
+
+    valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
     print(valid)
     #>           CP closestMetadata type Distance valid
     #> 1 2010-07-19      2010-07-19    1        0     1
     #> 2 2011-08-03      2011-08-23    2        1     1
 
-    p <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+    p <- PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
     print(p)
 
 <img src="../Examples.md/Example3_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />

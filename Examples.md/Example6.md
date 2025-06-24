@@ -59,11 +59,11 @@
     NA_ind = seq(from = 580, to = 630, by = 1)  # 2nd gap 
     mysignal[NA_ind] <- NA
 
-    # create OneSeries with full signal
-    OneSeries <- data.frame(date = mydate, signal = mysignal)
+    # create myseries with full signal
+    myseries <- data.frame(date = mydate, signal = mysignal)
 
     # plot signal and position of change-points (red dashed line)
-    plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+    plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
@@ -72,30 +72,28 @@
 
 #### a. Run the segmentation with default parameters
 
-    SegRes = Segmentation(OneSeries = OneSeries)
-    SegRes$Tmu
+    seg = Segmentation(OneSeries = myseries)
+    seg$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  199 2010-03-01 2010-09-15 -0.8967092 0.09561914 148
     #> 2   200  571 2010-09-16 2011-09-22  0.9128602 0.01369619 372
     #> 3   572  701 2011-09-23 2012-01-30  1.8608640 0.01494423  79
     #> 4   702  989 2012-01-31 2012-11-13  2.0044065 0.03642282 288
     #> 5   990 1000 2012-11-14 2012-11-24 -1.1441469 0.07603715  11
-    SegRes$CoeffF
-    #>        cos1        sin1        cos2        sin2        cos3        sin3 
-    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 
-    #>        cos4        sin4 
-    #> -0.00800733 -0.02794739
-    SegRes$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
-    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
-    SegRes$SSR
+    seg$CoeffF
+    #>        cos1        sin1        cos2        sin2        cos3        sin3        cos4        sin4 
+    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 -0.00800733 -0.02794739
+    seg$MonthVar
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
+    #> [12] 0.01868164
+    seg$SSR
     #> [1] 835.1317
-    sum(SegRes$CoeffF^2)
+    sum(seg$CoeffF^2)
     #> [1] 1.115087
 
     # validate updated CP position wrt metadata
-    Metadata <- data.frame(date = OneSeries$date[cp_ind], type = rep("True", (length(cp_ind))))
-    valid <- Validation(OneSeries = OneSeries, Tmu = SegRes$Tmu, MaxDist = 10, Metadata = Metadata)
+    metadata <- data.frame(date = myseries$date[cp_ind], type = rep("True", (length(cp_ind))))
+    valid <- Validation(OneSeries = myseries, Tmu = seg$Tmu, MaxDist = 10, Metadata = metadata)
     valid
     #>           CP closestMetadata type Distance valid
     #> 1 2010-09-15      2010-09-16 True        1     1
@@ -104,7 +102,7 @@
     #> 4 2012-11-13      2012-11-14 True        1     1
 
     # Plot the time series with RemoveData option
-    PlotSeg(OneSeries = OneSeries, SegRes = SegRes, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
@@ -116,7 +114,7 @@ number of CPs may be wanted. Therefore, try the segmentation with
 
 #### b. run segmentation with selection of statistically significant Fourier coefficients
 
-    seg_selectF = Segmentation(OneSeries = OneSeries, selectionF = TRUE)
+    seg_selectF = Segmentation(OneSeries = myseries, selectionF = TRUE)
     seg_selectF$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  199 2010-03-01 2010-09-15 -0.8965279 0.09561914 148
@@ -127,15 +125,15 @@ number of CPs may be wanted. Therefore, try the segmentation with
     #>     cos1 
     #> 1.004161
     seg_selectF$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
-    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
+    #> [12] 0.01868164
     seg_selectF$SSR
     #> [1] 841.1567
     sum(seg_selectF$CoeffF^2)
     #> [1] 1.008339
 
     # validate updated CP position wrt metadata
-    valid = Validation(OneSeries = OneSeries, Tmu = seg_selectF$Tmu, MaxDist = 10, Metadata = Metadata)
+    valid = Validation(OneSeries = myseries, Tmu = seg_selectF$Tmu, MaxDist = 10, Metadata = metadata)
     valid
     #>           CP closestMetadata type Distance valid
     #> 1 2010-09-15      2010-09-16 True        1     1
@@ -143,7 +141,7 @@ number of CPs may be wanted. Therefore, try the segmentation with
     #> 3 2012-11-13      2012-11-14 True        1     1
 
     # Plot the time series with RemoveData option
-    PlotSeg(OneSeries = OneSeries, SegRes = seg_selectF, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+    PlotSeg(OneSeries = myseries, SegRes = seg_selectF, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
 
@@ -168,66 +166,66 @@ time series.
     #> $ChangeCP
     #> [1] "Yes"
 
-    # update the segmentation dataframe if CPs have changed
+    # update the segmentation results if CPs have changed
     if (screening$ChangeCP == "Yes") {
-        SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=TRUE)
-        OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
+        myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
+        seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
     } else {
-        SegResUpd <- seg_selectF
-        OneSeriesUpd <- OneSeries
+        myseries_updated <- myseries
+        seg_updated <- seg_selectF
     }
 
-    SegResUpd$Tmu
+    seg_updated$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  199 2010-03-01 2010-09-15 -0.3753573 0.09561914 148
-    #> 2   200  574 2010-09-16 2011-09-25  1.5044014 0.01370054 375
-    #> 3   575 1000 2011-09-26 2012-11-24  2.4872546 0.01383366 364
-    SegResUpd$CoeffF
-    #>         cos1         sin1         cos2         sin2         cos3         sin3 
-    #>  1.000218275 -0.032170957  0.029128339  0.022356609 -0.029292154  0.010483136 
-    #>         cos4         sin4 
-    #> -0.005033549 -0.009957806
-    SegResUpd$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
-    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
-    SegResUpd$SSR
-    #> [1] 831.79
-    sum(SegResUpd$CoeffF^2)
-    #> [1] 1.003912
+    #> 2   200  574 2010-09-16 2011-09-25  1.5036789 0.01369372 375
+    #> 3   575 1000 2011-09-26 2012-11-24  2.3676473 0.01360512 375
+    seg_updated$CoeffF
+    #>         cos1         sin1         cos2         sin2         cos3         sin3         cos4         sin4 
+    #>  1.020716073  0.055655090  0.066497773  0.008607625 -0.050395883 -0.150476551  0.052732220  0.165367199
+    seg_updated$MonthVar
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
+    #> [12] 0.01868164
+    seg_updated$SSR
+    #> [1] 2219.188
+    sum(seg_updated$CoeffF^2)
+    #> [1] 1.104765
 
-    # plot the series with updated segmentation dataframe
-    valid <- Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
-    PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+    # plot the series with updated segmentation results
+    valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
+    PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
 
 The `UpdatedParametersForFixedCP` has an option to select the
 statistically significant Fourier coefficients `selectionF = TRUE`:
 
-    # update the segmentation dataframe with seletection
+    # update the segmentation results with selectionF = TRUE
     if (screening$ChangeCP == "Yes") {
-        SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=TRUE, selectionF = TRUE)
+        myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
+        seg_updated <- UpdatedParametersForFixedCP(OneSeries = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE, selectionF = TRUE)
     } else {
-        SegResUpd <- seg_selectF
+        myseries_updated <- myseries
+        seg_updated <- seg_selectF
     }
 
-    SegResUpd$Tmu
+    seg_updated$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  199 2010-03-01 2010-09-15 -0.3753573 0.09561914 148
     #> 2   200  574 2010-09-16 2011-09-25  1.5044014 0.01370054 375
     #> 3   575 1000 2011-09-26 2012-11-24  2.4872546 0.01383366 364
-    SegResUpd$CoeffF
+    seg_updated$CoeffF
     #> NULL
-    SegResUpd$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
-    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
-    SegResUpd$SSR
+    seg_updated$MonthVar
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260
+    #> [12] 0.01868164
+    seg_updated$SSR
     #> [1] 831.79
-    sum(SegResUpd$CoeffF^2)
+    sum(seg_updated$CoeffF^2)
     #> [1] 0
 
-    # plot the series with updated segmentation dataframe
-    valid <- Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
-    PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = TRUE, Metadata = Metadata, Validated_CP_Meta = valid)
+    # plot the series with updated segmentation results
+    valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
+    PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
 <img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />

@@ -53,12 +53,12 @@ set.seed(1)                                     # initialise random generator
 # create a data frame of time series with 2 columns: date, signal
 mydate <- seq.Date(from = as.Date("2010-01-01"), to = as.Date("2010-01-01")+(n-1), by = "day")
 mysignal <- simulate_time_series(cp_ind, segmt_mean, noise_stdev, n)
-OneSeries <- data.frame(date = mydate, signal = mysignal)
+myseries <- data.frame(date = mydate, signal = mysignal)
 
 CP_date <- mydate[cp_ind]                       # dates of CP
 
 # plot signal and position of change-points
-plot(OneSeries$date, OneSeries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
+plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
 abline(v = CP_date, col = "red", lty = 2)
 ```
 
@@ -67,18 +67,18 @@ abline(v = CP_date, col = "red", lty = 2)
 Run the segmentation without the functional part:
 
 ```{r}
-SegRes = Segmentation(OneSeries = OneSeries, 
-                   FunctPart = FALSE,
-                   VarMonthly = FALSE)
+seg = Segmentation(OneSeries = myseries, 
+                      FunctPart = FALSE,
+                      VarMonthly = FALSE)
 
-print(SegRes$Tmu)
+print(seg$Tmu)
 ```
 
 ### 3. Visualization of the time series with segmentation results superposed
 
 ```{r}
-PlotSeg(OneSeries = OneSeries, 
-        SegRes = SegRes, 
+PlotSeg(OneSeries = myseries, 
+        SegRes = seg, 
         FunctPart = FALSE)
 ```
 
@@ -89,35 +89,37 @@ Note that the segmentation is able to detect all CPs, even those close to the be
 We want to remove the segments smaller than 80 days, either isolated or in clusters.
 
 ```{r}
-screening <- Cluster_screening(Tmu = SegRes$Tmu, MaxDist = 80)
+screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = 80)
 screening
 ```
 The Cluster_screening function returns information to update the segmentation dataframe.
 
-Now, update the segmentation parameters and the time serie
+Now, update the time serie and then the segmentation parameters (in that order)
 
 ```{r}
-SegResUpd <- UpdatedParametersForFixedCP(OneSeries = OneSeries, ResScreening = screening, FunctPart=FALSE, VarMonthly=FALSE)
-print(SegResUpd)
+myseries_updated <- UpdateTimeSeries(OneSeries = myseries, RemoveData = screening$RemoveData)
 
-OneSeriesUpd <- UpdateTimeSeries(OneSeries, screening$RemoveData)
+seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart = FALSE, VarMonthly = FALSE)
+print(seg_updated)
+
 ```
 
 Plot the updated time series with the updated segmentation information.
 
 ```{r}
-PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE)
+PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = FALSE)
 ```
 
 
 ### 5. Validation of change-points after screening
 
 ```{r}
-Metadata = data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
-valid = Validation(OneSeries = OneSeriesUpd, Tmu = SegResUpd$Tmu, MaxDist = 10, Metadata = Metadata)
+metadata <- data.frame(date = CP_date[c(2, 6)], type = c("1", "2"))
+
+valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
 print(valid)
 
-p <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegResUpd, FunctPart = FALSE, Metadata = Metadata, Validated_CP_Meta = valid)
+p <- PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 print(p)
 
 ```
