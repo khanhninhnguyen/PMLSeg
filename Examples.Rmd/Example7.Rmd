@@ -100,6 +100,6 @@ It must be remembered that the model selection operates once the Maximum Likelih
 
 The model selection on this simulated case gives: `K=4` for `mBIC` and `Lav` and `K=5` for `BM_MJ` and `BM_slope`. The latter two criteria include a spurious CP in this case which is actually avoided when we set `selectionF = TRUE` (see Example 6) or `initf = "descendent"`.
 
-Based on a large set of simulations, we checked that all four criteria find the correct number of CPs with the recommended (default) strategy `selectionF = FALSE` and `initf = "both"`.
+Based on a large set of simulations, we checked that all four criteria find the correct number of CPs with the recommended (default) strategy `selectionF = FALSE` and `initf = "ascendent"`.
 
 
