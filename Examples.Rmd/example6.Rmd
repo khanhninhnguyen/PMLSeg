@@ -139,7 +139,7 @@ screening
 # update the segmentation results if CPs have changed
 if (screening$ChangeCP == "Yes") {
     myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
-    seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
+    seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
 } else {
     myseries_updated <- myseries
     seg_updated <- seg_selectF

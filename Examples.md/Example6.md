@@ -169,7 +169,7 @@ time series.
     # update the segmentation results if CPs have changed
     if (screening$ChangeCP == "Yes") {
         myseries_updated <- UpdateTimeSeries(OneSeries = myseries, screening$RemoveData)
-        seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
+        seg_updated <- UpdatedParametersForFixedCP(OneSeriesUpd = myseries_updated, UpdatedCP = screening$UpdatedCP, FunctPart=TRUE)
     } else {
         myseries_updated <- myseries
         seg_updated <- seg_selectF
@@ -178,18 +178,18 @@ time series.
     seg_updated$Tmu
     #>   begin  end     tbegin       tend       mean         se  np
     #> 1     1  199 2010-03-01 2010-09-15 -0.3753573 0.09561914 148
-    #> 2   200  574 2010-09-16 2011-09-25  1.5036789 0.01369372 375
-    #> 3   575 1000 2011-09-26 2012-11-24  2.3676473 0.01360512 375
+    #> 2   200  574 2010-09-16 2011-09-25  1.5044014 0.01370054 375
+    #> 3   575 1000 2011-09-26 2012-11-24  2.4872546 0.01383366 364
     seg_updated$CoeffF
     #>         cos1         sin1         cos2         sin2         cos3         sin3         cos4         sin4 
-    #>  1.020716073  0.055655090  0.066497773  0.008607625 -0.050395883 -0.150476551  0.052732220  0.165367199
+    #>  1.000218275 -0.032170957  0.029128339  0.022356609 -0.029292154  0.010483136 -0.005033549 -0.009957806
     seg_updated$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260
     #> [12] 0.01868164
     seg_updated$SSR
-    #> [1] 2219.188
+    #> [1] 831.79
     sum(seg_updated$CoeffF^2)
-    #> [1] 1.104765
+    #> [1] 1.003912
 
     # plot the series with updated segmentation results
     valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
