@@ -24,9 +24,9 @@
 
 Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
-  UpdatedCP <- c()
-  ChangeCP <- "No"
-  Test_detail <- NULL
+  updated_CP <- c()
+  changed_CP <- "No"
+  test_detail <- NULL
 
   if(nrow(Tmu) <= 1) {
     warning("Nothing to test...")
@@ -49,7 +49,7 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
     })
     
     ### save test details
-    Test_detail <- data.frame(
+    test_detail <- data.frame(
       mu_L = ifelse(is.na(list_ind$left), NA, Tmu$mean[list_ind$left]),
       mu_R = ifelse(is.na(list_ind$right), NA, Tmu$mean[list_ind$right]),
       se_L = ifelse(is.na(list_ind$left), NA, Tmu$se[list_ind$left]),
@@ -63,16 +63,16 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
     ### replace the CPs whith those having a significant change in mean
     ind_signif = which(PValues < alpha)
-    UpdatedCP = CP[list_ind$left[ind_signif]]
+    updated_CP = CP[list_ind$left[ind_signif]]
 
-    ### set ChangeCP
-    if(length(UpdatedCP) < length(CP)) ChangeCP <- "Yes"
+    ### set changed_CP
+    if(length(updated_CP) < length(CP)) changed_CP <- "Yes"
   }
 
   ### Create outout list
-  Out = list(UpdatedCP = UpdatedCP,
-             ChangeCP = ChangeCP,
-             detail = Test_detail)
+  Out = list(UpdatedCP = updated_CP,
+             ChangeCP = changed_CP,
+             detail = test_detail)
 
   return(Out)
 }
