@@ -30,7 +30,7 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
   if(nrow(Tmu) <= 1) {
     warning("Nothing to test...")
-    return(NULL)
+   # return(NULL)
   } else {
     ### List of indices of segments to the left and right of each CP.
     ind_left = 1:(nrow(Tmu)-1)
@@ -47,7 +47,7 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
     PValues <- sapply(TValues, function(x) {
       (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
     })
-    
+
     ### save test details
     test_detail <- data.frame(
       mu_L = ifelse(is.na(list_ind$left), NA, Tmu$mean[list_ind$left]),
