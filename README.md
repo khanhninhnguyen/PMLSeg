@@ -201,15 +201,6 @@ position of change-points:
     #> 1 2010-07-19    R
     #> 2 2011-08-23  RAD
 
-Plot with metadata:
-
-    PlotSeg(OneSeries = df, 
-            SegRes = seg, 
-            FunctPart = FALSE, 
-            Metadata = metadata) 
-
-<img src="README_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="100%" />
-
 Validate estimated change-point positions wrt metadata:
 
     valid_max_dist = 10             # maximum distance wrt metadata for a CP to be validated
@@ -229,7 +220,7 @@ Plot with metadata and validation results:
 
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-12-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-11-1.png" width="100%" />
 
 Validated change-points are indicated by a filled triangle at the bottom
 line.
