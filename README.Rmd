@@ -204,7 +204,8 @@ Plot with metadata and validation results:
 PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
 ```
 
-Validated change-points are indicated by a filled triangle at the bottom line.
+Metadata are indicated by grey symbols near the top of the figure.
+Validated change-points are indicated by a red squares at the bottom of the figure.
 
 ### Other examples 
 

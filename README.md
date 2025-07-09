@@ -222,8 +222,9 @@ Plot with metadata and validation results:
 
 <img src="README_files/figure-markdown_strict/unnamed-chunk-11-1.png" width="100%" />
 
-Validated change-points are indicated by a filled triangle at the bottom
-line.
+Metadata are indicated by grey symbols near the top of the figure.
+Validated change-points are indicated by a red squares at the bottom of
+the figure.
 
 ### Other examples
 
