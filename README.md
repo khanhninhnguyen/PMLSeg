@@ -235,7 +235,7 @@ cluster screening function (see Example 3), we found it useful to
 provide a test function which can be used in a post-segmentation step to
 evaluate the significance of the detected change-points. In practice, it
 comes out that the change-points detected by PMLseg are almost always
-significant at the leve 0.05.
+significant at the level 0.05.
 
 
     test <- Test_CP(Tmu = seg$Tmu, alpha = 0.05, detail = TRUE)
@@ -257,10 +257,11 @@ significant at the leve 0.05.
 The test structure provides the list of updated change-points
 `UpdatedCP`, the variable `ChangeCP` indicates if the list has been
 changed compared to the input vector `Tmu`. An optinal variable `detail`
-is returned if the input option `detail` is TRUE. It provides
+is returned if the input option `detail` is TRUE. It provides the input
 information on the pairs of segments to the left and to the right of
 each change-point which have been used for the test, and the test
-results, `signif`, `tstat`, and `pval`.
+outputs, `tstat`, `pval`, and `signif`, where `signif` = 1 means that a
+change-point is significant (this is the case when `pval < alpha`).
 
 ### Other examples
 
