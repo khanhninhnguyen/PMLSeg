@@ -49,55 +49,19 @@ devtools::install_github("khanhninhnguyen/PMLSeg")
 The package contains the following functions:
 
 ```{r, eval=FALSE}
-Segmentation(
-  OneSeries,            # time series (data frame with 2 columns: $signal, $date in Date format)
-  lmin = 1,             # minimum length of the segments
-  Kmax = 30,            # maximal number of segments
-  selectionK = "BM_BJ", # penalty criterion used for the model selection
-  FunctPart = TRUE,     # if TRUE include a functional part (Fourier Series) to model the periodic bias
-  selectionF = FALSE,   # if TRUE select the significant coefficients of the functional part
-  initf = "ascendent",  # initialization mode of the iterative inference procedure
-  VarMonthly = TRUE     # if TRUE use of monthly variance model, otherwise a constant variance.
-)
+Segmentation: estimates the position of change-points in a time series
 
-Validation(
-  OneSeries,            # time series data frame
-  Tmu,                  # estimated change-point information, output from Segmentation function
-  MaxDist = 62,         # maximum distance (in days) between detected CP in Tmu and known events in Metadata
-  Metadata              # data frame with two columns: $date and the $type
-)
+Validation: finds the closest metadata events for each change-point
 
-Cluster_screening(
-  Tmu,                  # estimated change-point information
-  MaxDist = 80,         # maximal number of days between change-points within a cluster
-  alpha = 0.05,         # significance level of test
-  detail = FALSE        # if TRUE the output contains a $detail field with additional information on the test
-)
+Cluster_screening: detects clusters of change-points (based on a statistical test)
 
-Test_CP(
-  Tmu,                  # estimated change-point information
-  alpha = 0.05,         # significance level of test
-  detail = FALSE        # if TRUE the output contains a $detail field with additional information on the test
-)
+Test_CP: tests significance of every change-point
 
-UpdatedParametersForFixedCP(
-  OneSeries,            # time series data frame
-  ResScreeningTest,     # output from Cluster_screening function or Test_CP function
-  FunctPart = TRUE,     # if TRUE update functional part
-  selectionF = FALSE,   # if TRUE select significant coefficients in the functional
-  VarMonthly = TRUE     # if TRUE use of monthly variance model, otherwise a constant variance
-)
+UpdateTimeSeries: removes data from the time-series in the clusters
 
-PlotSeg(
-  OneSeries,            # time series data frame
-  SegRes,               # output from Segmentation function
-  FunctPart = TRUE,     # if TRUE plot functional
-  Metadata = NULL,      # if not NULL plot metadata
-  Validated_CP_Meta = NULL, # if not NULL plot validation result
-  labelx = "date",
-  labely = "signal",
-  title = "Segmented time series"
-)
+UpdatedParametersForFixedCP: removes change-points in the clusters
+
+PlotSeg: plots time series, change-points, metadata and validation results
 ```
 
 Usage and help on functions can be found by ?"function" in R console, e.g.
