@@ -114,8 +114,8 @@ series. More examples are given in the `Examples.md/` folder.
     #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
     #>   ..$ begin : int [1:3] 1 201 601
     #>   ..$ end   : int [1:3] 200 600 1000
-    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" ...
-    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" ...
+    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" "2011-08-24"
+    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" "2012-09-26"
     #>   ..$ mean  : num [1:3] -0.959 0.999 1.97
     #>   ..$ se    : num [1:3] 0.075 0.0538 0.053
     #>   ..$ np    : int [1:3] 200 400 400
@@ -211,12 +211,9 @@ significant at the level 0.05.
     #> [1] "No"
     #> 
     #> $detail
-    #>         mu_L      mu_R       se_L       se_R np_L np_R     tstat          pval
-    #> 1 -0.9590041 0.9986774 0.07503988 0.05381478  200  400 -21.20037 9.474104e-100
-    #> 2  0.9986774 1.9700134 0.05381478 0.05301899  400  400 -12.85772  7.783979e-38
-    #>   signif
-    #> 1      1
-    #> 2      1
+    #>         mu_L      mu_R       se_L       se_R np_L np_R     tstat          pval signif
+    #> 1 -0.9590041 0.9986774 0.07503988 0.05381478  200  400 -21.20037 9.474104e-100      1
+    #> 2  0.9986774 1.9700134 0.05381478 0.05301899  400  400 -12.85772  7.783979e-38      1
 
 The test structure provides the list of updated change-points
 `UpdatedCP`, the variable `ChangeCP` indicates if the list has been
@@ -230,7 +227,12 @@ change-point is significant (this is the case when `pval < alpha`).
 ### Other examples
 
 See the other examples with more complex signals in the `Examples.md/`
-folder.
+folder: - Example 1: time series with 2 change-points and constant
+noise - Example 2: time series with missing data - Example 3: time
+series with clusters of CPs - Example 4: time series with monthly
+varying variance - Example 5: time series with periodic bias - Example
+6: time series with periodic bias, monthly variance, and gaps - Example
+7: Explore the different penalty criteria
 
 ## References
 
