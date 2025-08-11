@@ -227,12 +227,16 @@ change-point is significant (this is the case when `pval < alpha`).
 ### Other examples
 
 See the other examples with more complex signals in the `Examples.md/`
-folder: - Example 1: time series with 2 change-points and constant
-noise - Example 2: time series with missing data - Example 3: time
-series with clusters of CPs - Example 4: time series with monthly
-varying variance - Example 5: time series with periodic bias - Example
-6: time series with periodic bias, monthly variance, and gaps - Example
-7: Explore the different penalty criteria
+folder:
+
+-   Example 1: time series with 2 change-points and constant noise
+-   Example 2: time series with missing data
+-   Example 3: time series with clusters of CPs
+-   Example 4: time series with monthly varying variance
+-   Example 5: time series with periodic bias
+-   Example 6: time series with periodic bias, monthly variance, and
+    gaps
+-   Example 7: Explore the different penalty criteria
 
 ## References
 
