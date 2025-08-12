@@ -138,7 +138,7 @@ PlotSeg <- function(OneSeries,
 
   # plot functional
   if (FunctPart==TRUE){
-    p <- p + geom_line(data=subset(long_data, variable == "FitF"), size = 0.5, na.rm = TRUE)
+    p <- p + geom_line(data=subset(long_data, variable == "FitF"), linewidth = 0.5, na.rm = TRUE)
   }
 
   # Add vertical lines for CPs detected by segmentation
@@ -181,7 +181,7 @@ PlotSeg <- function(OneSeries,
 
   # Add labels
   p <- p +
-      scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
+      # scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
       scale_color_manual(values = colors) +
       labs(x = labelx, y = labely, color = "", fill = "") +
       theme(
