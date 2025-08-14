@@ -30,10 +30,10 @@ method can be found in (Quarello, Bock, and Lebarbier 2022).
 The development version of `PMLSeg` can be installed from GitHub with:
 
 
-    # Install devtools, tidyr, and purr if you haven't already
-    install.packages("devtools")
-    install.packages("tidyr")
-    install.packages("purr")
+    # Install devtools, tidyr, and purrr if you haven't already
+    install.packages("devtools", dependencies = TRUE))
+    install.packages("tidyr", dependencies = TRUE))
+    install.packages("purrr", dependencies = TRUE))
 
     # Download and install gfpop from
     https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
