@@ -10,8 +10,7 @@
 #' @param title a string for the title of plot
 #' @param ylims a vector with 2 columns for fixing the limits of the y-axis
 #'
-#' @return a object of class \code{\link[ggplot2]{ggplot}} representing the
-#'   time series plot with segmentation and validation results overlaid.
+#' @return object of class \code{\link[ggplot2]{ggplot}}
 #'
 #' @import ggplot2
 #' @importFrom dplyr mutate %>% group_by summarise
@@ -29,22 +28,23 @@ PlotSeg <- function(OneSeries,
                     ylims = NULL
                     )
 {
-    MaxPoint = max(OneSeries$signal, na.rm = TRUE)*1.1
-    MinPoint = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE))*1.1
-
-    if(!is.null(ylims)) {
-        MinPoint = ylims[1]
-        MaxPoint = ylims[2]
-    }
-
+    ### initialise
     Month <- c()
     type <- c()
     value <- c()
     variable <- c()
     shapes <- c()
-
     colors <- c("signal" = "gray", "Mean" = "red", "FitF" = "purple", "MonthStd" = "cyan")
     metadata_colors <- c("A" = "green", "R" = "magenta")
+
+    ### set y values for metadata markers (near top) and plot of functional (near bottom)
+    if(!is.null(ylims)) {
+        y_funcpart = ylims[1]
+        y_metadata = ylims[2]
+    } else {
+        y_metadata = max(OneSeries$signal, na.rm = TRUE)*1.1
+        y_funcpart = min(OneSeries$signal, na.rm = TRUE) - max(max(sqrt(SegRes$MonthVar)), max(SegRes$FitF, na.rm = TRUE))*1.1
+    }
 
     # mutate OneSeries
     OneSeries <- OneSeries %>%
@@ -59,13 +59,12 @@ PlotSeg <- function(OneSeries,
     }
 
     OneSeries <- OneSeries %>%
-    mutate(MonthStd = sqrt(var.est.t) - abs(MinPoint)) %>%
+    mutate(MonthStd = sqrt(var.est.t) + y_funcpart) %>%
     dplyr::select(-Month)
-
 
     if (FunctPart==TRUE){
         OneSeries <- OneSeries %>%
-        mutate( FitF = SegRes$FitF - abs(MinPoint))
+        mutate( FitF = SegRes$FitF + y_funcpart)
     }
 
     # dates of CPs
@@ -77,7 +76,7 @@ PlotSeg <- function(OneSeries,
     if (!is.null(Validated_CP_Meta)) {
         validCP = Validated_CP_Meta$CP[which(Validated_CP_Meta$valid == 1)]
         OneSeries <- OneSeries %>%
-        mutate(valid = ifelse(date %in% validCP, MinPoint, NA))
+        mutate(valid = ifelse(date %in% validCP, y_funcpart, NA))
         # shape for validated: open square (shapes = 0)
         shapes <- c(shapes, "valid" = 0)
     }
@@ -113,11 +112,11 @@ PlotSeg <- function(OneSeries,
 
         for (type in types) {
             spec_date = Metadata$date[Metadata$type == type] %>% unlist()
-            OneSeries[[type]][OneSeries$date %in% spec_date] <- MaxPoint
+            OneSeries[[type]][OneSeries$date %in% spec_date] <- y_metadata
         }
     } else {
         OneSeries <- OneSeries %>%
-        mutate(Meta = ifelse(date %in% Metadata, MaxPoint, NA))
+        mutate(Meta = ifelse(date %in% Metadata, y_metadata, NA))
         # shapes <- c(shapes, "Meta" = 1)
     }
 
@@ -132,7 +131,7 @@ PlotSeg <- function(OneSeries,
     )
     long_data$variable = factor(long_data$variable, levels = variable_names)
 
-    # plot the signal, Mean, MonthStd + add zero line for signal (y=0) and MonthStd (y=MinPoint)
+    # plot the signal, Mean, MonthStd + add zero line for signal (y=0) and MonthStd (y=y_funcpart)
     p <- ggplot2::ggplot(long_data, aes(x = date, y = value, colour = variable, shape = variable)) +
         theme_bw() +
         geom_line(data = subset(long_data, variable %in% c("signal")),
@@ -140,7 +139,7 @@ PlotSeg <- function(OneSeries,
         geom_line(data = subset(long_data, variable %in% c("Mean", "MonthStd")),
               aes(color = variable), linewidth = 0.5, na.rm = TRUE) +
         geom_hline(yintercept = 0, size = 0.3, lty = 1, color = "black",na.rm = TRUE) +
-        geom_hline(yintercept = MinPoint, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
+        geom_hline(yintercept = y_funcpart, size = 0.3, lty = 1, color = "black",na.rm = TRUE)
 
     # plot functional
     if (FunctPart==TRUE){
