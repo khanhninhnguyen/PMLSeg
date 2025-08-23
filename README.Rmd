@@ -115,7 +115,8 @@ df <- data.frame(date = mydate, signal = mysignal)
 
 ```{r}
 seg = Segmentation(OneSeries = df, 
-                   FunctPart = FALSE)
+                   FunctPart = FALSE,
+                   VarMonthly = FALSE)
 str(seg)
 ```
 
