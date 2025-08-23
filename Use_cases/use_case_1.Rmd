@@ -128,6 +128,8 @@ if (screening$ChangeCP == "Yes"){
 
     ### plot with validation results
     p <- PlotSeg(OneSeries = OneSeries_updated, SegRes = seg_updated, FunctPart = TRUE, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = validUpd, title = mytitle)
+    print(p)
+    
 } else {
     print(sprintf(" => screening %s, %s: nothing removed", station_name, criterion))
     OneSeries_updated <- OneSeries

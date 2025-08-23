@@ -6,27 +6,9 @@
 
     rm(list = ls())
     library(purrr)
-    #> Warning: le package 'purrr' a été compilé avec la version R 4.4.3
     library(lubridate)
-    #> Warning: le package 'lubridate' a été compilé avec la version R 4.4.3
-    #> 
-    #> Attachement du package : 'lubridate'
-    #> Les objets suivants sont masqués depuis 'package:base':
-    #> 
-    #>     date, intersect, setdiff, union
     library(dplyr)
-    #> 
-    #> Attachement du package : 'dplyr'
-    #> Les objets suivants sont masqués depuis 'package:stats':
-    #> 
-    #>     filter, lag
-    #> Les objets suivants sont masqués depuis 'package:base':
-    #> 
-    #>     intersect, setdiff, setequal, union
     library(ggplot2)
-    #> Warning: le package 'ggplot2' a été compilé avec la version R 4.4.3
-    #> Need help getting started? Try the R Graphics Cookbook:
-    #> https://r-graphics.org
     library(PMLseg)
 
     ### path to data and metadata: Ninh -> Hugo
@@ -172,12 +154,17 @@
 
         ### plot with validation results
         p <- PlotSeg(OneSeries = OneSeries_updated, SegRes = seg_updated, FunctPart = TRUE, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = validUpd, title = mytitle)
+        print(p)
+        
     } else {
         print(sprintf(" => screening %s, %s: nothing removed", station_name, criterion))
         OneSeries_updated <- OneSeries
         seg_updated <- seg
     }
     #> [1] "Screening: removed 1 segment(s)"
+
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" width="100%" />
+
 
     ### save plot
     file_name = file.path(path_plots, paste0(station_name, ".png"))
