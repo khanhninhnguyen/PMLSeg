@@ -84,7 +84,7 @@ completeness <- np / (days_diff + 1) * 100
 print(sprintf("data summary: n=%d, np=%d, dates=%s..%s (%d days), completeness=%.2f%%", n, np, date_begin, date_end, days_diff, completeness))
 
 ### Run segmentation
-seg = Segmentation(OneSeries = OneSeries, selectionK = criterion, selectionF = FALSE, Kmax = 10)
+seg = Segmentation(OneSeries = OneSeries, selectionK = criterion, selectionF = FALSE, Kmax = 30)
 pp <- nrow(seg$Tmu)+length(seg$CoeffF)
 print(seg$Tmu)
 print(sqrt(seg$MonthVar))
@@ -94,7 +94,6 @@ print(seg$SSR)
 print(sprintf("Segmentation: K=%d, min(mu)=%.2f, max(mu)=%.2f, rms(MonthVar)=%.2f, rss(CoeffF)=%.2f, sqrt(SSR/dof)=%.2f", length(seg$Tmu$begin), min(seg$Tmu$mean), max(seg$Tmu$mean), sqrt(mean(seg$MonthVar)), sqrt(sum(seg$CoeffF^2)), sqrt(seg$SSR/(np-pp))))
 
 ### plot series with segmentation results
-#dev.new(width = 8, height = 4, units = "in", res = 300)
 mytitle <- paste0("Station ", station_name)
 p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, title = mytitle)
 print(p)
@@ -105,7 +104,6 @@ valid = Validation(OneSeries = OneSeries, Tmu = seg$Tmu, Metadata = station_meta
 print(sprintf("Validation: CPs detected=%d, metadata=%d, validated=%d", nrow(seg$Tmu)-1, nrow(station_metadata), sum(valid$valid)))
 
 ### plot with validation results
-#dev.new(width = 8, height = 4, units = "in", res = 300)
 p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = valid, title = mytitle)
 print(p)
 

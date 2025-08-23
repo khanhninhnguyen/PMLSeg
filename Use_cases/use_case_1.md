@@ -77,24 +77,27 @@
     #> [1] "data summary: n=6169, np=6169, dates=2005-11-21..2022-12-30 (6248 days), completeness=98.72%"
 
     ### Run segmentation
-    seg = Segmentation(OneSeries = OneSeries, selectionK = criterion, selectionF = FALSE, Kmax = 10)
+    seg = Segmentation(OneSeries = OneSeries, selectionK = criterion, selectionF = FALSE, Kmax = 30)
     pp <- nrow(seg$Tmu)+length(seg$CoeffF)
     print(seg$Tmu)
-    #>   begin  end     tbegin       tend       mean         se   np
-    #> 1     1 6169 2005-11-21 2022-12-30 -0.3968582 0.00448372 6169
+    #>   begin  end     tbegin       tend        mean          se   np
+    #> 1     1 2032 2005-11-21 2011-07-03 -0.44048505 0.007700690 2032
+    #> 2  2033 3377 2011-07-04 2015-03-27 -0.33068629 0.009558243 1345
+    #> 3  3378 4339 2015-03-28 2017-11-21 -0.44854394 0.011866579  962
+    #> 4  4340 4407 2017-11-22 2018-01-31  0.02134775 0.034612144   68
+    #> 5  4408 6169 2018-02-01 2022-12-30 -0.38460665 0.008452496 1762
     print(sqrt(seg$MonthVar))
     #>  [1] 0.2659240 0.2646232 0.2659240 0.3128119 0.4050152 0.5473837 0.6854104
     #>  [8] 0.6386405 0.5004923 0.4066973 0.3426852 0.2972443
     print(sqrt(mean(seg$MonthVar)))
     #> [1] 0.4351538
     print(seg$SSR)
-    #> [1] 8625.239
+    #> [1] 8384.862
 
     print(sprintf("Segmentation: K=%d, min(mu)=%.2f, max(mu)=%.2f, rms(MonthVar)=%.2f, rss(CoeffF)=%.2f, sqrt(SSR/dof)=%.2f", length(seg$Tmu$begin), min(seg$Tmu$mean), max(seg$Tmu$mean), sqrt(mean(seg$MonthVar)), sqrt(sum(seg$CoeffF^2)), sqrt(seg$SSR/(np-pp))))
-    #> [1] "Segmentation: K=1, min(mu)=-0.40, max(mu)=-0.40, rms(MonthVar)=0.44, rss(CoeffF)=0.22, sqrt(SSR/dof)=1.18"
+    #> [1] "Segmentation: K=5, min(mu)=-0.45, max(mu)=0.02, rms(MonthVar)=0.44, rss(CoeffF)=0.21, sqrt(SSR/dof)=1.17"
 
     ### plot series with segmentation results
-    #dev.new(width = 8, height = 4, units = "in", res = 300)
     mytitle <- paste0("Station ", station_name)
     p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, title = mytitle)
     print(p)
@@ -105,12 +108,10 @@
     ### run validation
     max_dist_validation = 62
     valid = Validation(OneSeries = OneSeries, Tmu = seg$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
-    #> [1] "no CP to validate"
     print(sprintf("Validation: CPs detected=%d, metadata=%d, validated=%d", nrow(seg$Tmu)-1, nrow(station_metadata), sum(valid$valid)))
-    #> [1] "Validation: CPs detected=0, metadata=3, validated=0"
+    #> [1] "Validation: CPs detected=4, metadata=3, validated=0"
 
     ### plot with validation results
-    #dev.new(width = 8, height = 4, units = "in", res = 300)
     p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = valid, title = mytitle)
     print(p)
 
@@ -121,17 +122,20 @@
     screening <- Cluster_screening(Tmu = seg$Tmu, MaxDist = 80, alpha = 0.05, detail = TRUE)
     print(screening)
     #> $UpdatedCP
-    #> NULL
+    #> [1] 2032 3377 4339
     #> 
     #> $RemoveData
-    #>   begin end
-    #> 1    NA  NA
+    #>   begin  end
+    #> 1  4340 4407
     #> 
     #> $ChangeCP
-    #> [1] "No"
+    #> [1] "Yes"
     #> 
     #> $detail
-    #> [1] NA
+    #>         mu_L       mu_R       se_L        se_R np_L np_R     tstat         pval
+    #> 1 -0.4485439 -0.3846067 0.01186658 0.008452496  962 1762 -4.388537 1.141159e-05
+    #>   signif
+    #> 1      1
 
     ### if some CPs have been removed
     if (screening$ChangeCP == "Yes"){
@@ -155,7 +159,7 @@
         OneSeries_updated <- OneSeries
         seg_updated <- seg
     }
-    #> [1] " => screening 0alf, BM_BJ: nothing removed"
+    #> [1] "Screening: removed 1 segment(s)"
 
     ### save plot
     file_name = file.path(path_plots, paste0(station_name, ".png"))
