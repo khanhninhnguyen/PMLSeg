@@ -198,6 +198,8 @@ See the other examples with more complex signals in the `Examples.md/` folder:
  - Example 6: time series with periodic bias, monthly variance, and gaps
  - Example 7: Explore the different penalty criteria
 
+See also the use cases with real data in the `Use_Cases/` folder:
+
 ## References
 
 

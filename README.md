@@ -75,7 +75,6 @@ series. More examples are given in the `Examples.md/` folder.
     rm(list=ls(all=TRUE))
     library(PMLseg)
     library(purrr)
-    #> Warning: le package 'purrr' a été compilé avec la version R 4.4.3
 
     # define simulation function
     simulate_time_series <- function(cp_ind, segmt_mean, noise_stdev, length_series) {
@@ -242,6 +241,8 @@ folder:
 -   Example 6: time series with periodic bias, monthly variance, and
     gaps
 -   Example 7: Explore the different penalty criteria
+
+See also the use cases with real data in the `Use_Cases/` folder:
 
 ## References
 
