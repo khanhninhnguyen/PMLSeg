@@ -29,7 +29,8 @@ station_name = "0alf"
 mylabely = "GNSS - ERA5 (kg/m2)"
 
 ### Segmentation options
-selectionK = "BM_BJ"
+selectionK = "All"
+#selectionK = "BM_BJ"
 selectionF = FALSE
 FunctPart = TRUE
 VarMonthly = TRUE
