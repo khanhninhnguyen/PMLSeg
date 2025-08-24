@@ -2,8 +2,6 @@
 
 ## Use case \#1: time series of daily IWV differences (GNSS - ERA5)
 
-### Load useful packages
-
     rm(list = ls())
     library(purrr)
     library(lubridate)
@@ -11,7 +9,7 @@
     library(ggplot2)
     library(PMLseg)
 
-    ### path to data and metadata: Ninh -> Hugo
+    ### paths to data and metadata
     path_data = "./data/"
     path_result = "./results/"
     path_plots = "./plots/"
@@ -25,7 +23,7 @@
     FunctPart = TRUE
     VarMonthly = TRUE
 
-    ### create output path if it does not exist
+    ### create output paths if they don't exist
     if (!dir.exists(path_result)) {
       dir.create(path_result)
     }
@@ -33,9 +31,7 @@
       dir.create(path_plots)
     }
 
-    ### load Metadata
-    print(sprintf("load metadata %s...", filename_metadata))
-    #> [1] "load metadata ./metadata/metadata.txt..."
+    ### load metadata file
     buffer = read.table(file = filename_metadata, header = TRUE) %>% 
       setNames(c("name", "year", "doy", "date", "type")) %>% 
       mutate(date = as.Date(date, format = "%Y-%m-%d"))
@@ -53,8 +49,6 @@
 
     ### load data for the station
     path_data_one <- paste0(path_data, station_name, ".txt")
-    print(sprintf("load data %s...", path_data_one))
-    #> [1] "load data ./data/0alf.txt..."
     buffer <- read.table(
         file = path_data_one,
         sep = "\t",
@@ -94,11 +88,11 @@
     print(seg$SSR)
     #> [1] 8384.862
 
-    print(sprintf("Segmentation: K=%d, min(mu)=%.2f, max(mu)=%.2f, rms(MonthVar)=%.2f, rss(CoeffF)=%.2f, sqrt(SSR/dof)=%.2f", length(seg$Tmu$begin), min(seg$Tmu$mean), max(seg$Tmu$mean), sqrt(mean(seg$MonthVar)), sqrt(sum(seg$CoeffF^2)), sqrt(seg$SSR/(np-pp))))
-    #> [1] "Segmentation: K=5, min(mu)=-0.45, max(mu)=0.02, rms(MonthVar)=0.44, rss(CoeffF)=0.21, sqrt(SSR/dof)=1.17"
+    print(sprintf("Segmentation %s, %s: K=%d, min(mu)=%.2f, max(mu)=%.2f, rms(MonthVar)=%.2f, rss(CoeffF)=%.2f, sqrt(SSR/dof)=%.2f", station_name, criterion, length(seg$Tmu$begin), min(seg$Tmu$mean), max(seg$Tmu$mean), sqrt(mean(seg$MonthVar)), sqrt(sum(seg$CoeffF^2)), sqrt(seg$SSR/(np-pp))))
+    #> [1] "Segmentation 0alf, BM_BJ: K=5, min(mu)=-0.45, max(mu)=0.02, rms(MonthVar)=0.44, rss(CoeffF)=0.21, sqrt(SSR/dof)=1.17"
 
     ### plot series with segmentation results
-    mytitle <- paste0("Station ", station_name)
+    mytitle <- sprintf("Station %s, %s", station_name, criterion)
     p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, title = mytitle)
     print(p)
 
@@ -108,8 +102,8 @@
     ### run validation
     max_dist_validation = 62
     valid = Validation(OneSeries = OneSeries, Tmu = seg$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
-    print(sprintf("Validation: CPs detected=%d, metadata=%d, validated=%d", nrow(seg$Tmu)-1, nrow(station_metadata), sum(valid$valid)))
-    #> [1] "Validation: CPs detected=4, metadata=3, validated=0"
+    print(sprintf("Validation %s, %s: CPs detected=%d, metadata=%d, validated=%d", station_name, criterion, nrow(seg$Tmu)-1, nrow(station_metadata), sum(valid$valid)))
+    #> [1] "Validation 0alf, BM_BJ: CPs detected=4, metadata=3, validated=0"
 
     ### plot with validation results
     p <- PlotSeg(OneSeries = OneSeries, SegRes = seg, FunctPart = TRUE, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = valid, title = mytitle)
@@ -139,7 +133,8 @@
 
     ### if some CPs have been removed
     if (screening$ChangeCP == "Yes"){
-        print(sprintf("Screening: removed %d segment(s)", nrow(screening$RemoveData)))
+        print(sprintf("Screening %s, %s: removed %d segment(s)", station_name, criterion, nrow(screening$RemoveData)))
+        
         ### add tbegin and tend to RemoveData
         screening$RemoveData = screening$RemoveData %>% mutate(tbegin = OneSeries$date[screening$RemoveData$begin], tend = OneSeries$date[screening$RemoveData$end])
 
@@ -153,15 +148,16 @@
         validUpd = Validation(OneSeries = OneSeries_updated, Tmu = seg_updated$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
 
         ### plot with validation results
+        mytitle <- sprintf("Station %s, %s, after screening", station_name, criterion)
         p <- PlotSeg(OneSeries = OneSeries_updated, SegRes = seg_updated, FunctPart = TRUE, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = validUpd, title = mytitle)
         print(p)
         
     } else {
-        print(sprintf(" => screening %s, %s: nothing removed", station_name, criterion))
+        print(sprintf("Screening %s, %s: nothing removed", station_name, criterion))
         OneSeries_updated <- OneSeries
         seg_updated <- seg
     }
-    #> [1] "Screening: removed 1 segment(s)"
+    #> [1] "Screening 0alf, BM_BJ: removed 1 segment(s)"
 
 <img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" width="100%" />
 
