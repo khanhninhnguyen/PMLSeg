@@ -190,15 +190,16 @@ The test structure provides the list of updated change-points `UpdatedCP`, the v
 
 See the other examples with more complex signals in the `Examples.md/` folder:
 
- - Example 1: time series with 2 change-points and constant noise
- - Example 2: time series with missing data
- - Example 3: time series with clusters of CPs
- - Example 4: time series with monthly varying variance
+ - [Example 1: time series with 2 change-points and constant noise](./Examples.md/Example1.md)
+ - [Example 2: time series with missing data](./Examples.md/Example2.md)
+ - [Example 3: time series with clusters of CPs](./Examples.md/Example3.md)
+ - [Example 4: time series with monthly varying variance](./Examples.md/Example4.md)
  - [Example 5: time series with periodic bias](./Examples.md/Example5.md)
- - Example 6: time series with periodic bias, monthly variance, and gaps
- - Example 7: Explore the different penalty criteria
+ - [Example 6: time series with periodic bias, monthly variance, and gaps](./Examples.md/Example6.md)
+ - [Example 7: Explore the different penalty criteria](./Examples.md/Example7.md)
 
 See also the use cases with real data in the `Use_Cases/` folder:
+
  - [Use case 1: time series of daily IWV differences (GNSS-ERA5)](./Use_cases/use_case_1.md)
  
 ### Contribute
