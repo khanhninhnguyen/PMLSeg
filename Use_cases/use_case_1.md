@@ -42,118 +42,50 @@
     #> [1] "Load data file ./data/0alf.txt..."
     #> [1] " > data summary: n=6169, np=6169, dates=2005-11-21..2022-12-30 (6248 days), completeness=98.72%"
     #> [1] "Run segmentation for station 0alf with selectionK = All, selectionF = FALSE, FunctPart = TRUE, VarMonthly = TRUE, Kmax = 30 ..."
-    #> [1] " > segmentation results: criterion = mBIC, K = 8, min(mu) = -0.62, max(mu) = 0.33, rms(MonthVar) = 0.44, rss(CoeffF) = 0.22, sqrt(SSR/dof) = 1.16"
-    #> [1] " > validation results: station = 0alf, criterion = mBIC, detected change-points = 7, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
-
-    #> [1] " > screening results: station = 0alf, criterion = mBIC => removed 1 segment(s)"
-    #> $UpdatedCP
-    #> [1] 2032 3377 4339 5353 5464
-    #> 
-    #> $RemoveData
-    #>   begin  end
-    #> 1  4340 4406
-    #> 
-    #> $ChangeCP
-    #> [1] "Yes"
-    #> 
-    #> $detail
+    #> [1] "Loop over selectionK:"
+    #> [1] " > criterion = mBIC, station = 0alf, segmentation detected K = 8 segments, min(mu) = -0.62, max(mu) = 0.33, rms(MonthVar) = 0.44, rss(CoeffF) = 0.22, sqrt(SSR/dof) = 1.16"
+    #> [1] " > criterion = mBIC, station = 0alf, validation of change-points: detected = 7, metadata = 3, validated = 0"
+    #> [1] " > criterion = mBIC, station = 0alf, screening removed 1 segment(s)"
     #>         mu_L       mu_R       se_L       se_R np_L np_R     tstat         pval signif
     #> 1 -0.4488906 -0.3461712 0.01186658 0.01161417  962  947 -6.186291 6.159624e-10      1
-    #> 
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = mBIC, detected change-points = 5, metadata = 3, validated = 0"
+    #> [1] " > criterion = mBIC, station = 0alf, validation of change-points (after screening): detected = 5, metadata = 3, validated = 0"
+    #> [1] " > criterion = mBIC, station = 0alf, test changed nothing"
+    #> [1] " > criterion = mBIC, station = 0alf, validation of change-points (after screening and test): detected = 5, metadata = 3, validated = 0"
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-2.png" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-2.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" width="100%" />
 
-    #> [1] " > screening results: station = 0alf, criterion = mBIC => nothing removed"
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = mBIC, detected change-points = 5, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" width="100%" />
-
-    #> [1] " > segmentation results: criterion = Lav, K = 5, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
-    #> [1] " > validation results: station = 0alf, criterion = Lav, detected change-points = 4, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-4.png" width="100%" />
-
-    #> [1] " > screening results: station = 0alf, criterion = Lav => removed 1 segment(s)"
-    #> $UpdatedCP
-    #> [1] 2032 3377 4339
-    #> 
-    #> $RemoveData
-    #>   begin  end
-    #> 1  4340 4407
-    #> 
-    #> $ChangeCP
-    #> [1] "Yes"
-    #> 
-    #> $detail
+    #> [1] "Loop over selectionK:"
+    #> [1] " > criterion = Lav, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
+    #> [1] " > criterion = Lav, station = 0alf, validation of change-points: detected = 4, metadata = 3, validated = 0"
+    #> [1] " > criterion = Lav, station = 0alf, screening removed 1 segment(s)"
     #>         mu_L       mu_R       se_L        se_R np_L np_R     tstat         pval signif
     #> 1 -0.4485439 -0.3846067 0.01186658 0.008452496  962 1762 -4.388537 1.141159e-05      1
-    #> 
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = Lav, detected change-points = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = Lav, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = Lav, station = 0alf, test changed nothing"
+    #> [1] " > criterion = Lav, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-5.png" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-4.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-5.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-6.png" width="100%" />
 
-    #> [1] " > screening results: station = 0alf, criterion = Lav => nothing removed"
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = Lav, detected change-points = 3, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-6.png" width="100%" />
-
-    #> [1] " > segmentation results: criterion = BM_BJ, K = 5, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
-    #> [1] " > validation results: station = 0alf, criterion = BM_BJ, detected change-points = 4, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-7.png" width="100%" />
-
-    #> [1] " > screening results: station = 0alf, criterion = BM_BJ => removed 1 segment(s)"
-    #> $UpdatedCP
-    #> [1] 2032 3377 4339
-    #> 
-    #> $RemoveData
-    #>   begin  end
-    #> 1  4340 4407
-    #> 
-    #> $ChangeCP
-    #> [1] "Yes"
-    #> 
-    #> $detail
+    #> [1] "Loop over selectionK:"
+    #> [1] " > criterion = BM_BJ, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
+    #> [1] " > criterion = BM_BJ, station = 0alf, validation of change-points: detected = 4, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_BJ, station = 0alf, screening removed 1 segment(s)"
     #>         mu_L       mu_R       se_L        se_R np_L np_R     tstat         pval signif
     #> 1 -0.4485439 -0.3846067 0.01186658 0.008452496  962 1762 -4.388537 1.141159e-05      1
-    #> 
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = BM_BJ, detected change-points = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_BJ, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_BJ, station = 0alf, test changed nothing"
+    #> [1] " > criterion = BM_BJ, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-8.png" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-7.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-8.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-9.png" width="100%" />
 
-    #> [1] " > screening results: station = 0alf, criterion = BM_BJ => nothing removed"
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = BM_BJ, detected change-points = 3, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-9.png" width="100%" />
-
-    #> [1] " > segmentation results: criterion = BM_slope, K = 5, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
-    #> [1] " > validation results: station = 0alf, criterion = BM_slope, detected change-points = 4, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-10.png" width="100%" />
-
-    #> [1] " > screening results: station = 0alf, criterion = BM_slope => removed 1 segment(s)"
-    #> $UpdatedCP
-    #> [1] 2032 3377 4339
-    #> 
-    #> $RemoveData
-    #>   begin  end
-    #> 1  4340 4407
-    #> 
-    #> $ChangeCP
-    #> [1] "Yes"
-    #> 
-    #> $detail
+    #> [1] "Loop over selectionK:"
+    #> [1] " > criterion = BM_slope, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
+    #> [1] " > criterion = BM_slope, station = 0alf, validation of change-points: detected = 4, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_slope, station = 0alf, screening removed 1 segment(s)"
     #>         mu_L       mu_R       se_L        se_R np_L np_R     tstat         pval signif
     #> 1 -0.4485439 -0.3846067 0.01186658 0.008452496  962 1762 -4.388537 1.141159e-05      1
-    #> 
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = BM_slope, detected change-points = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_slope, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
+    #> [1] " > criterion = BM_slope, station = 0alf, test changed nothing"
+    #> [1] " > criterion = BM_slope, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-11.png" width="100%" />
-
-    #> [1] " > screening results: station = 0alf, criterion = BM_slope => nothing removed"
-    #> [1] " > validation results (after Screening): station = 0alf, criterion = BM_slope, detected change-points = 3, metadata = 3, validated = 0"
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-12.png" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-10.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-11.png" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-12.png" width="100%" />

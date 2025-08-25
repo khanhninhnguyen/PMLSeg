@@ -64,6 +64,7 @@ if(selectionK == "All") {
 SegCrit <- c()
 for (criterion in liste_criterion) {
     if(selectionK == "All") {
+        print(sprintf("Loop over selectionK:"))
         SegCrit$Tmu = Seg$Tmu[[criterion]]
         SegCrit$CoeffF = Seg$CoeffF[[criterion]]
         SegCrit$SSR = Seg$SSR[[criterion]]
@@ -75,7 +76,7 @@ for (criterion in liste_criterion) {
     
     ### display Segmentation results
     pp <- nrow(SegCrit$Tmu)+length(SegCrit$CoeffF)
-    print(sprintf(" > segmentation results: criterion = %s, K = %d, min(mu) = %.2f, max(mu) = %.2f, rms(MonthVar) = %.2f, rss(CoeffF) = %.2f, sqrt(SSR/dof) = %.2f", criterion, length(SegCrit$Tmu$begin), min(SegCrit$Tmu$mean), max(SegCrit$Tmu$mean), sqrt(mean(SegCrit$MonthVar)), sqrt(sum(SegCrit$CoeffF^2)), sqrt(SegCrit$SSR/(np-pp))))
+    print(sprintf(" > criterion = %s, station = %s, segmentation detected K = %d segments, min(mu) = %.2f, max(mu) = %.2f, rms(MonthVar) = %.2f, rss(CoeffF) = %.2f, sqrt(SSR/dof) = %.2f", criterion, station_name, length(SegCrit$Tmu$begin), min(SegCrit$Tmu$mean), max(SegCrit$Tmu$mean), sqrt(mean(SegCrit$MonthVar)), sqrt(sum(SegCrit$CoeffF^2)), sqrt(SegCrit$SSR/(np-pp))))
 
     # print(" > Segmentation details:")
     # print(SegCrit$Tmu)
@@ -85,20 +86,15 @@ for (criterion in liste_criterion) {
 
     ### run validation before screening
     ValidRes = Validation(OneSeries = OneSeries, Tmu = SegCrit$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
-    print(sprintf(" > validation results: station = %s, criterion = %s, detected change-points = %d, metadata = %d, validated = %d", station_name, criterion, nrow(SegCrit$Tmu)-1, nrow(station_metadata), sum(ValidRes$valid)))
-
-    ### plot before screening
-    mytitle <- sprintf("Station %s, %s, before screening", station_name, criterion)
-    p1 <- PlotSeg(OneSeries = OneSeries, SegRes = SegCrit, FunctPart = FunctPart, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidRes, title = mytitle)
-    print(p1)
+    print(sprintf(" > criterion = %s, station = %s, validation of change-points: detected = %d, metadata = %d, validated = %d", criterion, station_name, nrow(SegCrit$Tmu)-1, nrow(station_metadata), sum(ValidRes$valid)))
 
     ### cluster screening
     ScreeningRes <- Cluster_screening(Tmu = SegCrit$Tmu, MaxDist = max_dist_cluster, alpha = alpha_cluster, detail = TRUE)
 
     ### if some CPs have been removed
     if(ScreeningRes$ChangeCP == "Yes"){
-        print(sprintf(" > screening results: station = %s, criterion = %s => removed %d segment(s)", station_name, criterion, nrow(ScreeningRes$RemoveData)))
-        print(ScreeningRes)
+        print(sprintf(" > criterion = %s, station = %s, screening removed %d segment(s)", criterion, station_name, nrow(ScreeningRes$RemoveData)))
+        print(ScreeningRes$detail)
         
         ### add tbegin and tend to RemoveData
         ScreeningRes$RemoveData = ScreeningRes$RemoveData %>% mutate(tbegin = OneSeries$date[ScreeningRes$RemoveData$begin], tend = OneSeries$date[ScreeningRes$RemoveData$end])
@@ -110,43 +106,48 @@ for (criterion in liste_criterion) {
         SegScrUpd <- UpdatedParametersForFixedCP(OneSeriesUpd = OneSeriesUpd, UpdatedCP = ScreeningRes$UpdatedCP, FunctPart = FunctPart)
                 
     } else {
-        print(sprintf(" > screening results: station = %s, criterion = %s => nothing removed", station_name, criterion))
+        print(sprintf(" > criterion = %s, station = %s, screening removed nothing ", criterion, station_name))
         OneSeriesUpd <- OneSeries
         SegScrUpd <- SegCrit
     }
 
     ### validate after screening
-    ValidResUpd = Validation(OneSeries = OneSeriesUpd, Tmu = SegScrUpd$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
-    print(sprintf(" > validation results (after Screening): station = %s, criterion = %s, detected change-points = %d, metadata = %d, validated = %d", station_name, criterion, nrow(SegScrUpd$Tmu)-1, nrow(station_metadata), sum(ValidResUpd$valid)))
-
-    ### plot after screening
-    mytitle <- sprintf("Station %s, %s, after screening", station_name, criterion)
-    p2 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResUpd, title = mytitle)
-    print(p2)
+    ValidResScr = Validation(OneSeries = OneSeriesUpd, Tmu = SegScrUpd$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
+    print(sprintf(" > criterion = %s, station = %s, validation of change-points (after screening): detected = %d, metadata = %d, validated = %d", criterion, station_name, nrow(SegScrUpd$Tmu)-1, nrow(station_metadata), sum(ValidResScr$valid)))
 
     ### test the significance of the change-points 
     TestRes <- Test_CP(Tmu = SegScrUpd$Tmu, alpha = alpha_test_CP, detail = TRUE)
 
     ### if some CPs are not significant
     if(TestRes$ChangeCP == "Yes"){
-        print(sprintf(" > test results: station = %s, criterion = %s => updated %d CP(s)", station_name, criterion, nrow(TestRes$UpdatedCP)))
+        print(sprintf(" > criterion = %s, station = %s, test of change-points: updated number = %d", criterion, station_name, nrow(TestRes$UpdatedCP)))
         print(TestRes)
         
         ### update the segmentation parameters after test
         SegScrTestUpd <- UpdatedParametersForFixedCP(OneSeriesUpd = OneSeriesUpd, UpdatedCP = TestRes$UpdatedCP, FunctPart = FunctPart)
     
     } else {
-        print(sprintf(" > screening results: station = %s, criterion = %s => nothing removed", station_name, criterion))
+        print(sprintf(" > criterion = %s, station = %s, test changed nothing", criterion, station_name))
         SegScrTestUpd <- SegScrUpd
     }
 
     ### validate again
-    ValidResUpd = Validation(OneSeries = OneSeriesUpd, Tmu = SegScrTestUpd$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
-    print(sprintf(" > validation results (after Screening): station = %s, criterion = %s, detected change-points = %d, metadata = %d, validated = %d", station_name, criterion, nrow(SegScrTestUpd$Tmu)-1, nrow(station_metadata), sum(ValidResUpd$valid)))
+    ValidResScrTest = Validation(OneSeries = OneSeriesUpd, Tmu = SegScrTestUpd$Tmu, Metadata = station_metadata, MaxDist = max_dist_validation)
+    print(sprintf(" > criterion = %s, station = %s, validation of change-points (after screening and test): detected = %d, metadata = %d, validated = %d", criterion, station_name, nrow(SegScrTestUpd$Tmu)-1, nrow(station_metadata), sum(ValidResScrTest$valid)))
 
-    ### plot with validation results
+    ### plot before screening
+    mytitle <- sprintf("Station %s, %s, before screening", station_name, criterion)
+    p1 <- PlotSeg(OneSeries = OneSeries, SegRes = SegCrit, FunctPart = FunctPart, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidRes, title = mytitle)
+    print(p1)
+
+    ### plot after screening
+    mytitle <- sprintf("Station %s, %s, after screening", station_name, criterion)
+    p2 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResScr, title = mytitle)
+    print(p2)
+
+    ### plot after screening and test
     mytitle <- sprintf("Station %s, %s, after screening and test", station_name, criterion)
-    p3 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrTestUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResUpd, title = mytitle)
+    p3 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrTestUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResScrTest, title = mytitle)
     print(p3)
 
     ### save plots
