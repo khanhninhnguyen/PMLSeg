@@ -20,6 +20,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 rm(list = ls())
 
 ### paths to data and metadata
+project = "use_case_1"
 path_data = "./data/"
 path_result = "./results/"
 path_plots = "./plots/"
@@ -42,6 +43,9 @@ max_dist_validation = 62
 ### Screening options
 max_dist_cluster = 80
 alpha_cluster = 0.05
+
+### Test options
+alpha_test_CP = 0.05
 
 source("./user_function.R")
 ```
