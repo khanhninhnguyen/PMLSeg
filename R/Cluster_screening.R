@@ -60,7 +60,7 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
       ClusterEndInd[is.na(ClusterEndInd)] <- length(flag)
 
       # range of data points which are in each cluster that shall be removed
-      RemoveData <- data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd])
+      RemoveData <- data.frame(begin = Tmu$begin[ClusterBegInd],end = Tmu$end[ClusterEndInd], tbegin = Tmu$tbegin[ClusterBegInd], tend = Tmu$tend[ClusterEndInd])
 
       # list of segments before and after that can be used for the test
       SegmentsTest = data.frame(begin = SegBefInd, end = SegAftInd)

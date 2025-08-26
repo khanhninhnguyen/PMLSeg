@@ -97,7 +97,7 @@ for (criterion in liste_criterion) {
         print(ScreeningRes$detail)
         
         ### add tbegin and tend to RemoveData
-        ScreeningRes$RemoveData = ScreeningRes$RemoveData %>% mutate(tbegin = OneSeries$date[ScreeningRes$RemoveData$begin], tend = OneSeries$date[ScreeningRes$RemoveData$end])
+        # ScreeningRes$RemoveData = ScreeningRes$RemoveData %>% mutate(tbegin = OneSeries$date[ScreeningRes$RemoveData$begin], tend = OneSeries$date[ScreeningRes$RemoveData$end])
 
         ### update the time series
         OneSeriesUpd <- UpdateTimeSeries(OneSeries, ScreeningRes$RemoveData)
