@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# PMLSeg
+# PMLseg
 
 PMLseg is a R package for the segmentation of univariate time series
 based on Penalized Maximum Likelihood. The method detects changes in the
@@ -27,7 +27,7 @@ method can be found in (Quarello, Bock, and Lebarbier 2022).
 
 ## Installation
 
-The development version of `PMLSeg` can be installed from GitHub with:
+The development version of `PMLseg` can be installed from GitHub with:
 
 
     # Install devtools, tidyr, and purrr if you haven't already

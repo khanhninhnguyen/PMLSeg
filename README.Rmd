@@ -15,7 +15,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
 
-# PMLSeg
+# PMLseg
 
 PMLseg is a R package for the segmentation of univariate time series based on Penalized Maximum Likelihood. The method detects changes in the mean signal in the presence of a periodic bias and variance changing over prescribed intervals. A preliminary version was published under the name `GNSSseg` which was developed for the detection of change-points in daily GNSS minus reanalysis IWV time series with annual periodic bias and variance changing on monthly intervals. PMLseg is more versatile and can be used with various modelling options (with or without periodic bias, constant or monthly varying noise) and algorithmic evolutions regarding the iterative inference scheme. The time series should be provided in a data frame containing two columns: date and signal. The package includes the segmentation function as well as auxiliary functions for the validation with metadata, cluster screening, statistical test of change-points, and visualization of the time series with segmentation and validation results. The theoretical basis of the method can be found in [@Quarello2022].
  
@@ -27,7 +27,7 @@ PMLseg is a R package for the segmentation of univariate time series based on Pe
 
 ## Installation
 
-The development version of `PMLSeg` can be installed from GitHub with:
+The development version of `PMLseg` can be installed from GitHub with:
 
 ```{r, eval=FALSE}
 
