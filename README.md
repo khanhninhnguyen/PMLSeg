@@ -24,6 +24,7 @@ method can be found in (Quarello, Bock, and Lebarbier 2022).
 -   [Installation](#installation)
 -   [Functions](#functions)
 -   [Examples](#examples)
+-   [References](#references)
 
 ## Installation
 
@@ -42,7 +43,7 @@ The development version of `PMLseg` can be installed from GitHub with:
     # Install PMLseg from GitHub
     devtools::install_github("khanhninhnguyen/PMLSeg")
 
-# Functions
+## Functions
 
 The package contains the following functions:
 
@@ -65,7 +66,7 @@ e.g.
 
     ?Segmentation
 
-## Example
+## Examples
 
 Below we provide an example of the main functions with a simulated time
 series. More examples are given in the `Examples.md/` folder.
@@ -115,8 +116,8 @@ series. More examples are given in the `Examples.md/` folder.
     #>  $ Tmu     :'data.frame':    3 obs. of  7 variables:
     #>   ..$ begin : int [1:3] 1 201 601
     #>   ..$ end   : int [1:3] 200 600 1000
-    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" "2011-08-24"
-    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" "2012-09-26"
+    #>   ..$ tbegin: Date[1:3], format: "2010-01-01" "2010-07-20" ...
+    #>   ..$ tend  : Date[1:3], format: "2010-07-19" "2011-08-23" ...
     #>   ..$ mean  : num [1:3] -0.964 0.999 1.954
     #>   ..$ se    : num [1:3] 0.0753 0.0533 0.0533
     #>   ..$ np    : int [1:3] 200 400 400
@@ -212,9 +213,12 @@ significant at the level 0.05.
     #> [1] "No"
     #> 
     #> $detail
-    #>         mu_L      mu_R       se_L       se_R np_L np_R     tstat          pval signif
-    #> 1 -0.9644604 0.9994054 0.07534822 0.05327923  200  400 -21.28106 1.700634e-100      1
-    #> 2  0.9994054 1.9537044 0.05327923 0.05327923  400  400 -12.66518  9.220540e-37      1
+    #>         mu_L      mu_R       se_L       se_R np_L np_R     tstat          pval
+    #> 1 -0.9644604 0.9994054 0.07534822 0.05327923  200  400 -21.28106 1.700634e-100
+    #> 2  0.9994054 1.9537044 0.05327923 0.05327923  400  400 -12.66518  9.220540e-37
+    #>   signif
+    #> 1      1
+    #> 2      1
 
 The test structure provides the list of updated change-points
 `UpdatedCP`, the variable `ChangeCP` indicates if the list has been
