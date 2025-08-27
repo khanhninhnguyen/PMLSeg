@@ -24,6 +24,7 @@ PMLseg is a R package for the segmentation of univariate time series based on Pe
 - [Installation](#installation)
 - [Functions](#functions)
 - [Examples](#examples)
+- [References](#references)
 
 ## Installation
 
@@ -44,7 +45,7 @@ install.packages("gfpop_1.1.1.tar.gz")
 devtools::install_github("khanhninhnguyen/PMLSeg")
 ```
 
-# Functions
+## Functions
 
 The package contains the following functions:
 
@@ -70,7 +71,7 @@ Usage and help on functions can be found by ?"function" in R console, e.g.
 ?Segmentation
 ```
 
-## Example
+## Examples
 
 Below we provide an example of the main functions with a simulated time series. More examples are given in the `Examples.md/` folder. 
 
