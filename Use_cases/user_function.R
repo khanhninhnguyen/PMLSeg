@@ -12,8 +12,8 @@ library(PMLseg)
 if (!dir.exists(path_result)) {
   dir.create(path_result)
 }
-if (!dir.exists(path_plots)) {
-  dir.create(path_plots)
+if (!dir.exists(path_plot)) {
+  dir.create(path_plot)
 }
 
 ### load metadata file
