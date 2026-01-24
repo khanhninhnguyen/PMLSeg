@@ -9,11 +9,11 @@ library(ggplot2)
 library(PMLseg)
 
 ### create output paths if they don't exist
-if (!dir.exists(path_result)) {
-  dir.create(path_result)
+if (!dir.exists(path_results)) {
+  dir.create(path_results)
 }
-if (!dir.exists(path_plot)) {
-  dir.create(path_plot)
+if (!dir.exists(path_plots)) {
+  dir.create(path_plots)
 }
 
 ### load metadata file

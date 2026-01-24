@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-<!-- use_case_1.md is generated from use_case_1.Rmd. Please edit that file -->
+<!-- use_case_2.md is generated from use_case_2.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -14,20 +14,19 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-## Use case #1: time series of daily IWV differences (GNSS - ERA5)
+## Use case #2: time series of daily ZTD differences (GNSS - ERA5)
 
 ```{r}
 rm(list = ls())
 
 ### paths to data and metadata
-project = "use_case_1"
+project = "use_case_2"
 path_data = "./data/"
 path_results = "./results/"
 path_plots = "./plots/"
-filename_metadata = "./metadata/metadata.txt"
-station_name = "0alf"
-# station_name = "clgo"
-mylabely = "GNSS - ERA5 (kg/m2)"
+filename_metadata = "./metadata/metadata_IGSR3.txt"
+station_name = "guat"
+mylabely = "GNSS - ERA5 (m)"
 
 ### Segmentation options
 selectionK = "All"

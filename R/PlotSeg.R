@@ -146,6 +146,8 @@ PlotSeg <- function(OneSeries,
         p <- p + geom_line(data=subset(long_data, variable == "FitF"), linewidth = 0.5, na.rm = TRUE)
     }
 
+    # print(p)
+    
     # Add vertical lines for CPs detected by segmentation
     if (nrow(SegRes$Tmu) > 1) {
         p <- p +
@@ -164,12 +166,11 @@ PlotSeg <- function(OneSeries,
     if (!is.null(Metadata)) {
         if (!is.null(Metadata$type)) {
             p <- p +
-            geom_point(data = subset(long_data, variable %in% types), color = "gray", aes(shape = variable),
-               size = 2, na.rm = TRUE)
+            # geom_point(data = subset(long_data, variable %in% types), color = "gray", aes(shape = variable), size = 2, na.rm = TRUE)
+            geom_point(data = subset(long_data, variable %in% types), color = "blue", aes(shape = variable), size = 2, na.rm = TRUE)
         } else {
             p <- p +
-            geom_point(data = subset(long_data, variable == "Meta"), color = "blue",  aes(shape = variable),
-               size = 2, na.rm = TRUE)
+            geom_point(data = subset(long_data, variable == "Meta"), color = "blue",  aes(shape = variable), size = 2, na.rm = TRUE)
         }
     }
 
@@ -226,7 +227,7 @@ PlotSeg <- function(OneSeries,
     # )
     # }
 
-    p
+    print(p)
     return(p)
 }
 
