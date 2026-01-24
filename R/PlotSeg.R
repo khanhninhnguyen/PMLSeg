@@ -188,7 +188,7 @@ PlotSeg <- function(OneSeries,
     p <- p +
     # scale_x_date(date_breaks = "1 year", date_labels = "%Y",  minor_breaks = seq(first_date, last_date, by = 1)) +
     scale_color_manual(values = colors) +
-    labs(x = labelx, y = labely, color = "", fill = "") +
+    labs(x = labelx, y = labely, color = "none", fill = "none") +
     theme(
         legend.title = element_blank(),
         panel.grid.major = element_blank(),
