@@ -53,26 +53,8 @@
     #> [1] " > criterion = mBIC, station = 0alf, validation of change-points (after screening): detected = 5, metadata = 3, validated = 0"
     #> [1] " > criterion = mBIC, station = 0alf, test changed nothing"
     #> [1] " > criterion = mBIC, station = 0alf, validation of change-points (after screening and test): detected = 5, metadata = 3, validated = 0"
-    #> Ignoring unknown labels:
-    #> • fill : ""
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-1.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-2.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" alt="" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-1.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-2.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-3.png" alt="" width="100%" />
 
     #> [1] "Loop over selectionK:"
     #> [1] " > criterion = Lav, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
@@ -85,26 +67,8 @@
     #> [1] " > criterion = Lav, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
     #> [1] " > criterion = Lav, station = 0alf, test changed nothing"
     #> [1] " > criterion = Lav, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
-    #> Ignoring unknown labels:
-    #> • fill : ""
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-4.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-5.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-6.png" alt="" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-4.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-5.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-6.png" alt="" width="100%" />
 
     #> [1] "Loop over selectionK:"
     #> [1] " > criterion = BM_BJ, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
@@ -117,26 +81,8 @@
     #> [1] " > criterion = BM_BJ, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
     #> [1] " > criterion = BM_BJ, station = 0alf, test changed nothing"
     #> [1] " > criterion = BM_BJ, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
-    #> Ignoring unknown labels:
-    #> • fill : ""
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-7.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-8.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-9.png" alt="" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-7.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-8.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-9.png" alt="" width="100%" />
 
     #> [1] "Loop over selectionK:"
     #> [1] " > criterion = BM_slope, station = 0alf, segmentation detected K = 5 segments, min(mu) = -0.45, max(mu) = 0.02, rms(MonthVar) = 0.44, rss(CoeffF) = 0.21, sqrt(SSR/dof) = 1.17"
@@ -149,23 +95,5 @@
     #> [1] " > criterion = BM_slope, station = 0alf, validation of change-points (after screening): detected = 3, metadata = 3, validated = 0"
     #> [1] " > criterion = BM_slope, station = 0alf, test changed nothing"
     #> [1] " > criterion = BM_slope, station = 0alf, validation of change-points (after screening and test): detected = 3, metadata = 3, validated = 0"
-    #> Ignoring unknown labels:
-    #> • fill : ""
 
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-10.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-11.png" alt="" width="100%" />
-
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-    #> Ignoring unknown labels:
-    #> • fill : ""
-
-<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-12.png" alt="" width="100%" />
+<img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-10.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-11.png" alt="" width="100%" /><img src="use_case_1_files/figure-markdown_strict/unnamed-chunk-2-12.png" alt="" width="100%" />

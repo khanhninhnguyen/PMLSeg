@@ -138,17 +138,17 @@ for (criterion in liste_criterion) {
     ### plot before screening
     mytitle <- sprintf("Station %s, %s, before screening", station_name, criterion)
     p1 <- PlotSeg(OneSeries = OneSeries, SegRes = SegCrit, FunctPart = FunctPart, labelx = "", labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidRes, title = mytitle)
-    # print(p1)
+    print(p1)
 
     ### plot after screening
     mytitle <- sprintf("Station %s, %s, after screening", station_name, criterion)
     p2 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResScr, title = mytitle)
-    # print(p2)
+    print(p2)
 
     ### plot after screening and test
     mytitle <- sprintf("Station %s, %s, after screening and test", station_name, criterion)
     p3 <- PlotSeg(OneSeries = OneSeriesUpd, SegRes = SegScrTestUpd, FunctPart = FunctPart, labelx = NULL, labely = mylabely, Metadata = station_metadata, Validated_CP_Meta = ValidResScrTest, title = mytitle)
-    # print(p3)
+    print(p3)
 
     ### save plots
     file_name = file.path(path_plots, paste0(project, ".", criterion, ".", station_name, ".seg_valid.png"))
