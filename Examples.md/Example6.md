@@ -66,7 +66,7 @@
     plot(myseries$date, myseries$signal, type = "l", col = "gray", xlab = "date", ylab = "signal", main="Simulated time series")
     abline(v = CP_date, col = "red", lty = 2)
 
-<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="100%" />
+<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-2-1.png" alt="" width="100%" />
 
 ### 2. Segmentation
 
@@ -81,11 +81,13 @@
     #> 4   702  989 2012-01-31 2012-11-13  2.0044065 0.03642282 288
     #> 5   990 1000 2012-11-14 2012-11-24 -1.1441469 0.07603715  11
     seg$CoeffF
-    #>        cos1        sin1        cos2        sin2        cos3        sin3        cos4        sin4 
-    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 -0.00800733 -0.02794739
+    #>        cos1        sin1        cos2        sin2        cos3        sin3 
+    #>  1.04699518 -0.11479068  0.02674465  0.01993558 -0.05628484  0.02419983 
+    #>        cos4        sin4 
+    #> -0.00800733 -0.02794739
     seg$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
-    #> [12] 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg$SSR
     #> [1] 835.1317
     sum(seg$CoeffF^2)
@@ -104,7 +106,7 @@
     # Plot the time series with RemoveData option
     PlotSeg(OneSeries = myseries, SegRes = seg, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
+<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-3-1.png" alt="" width="100%" /><img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-3-2.png" alt="" width="100%" />
 
 A spurious CP is detected, due to confusion between noise, periodic
 signal and segmentation. Although the jump has a small amplitude, and
@@ -125,8 +127,8 @@ number of CPs may be wanted. Therefore, try the segmentation with
     #>     cos1 
     #> 1.004161
     seg_selectF$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813
-    #> [12] 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06359813 0.01868164
     seg_selectF$SSR
     #> [1] 841.1567
     sum(seg_selectF$CoeffF^2)
@@ -143,7 +145,7 @@ number of CPs may be wanted. Therefore, try the segmentation with
     # Plot the time series with RemoveData option
     PlotSeg(OneSeries = myseries, SegRes = seg_selectF, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />
+<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-1.png" alt="" width="100%" /><img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-4-2.png" alt="" width="100%" />
 
 The solution with selection does not have the spurious CP. Selection
 helps to reduce the confusion between periodic signal and segmentation.
@@ -160,8 +162,8 @@ time series.
     #> [1] 199 574
     #> 
     #> $RemoveData
-    #>   begin  end
-    #> 1   990 1000
+    #>   begin  end     tbegin       tend
+    #> 1   990 1000 2012-11-14 2012-11-24
     #> 
     #> $ChangeCP
     #> [1] "Yes"
@@ -181,11 +183,13 @@ time series.
     #> 2   200  574 2010-09-16 2011-09-25  1.5044014 0.01370054 375
     #> 3   575 1000 2011-09-26 2012-11-24  2.4872546 0.01383366 364
     seg_updated$CoeffF
-    #>         cos1         sin1         cos2         sin2         cos3         sin3         cos4         sin4 
-    #>  1.000218275 -0.032170957  0.029128339  0.022356609 -0.029292154  0.010483136 -0.005033549 -0.009957806
+    #>         cos1         sin1         cos2         sin2         cos3         sin3 
+    #>  1.000218275 -0.032170957  0.029128339  0.022356609 -0.029292154  0.010483136 
+    #>         cos4         sin4 
+    #> -0.005033549 -0.009957806
     seg_updated$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260
-    #> [12] 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
     seg_updated$SSR
     #> [1] 831.79
     sum(seg_updated$CoeffF^2)
@@ -195,7 +199,7 @@ time series.
     valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
     PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
+<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-5-1.png" alt="" width="100%" /><img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-5-2.png" alt="" width="100%" />
 
 The `UpdatedParametersForFixedCP` has an option to select the
 statistically significant Fourier coefficients `selectionF = TRUE`:
@@ -217,8 +221,8 @@ statistically significant Fourier coefficients `selectionF = TRUE`:
     seg_updated$CoeffF
     #> NULL
     seg_updated$MonthVar
-    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260
-    #> [12] 0.01868164
+    #>  [1] 0.01129550 0.10001087 0.52627660 1.30869358 3.83242112 5.38775912
+    #>  [7] 4.01748556 3.98183075 1.55847031 0.76260594 0.06432260 0.01868164
     seg_updated$SSR
     #> [1] 831.79
     sum(seg_updated$CoeffF^2)
@@ -228,4 +232,4 @@ statistically significant Fourier coefficients `selectionF = TRUE`:
     valid <- Validation(OneSeries = myseries_updated, Tmu = seg_updated$Tmu, MaxDist = 10, Metadata = metadata)
     PlotSeg(OneSeries = myseries_updated, SegRes = seg_updated, FunctPart = TRUE, Metadata = metadata, Validated_CP_Meta = valid)
 
-<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="100%" />
+<img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-6-1.png" alt="" width="100%" /><img src="../Examples.md/Example6_files/figure-markdown_strict/unnamed-chunk-6-2.png" alt="" width="100%" />
