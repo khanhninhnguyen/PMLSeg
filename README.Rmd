@@ -207,6 +207,7 @@ See the other examples with more complex signals in the `Examples.md/` folder:
 See also the use cases with real data in the `Use_Cases/` folder:
 
  - [Use case 1: time series of daily IWV differences (GNSS-ERA5)](./Use_cases/use_case_1.md)
+ - [Use case 2: time series of daily ZTD differences (GNSS-ERA5)](./Use_cases/use_case_2.md)
  
 ### Contribute
 Contributions are welcome! Open an [Issue](https://github.com/khanhninhnguyen/PMLSeg/issues) or Pull a Request.

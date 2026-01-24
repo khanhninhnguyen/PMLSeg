@@ -148,13 +148,6 @@ the `PlotSeg` function:
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
-    #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    #> ℹ Please use `linewidth` instead.
-    #> ℹ The deprecated feature was likely used in the PMLseg package.
-    #>   Please report the issue to the authors.
-    #> This warning is displayed once per session.
-    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    #> generated.
     #> Ignoring unknown labels:
     #> • fill : ""
 
@@ -267,6 +260,8 @@ See also the use cases with real data in the `Use_Cases/` folder:
 
 - [Use case 1: time series of daily IWV differences
   (GNSS-ERA5)](./Use_cases/use_case_1.md)
+- [Use case 2: time series of daily ZTD differences
+  (GNSS-ERA5)](./Use_cases/use_case_2.md)
 
 ### Contribute
 
