@@ -32,12 +32,17 @@ The development version of `PMLseg` can be installed from GitHub with:
 
 ```{r, eval=FALSE}
 
-# Install devtools, tidyr, and purrr if you haven't already
-install.packages("devtools", dependencies = TRUE))
-install.packages("tidyr", dependencies = TRUE))
-install.packages("purrr", dependencies = TRUE))
+# Install the following packages, if you haven't already
+install.packages("devtools", dependencies = TRUE)
+install.packages("tidyr", dependencies = TRUE)
+install.packages("purrr", dependencies = TRUE)
+install.packages("lubridate", dependencies = TRUE)
+install.packages("dplyr", dependencies = TRUE)
 
-# Download and install gfpop from
+# Rtools is necessary to compile gfpop, download and install it from:
+https://cran.r-project.org/bin/windows/Rtools/rtools45/rtools.html
+
+# Download and install gfpop from:
 https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
 install.packages("gfpop_1.1.1.tar.gz")
 

@@ -17,26 +17,31 @@ package includes the segmentation function as well as auxiliary
 functions for the validation with metadata, cluster screening,
 statistical test of change-points, and visualization of the time series
 with segmentation and validation results. The theoretical basis of the
-method can be found in (Quarello, Bock, and Lebarbier 2022).
+method can be found in (Quarello et al. 2022).
 
 ## Table of Contents
 
--   [Installation](#installation)
--   [Functions](#functions)
--   [Examples](#examples)
--   [References](#references)
+- [Installation](#installation)
+- [Functions](#functions)
+- [Examples](#examples)
+- [References](#references)
 
 ## Installation
 
 The development version of `PMLseg` can be installed from GitHub with:
 
 
-    # Install devtools, tidyr, and purrr if you haven't already
-    install.packages("devtools", dependencies = TRUE))
-    install.packages("tidyr", dependencies = TRUE))
-    install.packages("purrr", dependencies = TRUE))
+    # Install the following packages, if you haven't already
+    install.packages("devtools", dependencies = TRUE)
+    install.packages("tidyr", dependencies = TRUE)
+    install.packages("purrr", dependencies = TRUE)
+    install.packages("lubridate", dependencies = TRUE)
+    install.packages("dplyr", dependencies = TRUE)
 
-    # Download and install gfpop from
+    # Rtools is necessary to compile gfpop, download and install it from:
+    https://cran.r-project.org/bin/windows/Rtools/rtools45/rtools.html
+
+    # Download and install gfpop from:
     https://cran.r-project.org/src/contrib/Archive/gfpop/gfpop_1.1.1.tar.gz
     install.packages("gfpop_1.1.1.tar.gz")
 
@@ -143,8 +148,17 @@ the `PlotSeg` function:
     PlotSeg(OneSeries = df, 
             SegRes = seg, 
             FunctPart = FALSE)
+    #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    #> ℹ Please use `linewidth` instead.
+    #> ℹ The deprecated feature was likely used in the PMLseg package.
+    #>   Please report the issue to the authors.
+    #> This warning is displayed once per session.
+    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    #> generated.
+    #> Ignoring unknown labels:
+    #> • fill : ""
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-8-1.png" alt="" width="100%" />
 
 The plot shows the signal (grey line), the estimated means (red line),
 the estimated noise std (cyan line). The y-intercept of the noise is the
@@ -185,8 +199,10 @@ metadata
 Plot with metadata and validation results:
 
     PlotSeg(OneSeries = df, SegRes = seg, FunctPart = FALSE, Metadata = metadata, Validated_CP_Meta = valid)
+    #> Ignoring unknown labels:
+    #> • fill : ""
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-11-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-11-1.png" alt="" width="100%" />
 
 Metadata are indicated by grey symbols near the top of the figure.
 Validated change-points are indicated by a red squares at the bottom of
@@ -234,25 +250,23 @@ change-point is significant (this is the case when `pval < alpha`).
 See the other examples with more complex signals in the `Examples.md/`
 folder:
 
--   [Example 1: time series with 2 change-points and constant
-    noise](./Examples.md/Example1.md)
--   [Example 2: time series with missing
-    data](./Examples.md/Example2.md)
--   [Example 3: time series with clusters of
-    CPs](./Examples.md/Example3.md)
--   [Example 4: time series with monthly varying
-    variance](./Examples.md/Example4.md)
--   [Example 5: time series with periodic
-    bias](./Examples.md/Example5.md)
--   [Example 6: time series with periodic bias, monthly variance, and
-    gaps](./Examples.md/Example6.md)
--   [Example 7: Explore the different penalty
-    criteria](./Examples.md/Example7.md)
+- [Example 1: time series with 2 change-points and constant
+  noise](./Examples.md/Example1.md)
+- [Example 2: time series with missing data](./Examples.md/Example2.md)
+- [Example 3: time series with clusters of
+  CPs](./Examples.md/Example3.md)
+- [Example 4: time series with monthly varying
+  variance](./Examples.md/Example4.md)
+- [Example 5: time series with periodic bias](./Examples.md/Example5.md)
+- [Example 6: time series with periodic bias, monthly variance, and
+  gaps](./Examples.md/Example6.md)
+- [Example 7: Explore the different penalty
+  criteria](./Examples.md/Example7.md)
 
 See also the use cases with real data in the `Use_Cases/` folder:
 
--   [Use case 1: time series of daily IWV differences
-    (GNSS-ERA5)](./Use_cases/use_case_1.md)
+- [Use case 1: time series of daily IWV differences
+  (GNSS-ERA5)](./Use_cases/use_case_1.md)
 
 ### Contribute
 
