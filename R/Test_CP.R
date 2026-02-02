@@ -29,44 +29,44 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
     test_detail <- NULL
 
     if(nrow(Tmu) <= 1) {
-    warning(" => Test_CP: Nothing to test!")
+        print(" => Test_CP: Nothing to test!")
     # return(NULL)
     } else {
-    ### List of indices of segments to the left and right of each CP.
-    ind_left = 1:(nrow(Tmu)-1)
-    ind_right = ind_left+1
-    list_ind = data.frame(left = ind_left, right = ind_right)
+        ### List of indices of segments to the left and right of each CP.
+        ind_left = 1:(nrow(Tmu)-1)
+        ind_right = ind_left+1
+        list_ind = data.frame(left = ind_left, right = ind_right)
 
-    ### Test difference in mean to the left and right of each CP and update the list of CPs.
-    CP = Tmu$end[1:(nrow(Tmu)-1)]
-    TValues <- sapply(1:nrow(list_ind), function(x) {
-      D = Tmu$mean[list_ind$left[x]] - Tmu$mean[list_ind$right[x]]
-      SD = sqrt(Tmu$se[list_ind$left[x]]^2 + Tmu$se[list_ind$right[x]]^2)
-      D / SD
-    })
-    PValues <- sapply(TValues, function(x) {
-      (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
-    })
+        ### Test difference in mean to the left and right of each CP and update the list of CPs.
+        CP = Tmu$end[1:(nrow(Tmu)-1)]
+        TValues <- sapply(1:nrow(list_ind), function(x) {
+          D = Tmu$mean[list_ind$left[x]] - Tmu$mean[list_ind$right[x]]
+          SD = sqrt(Tmu$se[list_ind$left[x]]^2 + Tmu$se[list_ind$right[x]]^2)
+          D / SD
+        })
+        PValues <- sapply(TValues, function(x) {
+          (stats::pnorm(-abs(x), mean = 0, sd = 1, lower.tail = TRUE)) * 2
+        })
 
-    ### save test details
-    test_detail <- data.frame(
-      mu_L = ifelse(is.na(list_ind$left), NA, Tmu$mean[list_ind$left]),
-      mu_R = ifelse(is.na(list_ind$right), NA, Tmu$mean[list_ind$right]),
-      se_L = ifelse(is.na(list_ind$left), NA, Tmu$se[list_ind$left]),
-      se_R = ifelse(is.na(list_ind$right), NA, Tmu$se[list_ind$right]),
-      np_L = ifelse(is.na(list_ind$left), NA, Tmu$np[list_ind$left]),
-      np_R = ifelse(is.na(list_ind$right), NA, Tmu$np[list_ind$right]),
-      tstat = TValues,
-      pval = PValues,
-      signif = ifelse(PValues > alpha, 0, 1)
-    )
+        ### save test details
+        test_detail <- data.frame(
+          mu_L = ifelse(is.na(list_ind$left), NA, Tmu$mean[list_ind$left]),
+          mu_R = ifelse(is.na(list_ind$right), NA, Tmu$mean[list_ind$right]),
+          se_L = ifelse(is.na(list_ind$left), NA, Tmu$se[list_ind$left]),
+          se_R = ifelse(is.na(list_ind$right), NA, Tmu$se[list_ind$right]),
+          np_L = ifelse(is.na(list_ind$left), NA, Tmu$np[list_ind$left]),
+          np_R = ifelse(is.na(list_ind$right), NA, Tmu$np[list_ind$right]),
+          tstat = TValues,
+          pval = PValues,
+          signif = ifelse(PValues > alpha, 0, 1)
+        )
 
-    ### replace the CPs whith those having a significant change in mean
-    ind_signif = which(PValues < alpha)
-    updated_CP = CP[list_ind$left[ind_signif]]
+        ### replace the CPs whith those having a significant change in mean
+        ind_signif = which(PValues < alpha)
+        updated_CP = CP[list_ind$left[ind_signif]]
 
-    ### set changed_CP
-    if(length(updated_CP) < length(CP)) changed_CP <- "Yes"
+        ### set changed_CP
+        if(length(updated_CP) < length(CP)) changed_CP <- "Yes"
     }
 
     ### Create outout list

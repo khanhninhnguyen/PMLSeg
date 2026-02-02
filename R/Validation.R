@@ -99,7 +99,7 @@ Validation <- function(OneSeries, Tmu, MaxDist = 62, Metadata) {
     ### return NULL if there is no CP in the data
     else
     {
-      print("no CP to validate")
+      print(" => validation: no CP to validate!")
       Out <- NULL
     }
   }

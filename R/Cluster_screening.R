@@ -36,7 +36,12 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
   ChangeCP <- c()
   ClusterTestOut <- c()
 
-  if(nrow(Tmu) > 1) {
+  if(nrow(Tmu) <= 1) {
+    print(" => Cluster_screening: Nothing to test!")
+    RemoveData = data.frame(begin = NA,end = NA)
+    ChangeCP <- "No"
+    ClusterTestOut <- NA
+  } else {
     flag <- integer(length(Tmu$np))
     flag[Tmu$np<MaxDist] <- 1
 
@@ -121,11 +126,6 @@ Cluster_screening <- function(Tmu, alpha = 0.05, MaxDist = 80, detail = FALSE) {
       ChangeCP <- "No"
       ClusterTestOut <- NA
     }
-
-  } else {
-    RemoveData = data.frame(begin = NA,end = NA)
-    ChangeCP <- "No"
-    ClusterTestOut <- NA
   }
 
   Out = list(UpdatedCP = UpdatedCP,
