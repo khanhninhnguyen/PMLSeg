@@ -24,20 +24,20 @@
 
 Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
-  updated_CP <- c()
-  changed_CP <- "No"
-  test_detail <- NULL
+    updated_CP <- c()
+    changed_CP <- "No"
+    test_detail <- NULL
 
-  if(nrow(Tmu) <= 1) {
-    warning("Nothing to test...")
-   # return(NULL)
-  } else {
+    if(nrow(Tmu) <= 1) {
+    warning(" => Test_CP: Nothing to test!")
+    # return(NULL)
+    } else {
     ### List of indices of segments to the left and right of each CP.
     ind_left = 1:(nrow(Tmu)-1)
     ind_right = ind_left+1
     list_ind = data.frame(left = ind_left, right = ind_right)
 
-    ### Test difference in mean before and after each cluster and update the list of CPs.
+    ### Test difference in mean to the left and right of each CP and update the list of CPs.
     CP = Tmu$end[1:(nrow(Tmu)-1)]
     TValues <- sapply(1:nrow(list_ind), function(x) {
       D = Tmu$mean[list_ind$left[x]] - Tmu$mean[list_ind$right[x]]
@@ -67,12 +67,12 @@ Test_CP <- function(Tmu, alpha = 0.05, detail = FALSE) {
 
     ### set changed_CP
     if(length(updated_CP) < length(CP)) changed_CP <- "Yes"
-  }
+    }
 
-  ### Create outout list
-  Out = list(UpdatedCP = updated_CP,
+    ### Create outout list
+    Out = list(UpdatedCP = updated_CP,
              ChangeCP = changed_CP,
              detail = test_detail)
 
-  return(Out)
+    return(Out)
 }
